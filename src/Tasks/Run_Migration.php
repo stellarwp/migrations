@@ -49,8 +49,8 @@ class Run_Migration extends Task_Abstract {
 	public function process(): void {
 		[ $migration_id, $batch ] = $this->get_args();
 
-		$container  = Config::get_container();
-		$registry   = $container->get( Registry::class );
+		$container = Config::get_container();
+		$registry  = $container->get( Registry::class );
 
 		$migration = $registry->get( $migration_id );
 
@@ -127,10 +127,10 @@ class Run_Migration extends Task_Abstract {
 	}
 
 		/**
-	 * Get the task prefix.
-	 *
-	 * @return string
-	 */
+		 * Get the task prefix.
+		 *
+		 * @return string
+		 */
 	public function get_task_prefix(): string {
 		return 'mig_run_';
 	}
@@ -141,6 +141,6 @@ class Run_Migration extends Task_Abstract {
 	 * @return string
 	 */
 	public function get_group(): string {
-		return sprintf( '%s_migrations', Config::get_hook_prefix());
+		return sprintf( '%s_migrations', Config::get_hook_prefix() );
 	}
 }
