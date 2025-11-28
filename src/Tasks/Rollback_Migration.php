@@ -49,8 +49,8 @@ class Rollback_Migration extends Task_Abstract {
 	public function process(): void {
 		[ $migration_id, $batch ] = $this->get_args();
 
-		$container  = Config::get_container();
-		$registry   = $container->get( Registry::class );
+		$container = Config::get_container();
+		$registry  = $container->get( Registry::class );
 
 		$migration = $registry->get( $migration_id );
 
