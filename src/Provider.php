@@ -13,7 +13,7 @@ use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
-use StellarWP\Migrations\Tasks\Run_Migration;
+use StellarWP\Migrations\Tasks\Execute;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -144,7 +144,7 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			shepherd()->dispatch( new Run_Migration( $migration->get_id(), 1 ) );
+			shepherd()->dispatch( new Execute( 'up', $migration->get_id(), 1 ) );
 		}
 	}
 }
