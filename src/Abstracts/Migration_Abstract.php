@@ -22,12 +22,22 @@ use StellarWP\Migrations\Contracts\Migration;
  */
 abstract class Migration_Abstract implements Migration {
 	/**
-	 * @inheritDoc
+	 * Runs before each batch of the migration.
+	 *
+	 * @param int    $batch   The batch number.
+	 * @param string $context The context of the migration.
+	 *
+	 * @return void
 	 */
 	public function before( int $batch, string $context ): void {}
 
 	/**
-	 * @inheritDoc
+	 * Runs after each batch of the migration.
+	 *
+	 * @param int    $batch   The batch number.
+	 * @param string $context The context of the migration.
+	 *
+	 * @return void
 	 */
 	public function after( int $batch, string $context ): void {}
 }

@@ -21,6 +21,8 @@ use StellarWP\Migrations\Contracts\Migration;
 use Exception;
 use function StellarWP\Shepherd\shepherd;
 
+// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
+
 /**
  * Task to run a migration's up() method.
  *

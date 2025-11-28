@@ -40,6 +40,10 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @since 0.0.1
 	 *
 	 * @param array<Migration> $migrations An array of migrations.
+	 *
+	 * @return void
+	 *
+	 * @throws RuntimeException If the migration is not a valid migration.
 	 */
 	public function __construct( array $migrations = [] ) {
 		foreach ( $migrations as $migration ) {
@@ -57,6 +61,10 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @since 0.0.1
 	 *
 	 * @param Migration $migration The migration to register.
+	 *
+	 * @return void
+	 *
+	 * @throws RuntimeException If the migration is too late to be registered.
 	 */
 	public function register( Migration $migration ): void {
 		$prefix = Config::get_hook_prefix();
