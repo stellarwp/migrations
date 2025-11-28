@@ -91,12 +91,12 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param TKey $offset The offset to check.
+	 * @param string $migration_id The migration id to check.
 	 *
 	 * @return bool
 	 */
-	public function offsetExists( $offset ): bool {
-		return array_key_exists( $offset, $this->migrations );
+	public function offsetExists( $migration_id ): bool {
+		return array_key_exists( $migration_id, $this->migrations );
 	}
 
 	/**
@@ -123,7 +123,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string $offset The offset to unset.
+	 * @param string $migration_id The migration id to unset.
 	 */
 	public function offsetUnset( $migration_id ): void {
 		unset( $this->migrations[ $migration_id ] );

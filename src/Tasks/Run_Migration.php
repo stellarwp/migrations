@@ -32,8 +32,8 @@ class Run_Migration extends Task_Abstract {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $migration_slug The migration slug.
-	 * @param int    $batch          The batch number.
+	 * @param string $migration_id The migration id.
+	 * @param int    $batch        The batch number.
 	 */
 	public function __construct( string $migration_id, int $batch ) {
 		parent::__construct( $migration_id, $batch );

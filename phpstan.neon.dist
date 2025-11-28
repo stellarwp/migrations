@@ -17,7 +17,7 @@ parameters:
 	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	scanDirectories:
-		- vendor/stellarwp/shepherd/src/functions.php
+		- vendor/stellarwp/shepherd/src/
 
 	# Paths to be analyzed.
 	paths:
