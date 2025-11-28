@@ -21,4 +21,13 @@ use StellarWP\Migrations\Contracts\Migration;
  * @package StellarWP\Migrations\Abstracts
  */
 abstract class Migration_Abstract implements Migration {
+	/**
+	 * @inheritDoc
+	 */
+	public function before( int $batch, string $context ): void {}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function after( int $batch, string $context ): void {}
 }

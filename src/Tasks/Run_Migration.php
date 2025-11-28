@@ -63,13 +63,15 @@ class Run_Migration extends Task_Abstract {
 			);
 		}
 
-		if ( $migration->is_done() ) {
+		if ( $migration->is_up_done() ) {
 			return;
 		}
 
 		$prefix = Config::get_hook_prefix();
 
 		try {
+			$migration->before( $batch, 'up' );
+
 			/**
 			 * Fires before a batch is processed.
 			 *
@@ -78,7 +80,7 @@ class Run_Migration extends Task_Abstract {
 			 */
 			do_action( "stellarwp_migrations_{$prefix}_before_batch_processed", $migration, $batch );
 
-			$migration->up();
+			$migration->up( $batch );
 
 			/**
 			 * Fires after a batch is processed successfully.
@@ -110,11 +112,12 @@ class Run_Migration extends Task_Abstract {
 			);
 		}
 
-		wp_cache_flush();
-
-		if ( ! $migration->is_done() ) {
+		if ( ! $migration->is_up_done() ) {
 			shepherd()->dispatch( new self( $migration_id, $batch + 1 ) );
+			return;
 		}
+
+		$migration->after( $batch, 'up' );
 	}
 
 	/**

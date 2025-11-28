@@ -32,18 +32,22 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @var array<Migration>
 	 */
-	protected array $resources = [];
+	protected array $migrations = [];
 
 	/**
 	 * Constructor.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<Migration> $resources An array of items.
+	 * @param array<Migration> $migrations An array of migrations.
 	 */
-	public function __construct( array $resources = [] ) {
-		foreach ( $resources as $offset => $value ) {
-			$this->set( (string) $offset, $value );
+	public function __construct( array $migrations = [] ) {
+		foreach ( $migrations as $migration ) {
+			if ( ! $migration instanceof Migration ) {
+				throw new RuntimeException( esc_html__( 'Not a migration.', 'stellarwp-migrations' ) );
+			}
+
+			$this->register( $migration );
 		}
 	}
 
@@ -52,37 +56,36 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param string    $offset The offset to set.
-	 * @param Migration $value  The value to set.
+	 * @param Migration $migration The migration to register.
 	 */
-	protected function set( string $offset, Migration $value ): void {
+	public function register( Migration $migration ): void {
 		$prefix = Config::get_hook_prefix();
-		if ( did_action( "stellarwp_migrations_{$prefix}_schedule_migrations", $value ) ) {
+		if ( did_action( "stellarwp_migrations_{$prefix}_schedule_migrations" ) ) {
 			throw new RuntimeException( esc_html__( 'Too late to add a migration to the registry.', 'stellarwp-migrations' ) );
 		}
 
-		$this->resources[ $offset ] = $value;
+		$this->migrations[ $migration->get_id() ] = $migration;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function current(): Migration {
-		return current( $this->resources );
+		return current( $this->migrations );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function key(): ?string {
-		return (string) key( $this->resources );
+		return (string) key( $this->migrations );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function next(): void {
-		next( $this->resources );
+		next( $this->migrations );
 	}
 
 	/**
@@ -93,7 +96,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return bool
 	 */
 	public function offsetExists( $offset ): bool {
-		return array_key_exists( $offset, $this->resources );
+		return array_key_exists( $offset, $this->migrations );
 	}
 
 	/**
@@ -104,7 +107,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return Migration|null
 	 */
 	public function offsetGet( $offset ): ?Migration {
-		return $this->resources[ $offset ] ?? null;
+		return $this->migrations[ $offset ] ?? null;
 	}
 
 	/**
@@ -114,10 +117,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @param Migration $value  The value to set.
 	 */
 	public function offsetSet( $offset, $value ): void {
-		if ( ! $offset ) {
-			$offset = (string) count( $this->resources );
-		}
-		$this->set( $offset, $value );
+		$this->register( $value );
 	}
 
 	/**
@@ -125,29 +125,29 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @param string $offset The offset to unset.
 	 */
-	public function offsetUnset( $offset ): void {
-		unset( $this->resources[ $offset ] );
+	public function offsetUnset( $migration_id ): void {
+		unset( $this->migrations[ $migration_id ] );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function rewind(): void {
-		reset( $this->resources );
+		reset( $this->migrations );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function valid(): bool {
-		return key( $this->resources ) !== null;
+		return key( $this->migrations ) !== null;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function count(): int {
-		return count( $this->resources );
+		return count( $this->migrations );
 	}
 
 	/**
@@ -160,12 +160,6 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return Migration|null
 	 */
 	public function get( string $migration_id ): ?Migration {
-		foreach ( $this->resources as $migration ) {
-			if ( $migration->get_id() === $migration_id ) {
-				return $migration;
-			}
-		}
-
-		return null;
+		return $this->migrations[ $migration_id ] ?? null;
 	}
 }

@@ -52,13 +52,13 @@ class Provider extends Provider_Abstract {
 		Shepherd_Config::set_container( $this->container );
 		Shepherd_Config::set_hook_prefix( $prefix );
 
-		$this->container->get( Shepherd_Provider::class )->register();
-
 		if ( has_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_migrations' ] ) ) {
 			return;
 		}
 
 		add_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_migrations' ] );
+
+		$this->container->get( Shepherd_Provider::class )->register();
 	}
 
 	/**
@@ -140,10 +140,6 @@ class Provider extends Provider_Abstract {
 		$migrations_registry = $this->container->get( Registry::class );
 
 		foreach ( $migrations_registry as $migration ) {
-			if ( $migration->requires_user_input() || $migration->is_done() ) {
-				continue;
-			}
-
 			if ( ! $migration->is_applicable() ) {
 				continue;
 			}

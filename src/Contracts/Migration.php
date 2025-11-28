@@ -11,6 +11,10 @@ namespace StellarWP\Migrations\Contracts;
 
 /**
  * Interface for migrations.
+ *
+ * @since 0.0.1
+ *
+ * @package StellarWP\Migrations\Contracts
  */
 interface Migration {
 	/**
@@ -21,17 +25,6 @@ interface Migration {
 	 * @return string
 	 */
 	public function get_id(): string;
-
-	/**
-	 * Whether the migration requires user input before it can be run.
-	 *
-	 * If it doesn't, the migration will run automatically.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return bool
-	 */
-	public function requires_user_input(): bool;
 
 	/**
 	 * Whether the migration is applicable to the current site.
@@ -51,7 +44,7 @@ interface Migration {
 	 *
 	 * @return bool
 	 */
-	public function is_done(): bool;
+	public function is_up_done(): bool;
 
 	/**
 	 * Whether the migration has been rolled back.
@@ -60,23 +53,51 @@ interface Migration {
 	 *
 	 * @return bool
 	 */
-	public function is_rolled_back(): bool;
+	public function is_down_done(): bool;
 
 	/**
 	 * Runs the migration.
 	 *
 	 * @since 0.0.1
 	 *
+	 * @param int $batch The batch number.
+	 *
 	 * @return void
 	 */
-	public function up(): void;
+	public function up( int $batch ): void;
 
 	/**
 	 * Reverts the migration.
 	 *
 	 * @since 0.0.1
 	 *
+	 * @param int $batch The batch number.
+	 *
 	 * @return void
 	 */
-	public function down(): void;
+	public function down( int $batch ): void;
+
+	/**
+	 * Runs before each batch of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $batch   The batch number.
+	 * @param string $context The context of the migration.
+	 *
+	 * @return void
+	 */
+	public function before( int $batch, string $context ): void;
+
+	/**
+	 * Runs after each batch of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $batch   The batch number.
+	 * @param string $context The context of the migration.
+	 *
+	 * @return void
+	 */
+	public function after( int $batch, string $context ): void;
 }

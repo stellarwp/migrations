@@ -63,13 +63,15 @@ class Rollback_Migration extends Task_Abstract {
 			);
 		}
 
-		if ( $migration->is_rolled_back() ) {
+		if ( $migration->is_down_done() ) {
 			return;
 		}
 
 		$prefix = Config::get_hook_prefix();
 
 		try {
+			$migration->before( $batch, 'down' );
+
 			/**
 			 * Fires before a batch is rolled back.
 			 *
@@ -78,7 +80,7 @@ class Rollback_Migration extends Task_Abstract {
 			 */
 			do_action( "stellarwp_migrations_{$prefix}_before_batch_rolled_back", $migration, $batch );
 
-			$migration->down();
+			$migration->down( $batch );
 
 			/**
 			 * Fires after a batch is rolled back successfully.
@@ -107,11 +109,12 @@ class Rollback_Migration extends Task_Abstract {
 			);
 		}
 
-		wp_cache_flush();
-
-		if ( ! $migration->is_rolled_back() ) {
+		if ( ! $migration->is_down_done() ) {
 			shepherd()->dispatch( new self( $migration_id, $batch + 1 ) );
+			return;
 		}
+
+		$migration->after( $batch, 'down' );
 	}
 
 	/**
