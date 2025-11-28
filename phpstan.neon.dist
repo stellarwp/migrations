@@ -17,7 +17,7 @@ parameters:
 	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	scanDirectories:
-		- vendor/woocommerce/action-scheduler/
+		- vendor/stellarwp/shepherd/src/functions.php
 
 	# Paths to be analyzed.
 	paths:
