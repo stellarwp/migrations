@@ -13,6 +13,8 @@ use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
+use StellarWP\Migrations\Tasks\Run_Migration;
+use function StellarWP\Shepherd\shepherd;
 
 /**
  * Main service provider for the Migrations library.
@@ -80,7 +82,10 @@ class Provider extends Provider_Abstract {
 
 		self::$registered = true;
 
-		// Register implementations here.
+		$this->container->singleton( Registry::class );
+
+		add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
+		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
 	}
 
 	/**
@@ -104,5 +109,46 @@ class Provider extends Provider_Abstract {
 	public static function reset(): void {
 		self::$registered = false;
 		Shepherd_Config::reset();
+	}
+
+	/**
+	 * Trigger the migrations scheduling action.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function trigger_migrations_scheduling_action(): void {
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Fires when the migrations scheduling action is triggered.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+	}
+
+	/**
+	 * Schedule migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function schedule_migrations(): void {
+		$migrations_registry = $this->container->get( Registry::class );
+
+		foreach ( $migrations_registry as $migration ) {
+			if ( $migration->requires_user_input() || $migration->is_done() ) {
+				continue;
+			}
+
+			if ( ! $migration->is_applicable() ) {
+				continue;
+			}
+
+			shepherd()->dispatch( new Run_Migration( $migration->get_id(), 1 ) );
+		}
 	}
 }
