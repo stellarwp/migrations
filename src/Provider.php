@@ -14,6 +14,8 @@ use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
+use StellarWP\Migrations\Tables\Provider as Tables_Provider;
+use StellarWP\Migrations\Tables\Migration_Events;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -82,10 +84,16 @@ class Provider extends Provider_Abstract {
 
 		self::$registered = true;
 
-		$this->container->singleton( Registry::class );
+		add_action(
+			"stellarwp_migrations_{$prefix}_tables_registered",
+			function () use ( $prefix ) {
+				add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
+				add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
+			}
+		);
 
-		add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
-		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
+		$this->container->singleton( Registry::class );
+		$this->container->get( Tables_Provider::class )->register();
 	}
 
 	/**
@@ -137,6 +145,27 @@ class Provider extends Provider_Abstract {
 	 * @return void
 	 */
 	public function schedule_migrations(): void {
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filters whether migrations should be executed only via CLI.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param bool $migrations_only_via_cli Whether migrations should be executed only via CLI. Default is false.
+		 */
+		if ( apply_filters( "stellarwp_migrations_{$prefix}_migrations_only_via_cli", false ) ) {
+			// Via CLI we don't need to schedule migrations, we'll run them directly.
+			return;
+		}
+
+		/**
+		 * Fires before the migrations are scheduled.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
+
 		$migrations_registry = $this->container->get( Registry::class );
 
 		foreach ( $migrations_registry as $migration ) {
@@ -144,7 +173,32 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			shepherd()->dispatch( new Execute( 'up', $migration->get_id(), 1 ) );
+			$event = Migration_Events::get_first_by( 'migration_id', $migration->get_id() );
+
+			if ( $event ) {
+				continue;
+			}
+
+			$args = [ 'up', $migration->get_id(), 1 ];
+
+			Migration_Events::insert(
+				[
+					'migration_id' => $migration->get_id(),
+					'type'         => Migration_Events::TYPE_SCHEDULED,
+					'data'         => [
+						'args' => $args,
+					]
+				]
+			);
+
+			shepherd()->dispatch( new Execute( ...$args ) );
 		}
+
+		/**
+		 * Fires after the migrations are scheduled.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
 	}
 }
