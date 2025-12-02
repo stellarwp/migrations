@@ -20,14 +20,8 @@ class Real_Migration_Test extends WPTestCase {
 	 */
 	public function reset_state(): void {
 		Switch_Post_Meta_Key::reset();
+		Config::get_container()->get( Registry::class )->flush();
 		tests_migrations_clear_calls_data();
-
-		$container = Config::get_container();
-		$container->singleton( Registry::class, new Registry() );
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 
 	/**

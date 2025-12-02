@@ -21,11 +21,7 @@ class Migration_Failure_Test extends WPTestCase {
 		tests_migrations_clear_calls_data();
 
 		$container = Config::get_container();
-		$container->singleton( Registry::class, new Registry() );
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
+		$container->get( Registry::class )->flush();
 	}
 
 	/**
@@ -272,9 +268,5 @@ class Migration_Failure_Test extends WPTestCase {
 		Failing_Migration::reset();
 		Failing_At_Batch_Migration::reset();
 		tests_migrations_clear_calls_data();
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 }

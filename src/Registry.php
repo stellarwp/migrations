@@ -176,4 +176,15 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	public function get( string $migration_id ): ?Migration {
 		return $this->migrations[ $migration_id ] ?? null;
 	}
+
+	/**
+	 * Flush the registry.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function flush(): void {
+		$this->migrations = [];
+	}
 }

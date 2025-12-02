@@ -14,7 +14,7 @@ class Registry_Test extends WPTestCase {
 	 */
 	public function reset_registry(): void {
 		$container = Config::get_container();
-		$container->singleton( Registry::class, new Registry() );
+		$container->get( Registry::class )->flush();
 	}
 
 	/**

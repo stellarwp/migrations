@@ -18,11 +18,7 @@ class Provider_Test extends WPTestCase {
 		tests_migrations_clear_calls_data();
 
 		$container = Config::get_container();
-		$container->singleton( Registry::class, new Registry() );
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
+		$container->get( Registry::class )->flush();
 	}
 
 	/**
