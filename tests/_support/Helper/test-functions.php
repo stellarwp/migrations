@@ -198,7 +198,8 @@ function tests_migrations_clear_calls_data(): void {
  */
 function tests_migrations_shepherd_sync_enable() {
 	global $stellarwp_migrations_execute_callback;
-	add_filter( 'shepherd_tec_dispatch_handler', $stellarwp_migrations_execute_callback, 10, 2 );
+	$prefix = tests_migrations_get_hook_prefix();
+	add_filter( "shepherd_{$prefix}_dispatch_handler", $stellarwp_migrations_execute_callback, 10, 2 );
 }
 
 /**
@@ -208,5 +209,6 @@ function tests_migrations_shepherd_sync_enable() {
  */
 function tests_migrations_shepherd_sync_disable() {
 	global $stellarwp_migrations_execute_callback;
-	remove_filter( 'shepherd_tec_dispatch_handler', $stellarwp_migrations_execute_callback );
+	$prefix = tests_migrations_get_hook_prefix();
+	remove_filter( "shepherd_{$prefix}_dispatch_handler", $stellarwp_migrations_execute_callback );
 }
