@@ -87,6 +87,11 @@ class Provider extends Provider_Abstract {
 		add_action(
 			"stellarwp_migrations_{$prefix}_tables_registered",
 			function () use ( $prefix ) {
+				// During WP-CLI execution, we don't need to schedule migrations, we'll run them directly.
+				if ( defined( 'WP_CLI' ) && WP_CLI ) {
+					return;
+				}
+
 				add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
 				add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
 			}
