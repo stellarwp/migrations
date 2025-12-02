@@ -80,7 +80,7 @@ class Execute extends Task_Abstract {
 				'type'         => Migration_Events::TYPE_BATCH_STARTED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch ],
-				]
+				],
 			]
 		);
 
@@ -152,7 +152,7 @@ class Execute extends Task_Abstract {
 					'data'         => [
 						'args'    => [ $method, $migration_id, $batch ],
 						'message' => $e->getMessage(),
-					]
+					],
 				]
 			);
 
@@ -164,7 +164,7 @@ class Execute extends Task_Abstract {
 						'data'         => [
 							'args'    => [ 'down', $migration_id, 1 ],
 							'message' => $e->getMessage(),
-						]
+						],
 					]
 				);
 				// If it failed we need to trigger the rollback.
@@ -193,7 +193,7 @@ class Execute extends Task_Abstract {
 					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
 					'data'         => [
 						'args' => [ $method, $migration_id, $batch ],
-					]
+					],
 				]
 			);
 			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1 ) );
@@ -206,7 +206,7 @@ class Execute extends Task_Abstract {
 				'type'         => Migration_Events::TYPE_COMPLETED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch ],
-				]
+				],
 			]
 		);
 	}
