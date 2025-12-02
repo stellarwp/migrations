@@ -155,7 +155,7 @@ class Migration_Down_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$this->assertTrue( Multi_Batch_Migration::is_up_done() );
+		$this->assertTrue( $migration->is_up_done() );
 
 		Multi_Batch_Migration::$before_calls = [];
 		Multi_Batch_Migration::$after_calls  = [];
@@ -185,9 +185,5 @@ class Migration_Down_Test extends WPTestCase {
 		Simple_Migration::reset();
 		Multi_Batch_Migration::reset();
 		tests_migrations_clear_calls_data();
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 }

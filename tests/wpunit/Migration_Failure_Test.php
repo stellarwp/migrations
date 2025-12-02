@@ -133,6 +133,7 @@ class Migration_Failure_Test extends WPTestCase {
 		}
 
 		$this->assertTrue( $action_fired );
+		/** @var Exception $received_exception */
 		$this->assertNotNull( $received_exception );
 		$this->assertStringContainsString( 'intentionally', $received_exception->getMessage() );
 	}

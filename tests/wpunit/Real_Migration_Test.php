@@ -262,9 +262,5 @@ class Real_Migration_Test extends WPTestCase {
 	public function cleanup(): void {
 		Switch_Post_Meta_Key::reset();
 		tests_migrations_clear_calls_data();
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 }

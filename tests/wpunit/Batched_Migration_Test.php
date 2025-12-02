@@ -35,7 +35,7 @@ class Batched_Migration_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$this->assertTrue( Multi_Batch_Migration::is_up_done() );
+		$this->assertTrue( $migration->is_up_done() );
 		$this->assertEquals( 3, Multi_Batch_Migration::$up_batch_count );
 	}
 
@@ -222,7 +222,7 @@ class Batched_Migration_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$this->assertTrue( Multi_Batch_Migration::is_up_done() );
+		$this->assertTrue( $migration->is_up_done() );
 
 		Multi_Batch_Migration::$before_calls = [];
 		Multi_Batch_Migration::$after_calls  = [];
@@ -248,7 +248,7 @@ class Batched_Migration_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$this->assertTrue( Multi_Batch_Migration::is_up_done() );
+		$this->assertTrue( $migration->is_up_done() );
 		$this->assertCount( 1, Multi_Batch_Migration::$up_batches );
 
 		$calls = tests_migrations_get_calls_data();

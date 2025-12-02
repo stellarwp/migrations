@@ -147,7 +147,7 @@ class Migration_Up_Test extends WPTestCase {
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$this->assertTrue( Simple_Migration::$up_called );
-		$this->assertTrue( Multi_Batch_Migration::is_up_done() );
+		$this->assertTrue( $migration2->is_up_done() );
 	}
 
 	/**

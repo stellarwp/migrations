@@ -188,9 +188,5 @@ class Is_Applicable_Test extends WPTestCase {
 		Simple_Migration::reset();
 		Not_Applicable_Migration::reset();
 		tests_migrations_clear_calls_data();
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 }
