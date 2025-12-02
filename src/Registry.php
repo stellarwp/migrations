@@ -72,7 +72,13 @@ class Registry implements ArrayAccess, Iterator, Countable {
 			throw new RuntimeException( esc_html__( 'Too late to add a migration to the registry.', 'stellarwp-migrations' ) );
 		}
 
-		$this->migrations[ $migration->get_id() ] = $migration;
+		$migration_id = $migration->get_id();
+		if ( strlen( $migration_id ) > 191 ) {
+			// translators: %s is the migration ID.
+			throw new RuntimeException( sprintf( esc_html__( 'Migration ID `%s` is too long.', 'stellarwp-migrations' ), $migration_id ) );
+		}
+
+		$this->migrations[ $migration_id ] = $migration;
 	}
 
 	/**

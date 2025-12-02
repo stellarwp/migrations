@@ -20,6 +20,8 @@ interface Migration {
 	/**
 	 * Get the migration ID.
 	 *
+	 * Maximum length is 191 characters!
+	 *
 	 * @since 0.0.1
 	 *
 	 * @return string
