@@ -1,0 +1,85 @@
+<?php
+/**
+ * Migrations Tables Service Provider
+ *
+ * @since 0.0.1
+ *
+ * @package StellarWP\Migrations\Tables;
+ */
+
+declare(strict_types=1);
+
+namespace StellarWP\Migrations\Tables;
+
+use StellarWP\Shepherd\Abstracts\Provider_Abstract;
+use StellarWP\Schema\Register;
+use StellarWP\DB\Database\Exceptions\DatabaseQueryException;
+use StellarWP\Migrations\Config;
+use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
+
+/**
+ * Migrations Tables Service Provider
+ *
+ * @since 0.0.1
+ *
+ * @package StellarWP\Migrations\Tables;
+ */
+class Provider extends Provider_Abstract {
+	/**
+	 * Tables to register.
+	 *
+	 * @var array<int, class-string>
+	 */
+	private array $tables = [
+		Migration_Events::class,
+	];
+
+	/**
+	 * Registers the service provider bindings.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void The method does not return any value.
+	 */
+	public function register(): void {
+		$prefix = Config::get_hook_prefix();
+
+		// Bind after all tables are registered.
+		$implementation_id = self::get_safe_dynamic_prefix_implementation_id();
+		$this->container->singleton( $implementation_id, Safe_Dynamic_Prefix::class );
+		$this->container->get( $implementation_id )->calculate_longest_table_name( $this->tables );
+
+		try {
+			Register::table( Migration_Events::class );
+
+			/**
+			 * Fires an action when the Shepherd tables are registered.
+			 *
+			 * @since 0.0.7
+			 */
+			do_action( "stellarwp_migrations_{$prefix}_tables_registered" );
+		} catch ( DatabaseQueryException $e ) {
+			/**
+			 * Fires an action when an error or exception happens in the context of Shepherd tables implementation AND the server runs PHP 7.0+.
+			 *
+			 * @since 0.0.7
+			 *
+			 * @param DatabaseQueryException $e The thrown error.
+			 */
+			do_action( "stellarwp_migrations_{$prefix}_tables_error", $e );
+		}
+	}
+
+	/**
+	 * Gets the implementation ID for the safe dynamic prefix.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string The implementation ID.
+	 */
+	public static function get_safe_dynamic_prefix_implementation_id(): string {
+		$prefix = Config::get_hook_prefix();
+
+		return "stellarwp_migrations_{$prefix}_safe_dynamic_prefix";
+	}
+}
