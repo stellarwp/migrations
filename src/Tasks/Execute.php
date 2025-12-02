@@ -20,6 +20,7 @@ use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
 use Exception;
 use InvalidArgumentException;
+use StellarWP\Migrations\Tables\Migration_Events;
 use function StellarWP\Shepherd\shepherd;
 
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
@@ -72,6 +73,16 @@ class Execute extends Task_Abstract {
 		if ( $migration->$method_to_check_if_done() ) {
 			return;
 		}
+
+		Migration_Events::insert(
+			[
+				'migration_id' => $migration->get_id(),
+				'type'         => Migration_Events::TYPE_BATCH_STARTED,
+				'data'         => [
+					'args' => [ $method, $migration_id, $batch ],
+				]
+			]
+		);
 
 		$prefix = Config::get_hook_prefix();
 
@@ -134,7 +145,28 @@ class Execute extends Task_Abstract {
 			 */
 			do_action( "stellarwp_migrations_{$prefix}_batch_failed", $migration, $batch, $e );
 
+			Migration_Events::insert(
+				[
+					'migration_id' => $migration->get_id(),
+					'type'         => Migration_Events::TYPE_FAILED,
+					'data'         => [
+						'args'    => [ $method, $migration_id, $batch ],
+						'message' => $e->getMessage(),
+					]
+				]
+			);
+
 			if ( 'up' === $method ) {
+				Migration_Events::insert(
+					[
+						'migration_id' => $migration->get_id(),
+						'type'         => Migration_Events::TYPE_SCHEDULED,
+						'data'         => [
+							'args'    => [ 'down', $migration_id, 1 ],
+							'message' => $e->getMessage(),
+						]
+					]
+				);
 				// If it failed we need to trigger the rollback.
 				shepherd()->dispatch( new self( 'down', $migration_id, 1 ) );
 			}
@@ -155,8 +187,28 @@ class Execute extends Task_Abstract {
 		$migration->after( $batch, $method, $is_completed );
 
 		if ( ! $is_completed ) {
+			Migration_Events::insert(
+				[
+					'migration_id' => $migration->get_id(),
+					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
+					'data'         => [
+						'args' => [ $method, $migration_id, $batch ],
+					]
+				]
+			);
 			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1 ) );
+			return;
 		}
+
+		Migration_Events::insert(
+			[
+				'migration_id' => $migration->get_id(),
+				'type'         => Migration_Events::TYPE_COMPLETED,
+				'data'         => [
+					'args' => [ $method, $migration_id, $batch ],
+				]
+			]
+		);
 	}
 
 	/**
