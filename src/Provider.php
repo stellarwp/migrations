@@ -187,7 +187,7 @@ class Provider extends Provider_Abstract {
 					'type'         => Migration_Events::TYPE_SCHEDULED,
 					'data'         => [
 						'args' => $args,
-					]
+					],
 				]
 			);
 
