@@ -94,6 +94,21 @@ class Registry_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
+	public function it_should_allow_array_access_set_with_explicit_key(): void {
+		$registry  = Config::get_container()->get( Registry::class );
+		$migration = new Simple_Migration();
+
+		$registry['custom_key'] = $migration;
+
+		$this->assertCount( 1, $registry );
+		$this->assertSame( $migration, $registry[ $migration->get_id() ] );
+		$this->assertFalse( isset( $registry['custom_key'] ) );
+		$this->assertTrue( isset( $registry['tests_simple_migration'] ) );
+	}
+
+	/**
+	 * @test
+	 */
 	public function it_should_allow_array_access_isset(): void {
 		$registry  = Config::get_container()->get( Registry::class );
 		$migration = new Simple_Migration();
@@ -137,6 +152,40 @@ class Registry_Test extends WPTestCase {
 		$this->assertCount( 2, $ids );
 		$this->assertContains( $migration1->get_id(), $ids );
 		$this->assertContains( $migration2->get_id(), $ids );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_accept_migration_id_at_max_length(): void {
+		$registry = Config::get_container()->get( Registry::class );
+
+		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
+			public function get_id(): string {
+				return str_repeat( 'a', 191 );
+			}
+
+			public function is_applicable(): bool {
+				return true;
+			}
+
+			public function is_up_done(): bool {
+				return false;
+			}
+
+			public function is_down_done(): bool {
+				return true;
+			}
+
+			public function up( int $batch ): void {}
+
+			public function down( int $batch ): void {}
+		};
+
+		$registry->register( $migration );
+
+		$this->assertCount( 1, $registry );
+		$this->assertSame( $migration, $registry->get( str_repeat( 'a', 191 ) ) );
 	}
 
 	/**
