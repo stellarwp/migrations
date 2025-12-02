@@ -51,7 +51,16 @@ class Migration_Events extends Table_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE_RUNNING = 'running';
+	const TYPE_BATCH_STARTED = 'batch-started';
+
+	/**
+	 * The type of migration event.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	const TYPE_BATCH_COMPLETED = 'batch-completed';
 
 	/**
 	 * The type of migration event.
