@@ -52,8 +52,8 @@ abstract class Migration_Abstract implements Migration {
 	/**
 	 * Runs after each batch of the rollback.
 	 *
-	 * @param int    $batch        The batch number.
-	 * @param bool   $is_completed Whether there are more batches to run.
+	 * @param int  $batch        The batch number.
+	 * @param bool $is_completed Whether there are more batches to run.
 	 *
 	 * @return void
 	 */

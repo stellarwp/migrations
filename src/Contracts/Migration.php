@@ -181,8 +181,8 @@ interface Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int    $batch        The batch number.
-	 * @param bool   $is_completed Whether there are more batches to run.
+	 * @param int  $batch        The batch number.
+	 * @param bool $is_completed Whether there are more batches to run.
 	 *
 	 * @return void
 	 */
