@@ -118,6 +118,8 @@ class Student_Meta_Migration_Test extends WPTestCase {
 			$this->assertEquals( '1', get_user_meta( $uid, 'learndash_student', true ) );
 		}
 
+		$this->assertTrue( $migration->is_up_done() );
+
 		$calls = tests_migrations_get_calls_data();
 
 		$count = count( $uids );
