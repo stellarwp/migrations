@@ -24,7 +24,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	 * @return string Migration slug.
 	 */
 	public function get_id(): string {
-		return 'student-meta-migration';
+		return 'tests_student_meta_migration';
 	}
 
 	/**

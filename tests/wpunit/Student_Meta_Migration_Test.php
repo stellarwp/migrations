@@ -9,11 +9,11 @@ use Generator;
 use Closure;
 
 /**
- * Tests using Switch_Post_Meta_Key migration which operates on real database.
+ * Tests using Student_Meta_Migration migration which operates on real database.
  *
  * These tests create actual dummy data, run the migration, and verify the results.
  */
-class Real_Migration_Test extends WPTestCase {
+class Student_Meta_Migration_Test extends WPTestCase {
 	/**
 	 * @before
 	 * @after

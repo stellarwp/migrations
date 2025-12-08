@@ -147,6 +147,18 @@ class Is_Applicable_Test extends WPTestCase {
 				self::$applicable = $applicable;
 			}
 
+			public function get_total_batches(): int {
+				return 1;
+			}
+
+			public function get_label(): string {
+				return 'Dynamic Applicable Migration';
+			}
+
+			public function get_description(): string {
+				return 'This is a dynamic migration that is applicable if the $applicable property is true.';
+			}
+
 			public function get_id(): string {
 				return 'tests_dynamic_applicable';
 			}

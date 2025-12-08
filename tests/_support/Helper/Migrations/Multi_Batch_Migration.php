@@ -69,6 +69,18 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		return true;
 	}
 
+	public function get_total_batches(): int {
+		return self::$total_batches;
+	}
+
+	public function get_label(): string {
+		return 'Multi Batch Migration';
+	}
+
+	public function get_description(): string {
+		return 'This migration runs multiple batches to complete.';
+	}
+
 	public function is_up_done(): bool {
 		return self::$up_batch_count >= self::$total_batches;
 	}
@@ -88,18 +100,33 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		self::$up_batch_count--;
 	}
 
-	public function before( int $batch, string $context ): void {
+	public function before_up( int $batch ): void {
 		self::$before_calls[] = [
 			'batch'   => $batch,
-			'context' => $context,
+			'context' => 'up',
 		];
 	}
 
-	public function after( int $batch, string $context, bool $there_are_more_batches ): void {
+	public function after_up( int $batch, bool $is_completed ): void {
 		self::$after_calls[] = [
 			'batch'   => $batch,
-			'context' => $context,
-			'more'    => $there_are_more_batches,
+			'context' => 'up',
+			'more'    => $is_completed,
+		];
+	}
+
+	public function before_down( int $batch ): void {
+		self::$before_calls[] = [
+			'batch'   => $batch,
+			'context' => 'down',
+		];
+	}
+
+	public function after_down( int $batch, bool $is_completed ): void {
+		self::$after_calls[] = [
+			'batch'   => $batch,
+			'more'    => $is_completed,
+			'context' => 'down',
 		];
 	}
 }
