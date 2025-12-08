@@ -87,7 +87,7 @@ class Execute extends Task_Abstract {
 		$prefix = Config::get_hook_prefix();
 
 		try {
-			$migration->before( $batch, $method );
+			$migration->{"before_{$method}"}( $batch );
 
 			/**
 			 * Fires before a batch is processed.
@@ -184,7 +184,7 @@ class Execute extends Task_Abstract {
 
 		$is_completed = $migration->$method_to_check_if_done();
 
-		$migration->after( $batch, $method, $is_completed );
+		$migration->{"after_{$method}"}( $batch, $is_completed );
 
 		if ( ! $is_completed ) {
 			Migration_Events::insert(
@@ -217,7 +217,15 @@ class Execute extends Task_Abstract {
 	 * @return int
 	 */
 	public function get_max_retries(): int {
-		return 0;
+		$container = Config::get_container();
+		$registry  = $container->get( Registry::class );
+		$migration = $registry->get( $this->get_args()[1] );
+
+		if ( ! $migration ) {
+			return 0;
+		}
+
+		return $migration->get_number_of_retries_per_batch();
 	}
 
 	/**

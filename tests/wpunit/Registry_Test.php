@@ -169,6 +169,18 @@ class Registry_Test extends WPTestCase {
 				return true;
 			}
 
+			public function get_total_batches(): int {
+				return 1;
+			}
+
+			public function get_label(): string {
+				return 'Test Migration';
+			}
+
+			public function get_description(): string {
+				return 'This is a test migration.';
+			}
+
 			public function is_up_done(): bool {
 				return false;
 			}
@@ -197,6 +209,17 @@ class Registry_Test extends WPTestCase {
 		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
 			public function get_id(): string {
 				return str_repeat( 'a', 192 );
+			}
+			public function get_total_batches(): int {
+				return 1;
+			}
+
+			public function get_label(): string {
+				return 'Test Migration';
+			}
+
+			public function get_description(): string {
+				return 'This is a test migration.';
 			}
 
 			public function is_applicable(): bool {

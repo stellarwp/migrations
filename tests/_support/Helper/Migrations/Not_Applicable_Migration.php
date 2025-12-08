@@ -35,6 +35,18 @@ class Not_Applicable_Migration extends Migration_Abstract {
 		return 'tests_not_applicable_migration';
 	}
 
+	public function get_total_batches(): int {
+		return 1;
+	}
+
+	public function get_label(): string {
+		return 'Not Applicable Migration';
+	}
+
+	public function get_description(): string {
+		return 'This migration is not applicable.';
+	}
+
 	public function is_applicable(): bool {
 		return false;
 	}
