@@ -1,6 +1,6 @@
 # Migrations
 
-A batched database migrations library for WordPress plugins powered by [Shepherd](https://github.com/developer/shepherd).
+A batched database migrations library for WordPress plugins powered by [Shepherd](https://github.com/stellarwp/shepherd).
 
 ## Features
 
