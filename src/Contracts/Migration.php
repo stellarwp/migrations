@@ -187,4 +187,26 @@ interface Migration {
 	 * @return void
 	 */
 	public function after_down( int $batch, bool $is_completed ): void;
+
+	/**
+	 * Get extra arguments to be passed to the `up()` method for a specific batch.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $batch The batch number.
+	 *
+	 * @return array
+	 */
+	public function get_up_extra_args_for_batch( int $batch ): array;
+
+	/**
+	 * Get extra arguments to be passed to the `down()` method for a specific batch.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $batch The batch number.
+	 *
+	 * @return array
+	 */
+	public function get_down_extra_args_for_batch( int $batch ): array;
 }

@@ -1,6 +1,6 @@
 # Migrations
 
-A batched database migrations library for WordPress plugins powered by [Shepherd](https://github.com/developer/shepherd).
+A batched database migrations library for WordPress plugins powered by [Shepherd](https://github.com/stellarwp/shepherd).
 
 ## Features
 
@@ -38,28 +38,46 @@ class Rename_Meta_Key extends Migration_Abstract {
     public function is_up_done(): bool {
         global $wpdb;
         return ! (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'old_key'"
+            $wpdb->prepare(
+                'SELECT COUNT(*) FROM %i WHERE meta_key = %s',
+                $wpdb->postmeta,
+                'old_key'
+            )
         );
     }
 
     public function is_down_done(): bool {
         global $wpdb;
         return ! (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'new_key'"
+            $wpdb->prepare(
+                'SELECT COUNT(*) FROM %i WHERE meta_key = %s',
+                $wpdb->postmeta,
+                'new_key'
+            )
         );
     }
 
     public function up( int $batch ): void {
         global $wpdb;
         $wpdb->query(
-            "UPDATE {$wpdb->postmeta} SET meta_key = 'new_key' WHERE meta_key = 'old_key' LIMIT 100"
+            $wpdb->prepare(
+                'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100',
+                $wpdb->postmeta,
+                'new_key',
+                'old_key'
+            )
         );
     }
 
     public function down( int $batch ): void {
         global $wpdb;
         $wpdb->query(
-            "UPDATE {$wpdb->postmeta} SET meta_key = 'old_key' WHERE meta_key = 'new_key' LIMIT 100"
+            $wpdb->prepare(
+                'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100',
+                $wpdb->postmeta,
+                'old_key',
+                'new_key'
+            )
         );
     }
 }

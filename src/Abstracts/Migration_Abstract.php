@@ -102,4 +102,30 @@ abstract class Migration_Abstract implements Migration {
 	public function get_tags(): array {
 		return [];
 	}
+
+	/**
+	 * Get extra arguments to be passed to the `up()` method for a specific batch.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $batch The batch number.
+	 *
+	 * @return array
+	 */
+	public function get_up_extra_args_for_batch( int $batch ): array {
+		return [];
+	}
+
+	/**
+	 * Get extra arguments to be passed to the `down()` method for a specific batch.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $batch The batch number.
+	 *
+	 * @return array
+	 */
+	public function get_down_extra_args_for_batch( int $batch ): array {
+		return [];
+	}
 }

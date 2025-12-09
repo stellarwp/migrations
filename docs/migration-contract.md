@@ -37,7 +37,11 @@ Returns `true` when the migration has fully completed. The library calls this af
 public function is_up_done(): bool {
     global $wpdb;
     return (int) $wpdb->get_var(
-        "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'old_key'"
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+            $wpdb->postmeta,
+            'old_key'
+        )
     ) === 0;
 }
 ```
@@ -50,7 +54,11 @@ Returns `true` when the rollback has fully completed.
 public function is_down_done(): bool {
     global $wpdb;
     return (int) $wpdb->get_var(
-        "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'new_key'"
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+            $wpdb->postmeta,
+            'new_key'
+        )
     ) === 0;
 }
 ```
@@ -63,10 +71,12 @@ Executes the migration logic for a single batch. Process a fixed number of recor
 public function up( int $batch ): void {
     global $wpdb;
     $wpdb->query(
-        "UPDATE {$wpdb->postmeta}
-         SET meta_key = 'new_key'
-         WHERE meta_key = 'old_key'
-         LIMIT 100"
+        $wpdb->prepare(
+            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+            $wpdb->postmeta,
+            'new_key',
+            'old_key'
+        )
     );
 }
 ```
@@ -79,10 +89,12 @@ Reverts the migration logic for a single batch.
 public function down( int $batch ): void {
     global $wpdb;
     $wpdb->query(
-        "UPDATE {$wpdb->postmeta}
-         SET meta_key = 'old_key'
-         WHERE meta_key = 'new_key'
-         LIMIT 100"
+        $wpdb->prepare(
+            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+            $wpdb->postmeta,
+            'old_key',
+            'new_key'
+        )
     );
 }
 ```
@@ -109,9 +121,53 @@ public function after( int $batch, string $context, bool $is_complete ): void {
 }
 ```
 
+#### `get_up_extra_args_for_batch( int $batch ): array`
+
+Returns extra arguments to be passed to the `up()` method for a specific batch. This enables migrations to pass dynamic, batch-specific data to their processing methods.
+
+The `$batch` parameter is the batch number about to be processed. The returned array values are spread as additional arguments to the `up()` method.
+
+```php
+public function get_up_extra_args_for_batch( int $batch ): array {
+    // Return batch-specific data for the up migration.
+    return [ $this->get_items_for_batch( $batch ) ];
+}
+```
+
+#### `get_down_extra_args_for_batch( int $batch ): array`
+
+Returns extra arguments to be passed to the `down()` method for a specific batch. This enables migrations to pass dynamic, batch-specific data to their rollback methods.
+
+The `$batch` parameter is the batch number about to be processed. The returned array values are spread as additional arguments to the `down()` method.
+
+```php
+public function get_down_extra_args_for_batch( int $batch ): array {
+    // Return batch-specific data for the down rollback.
+    return [ $this->get_items_for_batch( $batch ) ];
+}
+```
+
+When extra arguments are provided, your `up()` and `down()` methods should accept them as variadic parameters:
+
+```php
+public function up( int $batch, ...$extra_args ): void {
+    $items = $extra_args[0] ?? [];
+    foreach ( $items as $item ) {
+        // Process item.
+    }
+}
+
+public function down( int $batch, ...$extra_args ): void {
+    $items = $extra_args[0] ?? [];
+    foreach ( $items as $item ) {
+        // Revert item.
+    }
+}
+```
+
 ## Abstract Class: `Migration_Abstract`
 
-`StellarWP\Migrations\Abstracts\Migration_Abstract` provides default empty implementations for `before()` and `after()`. Extend this class to avoid implementing these methods when not needed.
+`StellarWP\Migrations\Abstracts\Migration_Abstract` provides default empty implementations for `before()`, `after()`, `get_up_extra_args_for_batch()`, and `get_down_extra_args_for_batch()`. Extend this class to avoid implementing these methods when not needed.
 
 ```php
 use StellarWP\Migrations\Abstracts\Migration_Abstract;

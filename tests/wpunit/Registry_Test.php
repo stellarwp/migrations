@@ -6,9 +6,12 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
+use StellarWP\Migrations\Tests\Traits\With_Uopz;
 use RuntimeException;
 
 class Registry_Test extends WPTestCase {
+	use With_Uopz;
+
 	/**
 	 * @before
 	 */
@@ -264,7 +267,7 @@ class Registry_Test extends WPTestCase {
 	 */
 	public function it_should_throw_if_non_migration_passed_to_constructor(): void {
 		$this->expectException( RuntimeException::class );
-		$this->expectExceptionMessage( 'Not a migration' );
+		$this->expectExceptionMessage( 'You should pass an array of migrations to the Registry constructor.' );
 
 		new Registry( [ 'not a migration' ] );
 	}
@@ -272,17 +275,20 @@ class Registry_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_throw_if_registering_after_schedule_action(): void {
+	public function it_should_trigger_doing_it_wrong_if_registering_after_schedule_action(): void {
 		$registry  = Config::get_container()->get( Registry::class );
 		$migration = new Simple_Migration();
 		$prefix    = Config::get_hook_prefix();
 
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$this->expectException( RuntimeException::class );
-		$this->expectExceptionMessage( 'Too late to add a migration' );
+		$triggered = false;
+		$this->set_fn_return( '_doing_it_wrong', function() use ( &$triggered ) {
+			$triggered = true;
+		}, true );
 
 		$registry->register( $migration );
+		$this->assertTrue( $triggered );
 	}
 
 	/**
