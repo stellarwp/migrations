@@ -82,7 +82,7 @@ class Execute extends Task_Abstract {
 		Migration_Events::insert(
 			[
 				'migration_id' => $migration->get_id(),
-				'type'         => Migration_Events::TYPE_BATCH_STARTED,
+				'type'         => 'up' === $method ? Migration_Events::TYPE_BATCH_STARTED : Migration_Events::TYPE_DOWN_BATCH_STARTED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
 				],
@@ -153,7 +153,7 @@ class Execute extends Task_Abstract {
 			Migration_Events::insert(
 				[
 					'migration_id' => $migration->get_id(),
-					'type'         => Migration_Events::TYPE_FAILED,
+					'type'         => 'up' === $method ? Migration_Events::TYPE_FAILED : Migration_Events::TYPE_DOWN_FAILED,
 					'data'         => [
 						'args'    => [ $method, $migration_id, $batch, ...$extra_args ],
 						'message' => $e->getMessage(),
@@ -165,7 +165,7 @@ class Execute extends Task_Abstract {
 				Migration_Events::insert(
 					[
 						'migration_id' => $migration->get_id(),
-						'type'         => Migration_Events::TYPE_SCHEDULED,
+						'type'         => Migration_Events::TYPE_DOWN_SCHEDULED,
 						'data'         => [
 							'args'    => [ 'down', $migration_id, 1, ...$extra_args ],
 							'message' => $e->getMessage(),
@@ -195,7 +195,7 @@ class Execute extends Task_Abstract {
 			Migration_Events::insert(
 				[
 					'migration_id' => $migration->get_id(),
-					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
+					'type'         => 'up' === $method ? Migration_Events::TYPE_BATCH_COMPLETED : Migration_Events::TYPE_DOWN_BATCH_COMPLETED,
 					'data'         => [
 						'args' => [ $method, $migration_id, $batch, ...$extra_args ],
 					],
@@ -208,7 +208,7 @@ class Execute extends Task_Abstract {
 		Migration_Events::insert(
 			[
 				'migration_id' => $migration->get_id(),
-				'type'         => Migration_Events::TYPE_COMPLETED,
+				'type'         => 'up' === $method ? Migration_Events::TYPE_COMPLETED : Migration_Events::TYPE_DOWN_COMPLETED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
 				],
