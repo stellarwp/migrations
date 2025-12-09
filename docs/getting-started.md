@@ -41,7 +41,7 @@ class Rename_Meta_Key extends Migration_Abstract {
     }
 
     public function is_applicable(): bool {
-        // Return true if this migration should run on this site.
+        // Return true if the pre-conditions are met. You should not consider if the migration has been run or not here.
         return true;
     }
 
