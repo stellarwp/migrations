@@ -35,6 +35,18 @@ class Extra_Args_Migration extends Migration_Abstract {
 		return 'tests_extra_args_migration';
 	}
 
+	public function get_total_batches(): int {
+		return 4;
+	}
+
+	public function get_label(): string {
+		return 'Extra Args Migration';
+	}
+
+	public function get_description(): string {
+		return 'This migration uses extra arguments to be passed to the `up()` and `down()` methods.';
+	}
+
 	public function is_applicable(): bool {
 		return true;
 	}
