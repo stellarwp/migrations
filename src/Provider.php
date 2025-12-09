@@ -15,6 +15,7 @@ use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
+use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\Tables\Migration_Events;
 use StellarWP\Migrations\Contracts\Migration;
 use function StellarWP\Shepherd\shepherd;
@@ -100,6 +101,8 @@ class Provider extends Provider_Abstract {
 	 */
 	public function on_migrations_schema_up(): void {
 		$prefix = Config::get_hook_prefix();
+
+		$this->container->get( CLI_Provider::class )->register();
 
 		// During WP-CLI execution, we don't need to schedule migrations, we'll run them directly.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
