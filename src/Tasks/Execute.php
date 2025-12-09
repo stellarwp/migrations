@@ -173,7 +173,7 @@ class Execute extends Task_Abstract {
 					]
 				);
 				// If it failed we need to trigger the rollback.
-				shepherd()->dispatch( new self( 'down', $migration_id, 1, ...$migration->get_extra_args( 'down', $batch ) ) );
+				shepherd()->dispatch( new self( 'down', $migration_id, 1, ...$migration->get_down_extra_args_for_batch( 1 ) ) );
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
@@ -201,7 +201,7 @@ class Execute extends Task_Abstract {
 					],
 				]
 			);
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$migration->get_extra_args( $method, $batch + 1 ) ) );
+			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 ) ) );
 			return;
 		}
 

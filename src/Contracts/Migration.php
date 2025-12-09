@@ -105,14 +105,24 @@ interface Migration {
 	public function after( int $batch, string $context, bool $is_complete ): void;
 
 	/**
-	 * Get extra arguments to be passed to the `up()` or `down()` method.
+	 * Get extra arguments to be passed to the `up()` method for a specific batch.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param string $method The method to get extra arguments for.
-	 * @param int    $batch  The batch number.
+	 * @param int $batch The batch number.
 	 *
 	 * @return array
 	 */
-	public function get_extra_args( string $method, int $batch ): array;
+	public function get_up_extra_args_for_batch( int $batch ): array;
+
+	/**
+	 * Get extra arguments to be passed to the `down()` method for a specific batch.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $batch The batch number.
+	 *
+	 * @return array
+	 */
+	public function get_down_extra_args_for_batch( int $batch ): array;
 }

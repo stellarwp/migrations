@@ -194,7 +194,7 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			$args = [ 'up', $migration->get_id(), 1, ...$migration->get_extra_args( 'up', 1 ) ];
+			$args = [ 'up', $migration->get_id(), 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
 
 			Migration_Events::insert(
 				[
