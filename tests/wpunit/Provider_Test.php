@@ -7,9 +7,12 @@ use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use RuntimeException;
+use StellarWP\Migrations\Tests\Traits\With_Uopz;
 use function StellarWP\Shepherd\shepherd;
 
 class Provider_Test extends WPTestCase {
+	use With_Uopz;
+
 	/**
 	 * @before
 	 */
@@ -72,7 +75,7 @@ class Provider_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_throw_if_registering_migration_after_schedule(): void {
+	public function it_should_trigger_doing_it_wrong_if_registering_migration_after_schedule(): void {
 		$registry   = Config::get_container()->get( Registry::class );
 		$migration1 = new Simple_Migration();
 
@@ -81,10 +84,13 @@ class Provider_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$this->expectException( RuntimeException::class );
-		$this->expectExceptionMessage( 'Too late to add a migration to the registry.' );
+		$triggered = false;
+		$this->set_fn_return( '_doing_it_wrong', function() use ( &$triggered ) {
+			$triggered = true;
+		}, true );
 
 		$registry->register( new Simple_Migration() );
+		$this->assertTrue( $triggered );
 	}
 
 	/**
