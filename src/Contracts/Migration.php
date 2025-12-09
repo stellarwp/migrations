@@ -96,11 +96,11 @@ interface Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int    $batch                  The batch number.
-	 * @param string $context                The context of the migration.
-	 * @param bool   $there_are_more_batches Whether there are more batches to run.
+	 * @param int    $batch       The batch number.
+	 * @param string $context     The context of the migration.
+	 * @param bool   $is_complete Whether the migration has finished.
 	 *
 	 * @return void
 	 */
-	public function after( int $batch, string $context, bool $there_are_more_batches ): void;
+	public function after( int $batch, string $context, bool $is_complete ): void;
 }
