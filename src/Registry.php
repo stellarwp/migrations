@@ -48,7 +48,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	public function __construct( array $migrations = [] ) {
 		foreach ( $migrations as $migration ) {
 			if ( ! $migration instanceof Migration ) {
-				throw new RuntimeException( esc_html__( 'Not a migration.', 'stellarwp-migrations' ) );
+				throw new RuntimeException( 'You should pass an array of migrations to the Registry constructor.' );
 			}
 
 			$this->register( $migration );
@@ -69,13 +69,13 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	public function register( Migration $migration ): void {
 		$prefix = Config::get_hook_prefix();
 		if ( did_action( "stellarwp_migrations_{$prefix}_schedule_migrations" ) ) {
-			throw new RuntimeException( esc_html__( 'Too late to add a migration to the registry.', 'stellarwp-migrations' ) );
+			_doing_it_wrong( __FUNCTION__, 'Too late to add a migration to the registry.', '0.0.1' );
+			return;
 		}
 
 		$migration_id = $migration->get_id();
 		if ( strlen( $migration_id ) > 191 ) {
-			// translators: %s is the migration ID.
-			throw new RuntimeException( sprintf( esc_html__( 'Migration ID `%s` is too long.', 'stellarwp-migrations' ), $migration_id ) );
+			throw new RuntimeException( "Migration ID {$migration_id} is too long." );
 		}
 
 		$this->migrations[ $migration_id ] = $migration;
