@@ -53,7 +53,7 @@ class Execute extends Task_Abstract {
 	 * @throws ShepherdTaskFailWithoutRetryException If the migration fails.
 	 */
 	public function process(): void {
-		$args = $this->get_args();
+		$args                              = $this->get_args();
 		[ $method, $migration_id, $batch ] = $args;
 
 		unset( $args[0], $args[1], $args[2] );
