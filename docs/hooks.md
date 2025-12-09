@@ -156,15 +156,27 @@ During a successful migration:
 1. `stellarwp_migrations_{prefix}_schedule_migrations`
 2. `stellarwp_migrations_{prefix}_pre_schedule_migrations`
 3. For each migration:
-   - `Migration::before()`
+   - `Migration::before_up()`
    - `stellarwp_migrations_{prefix}_before_up_batch_processed`
    - `stellarwp_migrations_{prefix}_before_batch_processed`
    - `Migration::up()`
    - `stellarwp_migrations_{prefix}_post_up_batch_processed`
    - `stellarwp_migrations_{prefix}_post_batch_processed`
-   - `Migration::after()`
+   - `Migration::after_up()`
    - (Repeat for additional batches until `is_up_done()` returns `true`)
 4. `stellarwp_migrations_{prefix}_post_schedule_migrations`
+
+During a successful rollback:
+
+1. For each batch:
+   - `Migration::before_down()`
+   - `stellarwp_migrations_{prefix}_before_down_batch_processed`
+   - `stellarwp_migrations_{prefix}_before_batch_processed`
+   - `Migration::down()`
+   - `stellarwp_migrations_{prefix}_post_down_batch_processed`
+   - `stellarwp_migrations_{prefix}_post_batch_processed`
+   - `Migration::after_down()`
+   - (Repeat for additional batches until `is_down_done()` returns `true`)
 
 During a failure:
 
