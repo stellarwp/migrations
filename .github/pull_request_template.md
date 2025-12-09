@@ -30,7 +30,7 @@ Closes #<!-- issue number -->
 - [ ] **PHPStan analysis passes**: `composer test:analysis`
 - [ ] **PHP compatibility check passes**: `composer compatibility`
 - [ ] **Coding standards pass**: `vendor/bin/phpcs`
-- [ ] **All tests pass**: `slic run wpunit && slic run integration`
+- [ ] **All tests pass**
 - [ ] **No debug code** (var_dump, error_log, etc.) left in production code
 - [ ] **No commented-out code** unless specifically needed for reference
 - [ ] **Documentation updated** for any new features or changed behavior
