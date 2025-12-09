@@ -75,7 +75,7 @@ class Commands {
 		$registry  = $container->get( Registry::class );
 
 		if ( ! empty( $tags ) ) {
-			$registry->filter( fn( Migration $migration ):bool => in_array( $tags, $migration->get_tags(), true ) );
+			$registry->filter( fn( Migration $migration ): bool => in_array( $tags, $migration->get_tags(), true ) );
 		}
 
 		$items = $registry->all();
