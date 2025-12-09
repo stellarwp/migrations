@@ -6,7 +6,6 @@ namespace StellarWP\Migrations;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
-use RuntimeException;
 use StellarWP\Migrations\Tests\Traits\With_Uopz;
 use function StellarWP\Shepherd\shepherd;
 
