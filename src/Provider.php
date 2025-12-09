@@ -84,21 +84,29 @@ class Provider extends Provider_Abstract {
 
 		self::$registered = true;
 
-		add_action(
-			"stellarwp_migrations_{$prefix}_tables_registered",
-			function () use ( $prefix ) {
-				// During WP-CLI execution, we don't need to schedule migrations, we'll run them directly.
-				if ( defined( 'WP_CLI' ) && WP_CLI ) {
-					return;
-				}
-
-				add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
-				add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
-			}
-		);
+		add_action( "stellarwp_migrations_{$prefix}_tables_registered", [ $this, 'on_migrations_schema_up' ] );
 
 		$this->container->singleton( Registry::class );
 		$this->container->get( Tables_Provider::class )->register();
+	}
+
+	/**
+	 * Called when the migrations schema is up.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function on_migrations_schema_up(): void {
+		$prefix = Config::get_hook_prefix();
+
+		// During WP-CLI execution, we don't need to schedule migrations, we'll run them directly.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			return;
+		}
+
+		add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
+		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
 	}
 
 	/**
