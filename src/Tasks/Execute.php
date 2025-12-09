@@ -36,12 +36,13 @@ class Execute extends Task_Abstract {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $method       The method to run.
-	 * @param string $migration_id The migration id.
-	 * @param int    $batch        The batch number.
+	 * @param string $method        The method to run.
+	 * @param string $migration_id  The migration id.
+	 * @param int    $batch         The batch number.
+	 * @param mixed  ...$extra_args Extra arguments controlled by each migration.
 	 */
-	public function __construct( string $method, string $migration_id, int $batch ) {
-		parent::__construct( $method, $migration_id, $batch );
+	public function __construct( string $method, string $migration_id, int $batch, ...$extra_args ) {
+		parent::__construct( $method, $migration_id, $batch, ...$extra_args );
 	}
 
 	/**
@@ -52,7 +53,11 @@ class Execute extends Task_Abstract {
 	 * @throws ShepherdTaskFailWithoutRetryException If the migration fails.
 	 */
 	public function process(): void {
-		[ $method, $migration_id, $batch ] = $this->get_args();
+		$args = $this->get_args();
+		[ $method, $migration_id, $batch ] = $args;
+
+		unset( $args[0], $args[1], $args[2] );
+		$extra_args = $args;
 
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
@@ -79,7 +84,7 @@ class Execute extends Task_Abstract {
 				'migration_id' => $migration->get_id(),
 				'type'         => Migration_Events::TYPE_BATCH_STARTED,
 				'data'         => [
-					'args' => [ $method, $migration_id, $batch ],
+					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
 				],
 			]
 		);
@@ -107,7 +112,7 @@ class Execute extends Task_Abstract {
 			 */
 			do_action( "stellarwp_migrations_{$prefix}_before_batch_processed", $migration, $batch, $method );
 
-			$migration->$method( $batch );
+			$migration->$method( $batch, ...$extra_args );
 
 			/**
 			 * Fires after a batch is processed successfully.
@@ -150,7 +155,7 @@ class Execute extends Task_Abstract {
 					'migration_id' => $migration->get_id(),
 					'type'         => Migration_Events::TYPE_FAILED,
 					'data'         => [
-						'args'    => [ $method, $migration_id, $batch ],
+						'args'    => [ $method, $migration_id, $batch, ...$extra_args ],
 						'message' => $e->getMessage(),
 					],
 				]
@@ -162,13 +167,13 @@ class Execute extends Task_Abstract {
 						'migration_id' => $migration->get_id(),
 						'type'         => Migration_Events::TYPE_SCHEDULED,
 						'data'         => [
-							'args'    => [ 'down', $migration_id, 1 ],
+							'args'    => [ 'down', $migration_id, 1, ...$extra_args ],
 							'message' => $e->getMessage(),
 						],
 					]
 				);
 				// If it failed we need to trigger the rollback.
-				shepherd()->dispatch( new self( 'down', $migration_id, 1 ) );
+				shepherd()->dispatch( new self( 'down', $migration_id, 1, ...$migration->get_extra_args( 'down', $batch ) ) );
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
@@ -192,11 +197,11 @@ class Execute extends Task_Abstract {
 					'migration_id' => $migration->get_id(),
 					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
 					'data'         => [
-						'args' => [ $method, $migration_id, $batch ],
+						'args' => [ $method, $migration_id, $batch, ...$extra_args ],
 					],
 				]
 			);
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1 ) );
+			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$migration->get_extra_args( $method, $batch + 1 ) ) );
 			return;
 		}
 
@@ -205,7 +210,7 @@ class Execute extends Task_Abstract {
 				'migration_id' => $migration->get_id(),
 				'type'         => Migration_Events::TYPE_COMPLETED,
 				'data'         => [
-					'args' => [ $method, $migration_id, $batch ],
+					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
 				],
 			]
 		);
@@ -248,8 +253,8 @@ class Execute extends Task_Abstract {
 	protected function validate_args(): void {
 		$args = $this->get_args();
 
-		if ( count( $args ) !== 3 ) {
-			throw new InvalidArgumentException( 'Execute task requires 3 arguments: method, migration_id, batch.' );
+		if ( count( $args ) < 3 ) {
+			throw new InvalidArgumentException( 'Execute task requires at least 3 arguments: method, migration_id, batch.' );
 		}
 
 		if ( ! in_array( $args[0], [ 'up', 'down' ], true ) ) {

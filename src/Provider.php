@@ -16,6 +16,7 @@ use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Contracts\Migration;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -181,6 +182,7 @@ class Provider extends Provider_Abstract {
 
 		$migrations_registry = $this->container->get( Registry::class );
 
+		/** @var Migration $migration */
 		foreach ( $migrations_registry as $migration ) {
 			if ( ! $migration->is_applicable() ) {
 				continue;
@@ -192,7 +194,7 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			$args = [ 'up', $migration->get_id(), 1 ];
+			$args = [ 'up', $migration->get_id(), 1, ...$migration->get_extra_args( 'up', 1 ) ];
 
 			Migration_Events::insert(
 				[
