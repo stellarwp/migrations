@@ -2,7 +2,7 @@
 /**
  * Migration contract.
  *
- * @package StellarWP\Migrations
+ * @package StellarWP\Migrations\Contracts
  */
 
 declare(strict_types=1);

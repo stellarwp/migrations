@@ -24,7 +24,7 @@ use function StellarWP\Shepherd\shepherd;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Provider
+ * @package StellarWP\Migrations
  */
 class Provider extends Provider_Abstract {
 

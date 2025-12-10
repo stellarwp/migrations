@@ -30,7 +30,7 @@ use function StellarWP\Shepherd\shepherd;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Tasks;
+ * @package StellarWP\Migrations\Tasks
  */
 class Execute extends Task_Abstract {
 	/**

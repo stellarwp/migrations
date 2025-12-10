@@ -4,7 +4,7 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Registry
+ * @package StellarWP\Migrations
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ use RuntimeException;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Registry
+ * @package StellarWP\Migrations
  */
 class Registry implements ArrayAccess, Iterator, Countable {
 	/**
