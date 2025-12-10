@@ -74,6 +74,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 		}
 
 		$migration_id = $migration->get_id();
+
+		// MySQL index limitations.
 		if ( strlen( $migration_id ) > 191 ) {
 			throw new RuntimeException( "Migration ID {$migration_id} is too long." );
 		}

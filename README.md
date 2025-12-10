@@ -92,6 +92,7 @@ $registry->register( new Rename_Meta_Key() );
 - [Getting Started](./docs/getting-started.md) - Installation and basic usage.
 - [Migration Contract](./docs/migration-contract.md) - Full API reference.
 - [Hooks Reference](./docs/hooks.md) - Available actions and filters.
+- [Tests](./docs/test.md) - Test setup instructions.
 
 ## Contributing
 
