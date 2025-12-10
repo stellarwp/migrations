@@ -7,10 +7,13 @@ jobs:
       matrix:
         suite:
           - wpunit
+
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v6
+
       # ------------------------------------------------------------------------------
       # Set up PHP to run slic
       # ------------------------------------------------------------------------------
@@ -18,6 +21,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
+
       # ------------------------------------------------------------------------------
       # Checkout slic
       # ------------------------------------------------------------------------------
@@ -28,6 +32,7 @@ jobs:
           ref: main
           path: slic
           fetch-depth: 1
+
       # ------------------------------------------------------------------------------
       # Prepare our composer cache directory
       # ------------------------------------------------------------------------------
@@ -35,6 +40,7 @@ jobs:
         id: get-composer-cache-dir
         run: |
           echo "::set-output name=dir::$(composer config cache-files-dir)"
+
       - uses: actions/cache@v4
         id: composer-cache
         with:
@@ -50,14 +56,18 @@ jobs:
           echo "SLIC_BIN=${GITHUB_WORKSPACE}/slic/slic" >> $GITHUB_ENV
           echo "SLIC_WP_DIR=${GITHUB_WORKSPACE}/slic/_wordpress" >> $GITHUB_ENV
           echo "SLIC_WORDPRESS_DOCKERFILE=Dockerfile.base" >> $GITHUB_ENV
+
       - name: Set run context for slic
         run: echo "SLIC=1" >> $GITHUB_ENV && echo "CI=1" >> $GITHUB_ENV
+
       - name: Start ssh-agent
         run: |
           mkdir -p "${HOME}/.ssh";
           ssh-agent -a /tmp/ssh_agent.sock;
+
       - name: Export SSH_AUTH_SOCK env var
         run: echo "SSH_AUTH_SOCK=/tmp/ssh_agent.sock" >> $GITHUB_ENV
+
       - name: Set up slic for CI
         run: |
           cd ${GITHUB_WORKSPACE}/..
@@ -69,20 +79,24 @@ jobs:
           ${SLIC_BIN} debug on
           ${SLIC_BIN} info
           ${SLIC_BIN} config
+
       - name: Start the Chrome container
         run: ${SLIC_BIN} up chrome
+
       - name: Set up StellarWP Migrations
         run: |
           ${SLIC_BIN} use migrations
           ${SLIC_BIN} composer install
+
       - name: Init the WordPress container
         run: |
           ${SLIC_BIN} up wordpress
+          ${SLIC_BIN} wp core update --force --version=latest
           ${SLIC_BIN} wp core version
-          ${SLIC_BIN} wp core update --force --version=6.7
-          ${SLIC_BIN} wp core version
+
       - name: Ensure Kadence is installed
         run: |
           ${SLIC_BIN} wp theme install kadence --activate
+
       - name: Run suites
         run: ${SLIC_BIN} run ${{ matrix.suite }} --ext DotReporter
