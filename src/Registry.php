@@ -92,7 +92,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @inheritDoc
 	 */
 	public function key(): ?string {
-		return (string) key( $this->migrations );
+		return key( $this->migrations );
 	}
 
 	/**
