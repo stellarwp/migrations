@@ -18,17 +18,6 @@ namespace StellarWP\Migrations\Contracts;
  */
 interface Migration {
 	/**
-	 * Get the migration ID.
-	 *
-	 * Maximum length is 191 characters!
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return string
-	 */
-	public function get_id(): string;
-
-	/**
 	 * Whether the migration is applicable to the current site.
 	 *
 	 * This is something that should not change by whether the migration has been run or not.

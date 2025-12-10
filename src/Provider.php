@@ -183,22 +183,22 @@ class Provider extends Provider_Abstract {
 		$migrations_registry = $this->container->get( Registry::class );
 
 		/** @var Migration $migration */
-		foreach ( $migrations_registry as $migration ) {
+		foreach ( $migrations_registry as $migration_id => $migration ) {
 			if ( ! $migration->is_applicable() ) {
 				continue;
 			}
 
-			$event = Migration_Events::get_first_by( 'migration_id', $migration->get_id() );
+			$event = Migration_Events::get_first_by( 'migration_id', $migration_id );
 
 			if ( $event ) {
 				continue;
 			}
 
-			$args = [ 'up', $migration->get_id(), 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
+			$args = [ 'up', $migration_id, 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
 
 			Migration_Events::insert(
 				[
-					'migration_id' => $migration->get_id(),
+					'migration_id' => $migration_id,
 					'type'         => Migration_Events::TYPE_SCHEDULED,
 					'data'         => [
 						'args' => $args,
