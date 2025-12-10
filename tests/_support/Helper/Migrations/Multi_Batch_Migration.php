@@ -86,14 +86,14 @@ class Multi_Batch_Migration extends Migration_Abstract {
 	}
 
 	public function up( int $batch ): void {
-		self::$up_batch_count++;
+		++self::$up_batch_count;
 		self::$up_batches[] = $batch;
 	}
 
 	public function down( int $batch ): void {
-		self::$down_batch_count++;
+		++self::$down_batch_count;
 		self::$down_batches[] = $batch;
-		self::$up_batch_count--;
+		--self::$up_batch_count;
 	}
 
 	public function before_up( int $batch ): void {

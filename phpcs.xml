@@ -1,11 +1,40 @@
 <?xml version="1.0"?>
 <ruleset name="Migrations Coding Standards">
+
+	<file>.</file>
+
+	<!-- General exclusions -->
+	<exclude-pattern>*/docs/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/phpstan-cache/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+	<!-- Formats of the report -->
+	<arg name="report" value="full,summary,source"/>
+	<!-- Show results with colors -->
+	<arg name="colors"/>
+	<!-- Enables cache -->
+	<arg name="cache"/>
+	<!-- Limit to PHP files -->
+	<arg name="extensions" value="php"/>
+
 	<rule ref="StellarWP">
 		<exclude name="StellarWP.Classes.ValidClassName.NotSnakeCase"/>
 	</rule>
 
-	<rule ref="WordPress-VIP-Go"/>
-	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress-VIP-Go">
+		<exclude name="WordPressVIPMinimum.JS.DangerouslySetInnerHTML"/>
+		<exclude name="WordPressVIPMinimum.JS.HTMLExecutingFunctions"/>
+		<exclude name="WordPressVIPMinimum.JS.InnerHTML"/>
+		<exclude name="WordPressVIPMinimum.JS.StringConcat"/>
+		<exclude name="WordPressVIPMinimum.JS.StrippingTags"/>
+		<exclude name="WordPressVIPMinimum.JS.Window"/>
+	</rule>
+
+	<rule ref="WordPress-Extra">
+		<exclude name="Generic.Debug.JSHint"/>
+	</rule>
+
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 
@@ -14,6 +43,7 @@
 		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
 		<exclude name="Generic.Files.LineLength.TooLong"/>
+		<exclude name="Generic.Debug.JSHint"/>
 	</rule>
 
 	<rule ref="WordPress.WP.I18n">
@@ -26,13 +56,32 @@
 
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 
-	<!-- Exclude deprecated sniffs -->
-	<exclude name="Generic.Debug.JSHint"/>
+	<!-- Exclude specific rules for test files only -->
 
-	<!-- General exclusions -->
-	<exclude-pattern>*/docs/*</exclude-pattern>
-	<exclude-pattern>*/node_modules/*</exclude-pattern>
-	<exclude-pattern>*/phpstan-cache/*</exclude-pattern>
-	<exclude-pattern>*/tests/*</exclude-pattern>
-	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<rule ref="WordPress">
+		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery"/>
+		<exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching"/>
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_key"/>
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_value"/>
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query"/>
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_tax_query"/>
+
+		<exclude-pattern>*/src/*</exclude-pattern>
+		<exclude-pattern>*/migrations.php</exclude-pattern>
+	</rule>
+
+	<rule ref="Generic.CodeAnalysis">
+		<exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
+		<exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
+
+		<exclude-pattern>*/src/*</exclude-pattern>
+		<exclude-pattern>*/migrations.php</exclude-pattern>
+	</rule>
+
+	<rule ref="Universal.NamingConventions">
+		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames"/>
+
+		<exclude-pattern>*/src/*</exclude-pattern>
+		<exclude-pattern>*/migrations.php</exclude-pattern>
+	</rule>
 </ruleset>
