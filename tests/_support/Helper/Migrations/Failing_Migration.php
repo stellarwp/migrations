@@ -56,10 +56,6 @@ class Failing_Migration extends Migration_Abstract {
 		self::$should_fail_down = false;
 	}
 
-	public function get_id(): string {
-		return 'tests_failing_migration';
-	}
-
 	public function is_applicable(): bool {
 		return true;
 	}

@@ -29,10 +29,6 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	 */
 	private static array $created_meta_values = [];
 
-	public function get_id(): string {
-		return 'tests_switch_post_meta_key';
-	}
-
 	public function is_applicable(): bool {
 		return true;
 	}

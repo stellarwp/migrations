@@ -25,10 +25,9 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_non_applicable_migrations(): void {
-		$registry      = Config::get_container()->get( Registry::class );
-		$not_applicable = new Not_Applicable_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $not_applicable );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -40,15 +39,14 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_not_schedule_event_for_non_applicable_migrations(): void {
-		$registry       = Config::get_container()->get( Registry::class );
-		$not_applicable = new Not_Applicable_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $not_applicable );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$event = Migration_Events::get_first_by( 'migration_id', $not_applicable->get_id() );
+		$event = Migration_Events::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
 
 		$this->assertNull( $event );
 	}
@@ -57,10 +55,9 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_not_dispatch_task_for_non_applicable_migrations(): void {
-		$registry       = Config::get_container()->get( Registry::class );
-		$not_applicable = new Not_Applicable_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $not_applicable );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -74,12 +71,10 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_run_applicable_and_skip_non_applicable(): void {
-		$registry       = Config::get_container()->get( Registry::class );
-		$applicable     = new Simple_Migration();
-		$not_applicable = new Not_Applicable_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $applicable );
-		$registry->register( $not_applicable );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -92,20 +87,18 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_only_schedule_events_for_applicable_migrations(): void {
-		$registry       = Config::get_container()->get( Registry::class );
-		$applicable     = new Simple_Migration();
-		$not_applicable = new Not_Applicable_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $applicable );
-		$registry->register( $not_applicable );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$applicable_event = Migration_Events::get_first_by( 'migration_id', $applicable->get_id() );
+		$applicable_event = Migration_Events::get_first_by( 'migration_id', 'tests_simple_migration' );
 		$this->assertNotNull( $applicable_event );
 
-		$not_applicable_event = Migration_Events::get_first_by( 'migration_id', $not_applicable->get_id() );
+		$not_applicable_event = Migration_Events::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
 		$this->assertNull( $not_applicable_event );
 	}
 
@@ -113,12 +106,10 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_only_dispatch_tasks_for_applicable_migrations(): void {
-		$registry       = Config::get_container()->get( Registry::class );
-		$applicable     = new Simple_Migration();
-		$not_applicable = new Not_Applicable_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $applicable );
-		$registry->register( $not_applicable );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -128,57 +119,7 @@ class Is_Applicable_Test extends WPTestCase {
 		$this->assertCount( 1, $calls );
 
 		$args = $calls[0]->get_args();
-		$this->assertEquals( $applicable->get_id(), $args[1] );
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_create_dynamic_applicable_migration(): void {
-		$registry = Config::get_container()->get( Registry::class );
-
-		$should_be_applicable = true;
-
-		$migration = new class( $should_be_applicable ) extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
-			private static bool $applicable;
-			public static bool $up_called = false;
-
-			public function __construct( bool $applicable ) {
-				self::$applicable = $applicable;
-			}
-
-			public function get_id(): string {
-				return 'tests_dynamic_applicable';
-			}
-
-			public function is_applicable(): bool {
-				return self::$applicable;
-			}
-
-			public function is_up_done(): bool {
-				return self::$up_called;
-			}
-
-			public function is_down_done(): bool {
-				return ! self::$up_called;
-			}
-
-			public function up( int $batch ): void {
-				self::$up_called = true;
-			}
-
-			public function down( int $batch ): void {
-				self::$up_called = false;
-			}
-		};
-
-		$registry->register( $migration );
-
-		$prefix = Config::get_hook_prefix();
-		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
-
-		$event = Migration_Events::get_first_by( 'migration_id', $migration->get_id() );
-		$this->assertNotNull( $event );
+		$this->assertEquals( 'tests_simple_migration', $args[1] );
 	}
 
 	/**

@@ -31,10 +31,6 @@ class Extra_Args_Migration extends Migration_Abstract {
 		self::$down_batch_count    = 0;
 	}
 
-	public function get_id(): string {
-		return 'tests_extra_args_migration';
-	}
-
 	public function is_applicable(): bool {
 		return true;
 	}

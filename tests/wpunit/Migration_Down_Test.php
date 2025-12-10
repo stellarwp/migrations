@@ -27,10 +27,9 @@ class Migration_Down_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_execute_down_on_a_completed_migration(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -40,7 +39,7 @@ class Migration_Down_Test extends WPTestCase {
 
 		tests_migrations_clear_calls_data();
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_simple_migration', 1 );
 		shepherd()->dispatch( $task );
 
 		$this->assertTrue( Simple_Migration::$down_called );
@@ -51,18 +50,17 @@ class Migration_Down_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_down_events(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_simple_migration', 1 );
 		shepherd()->dispatch( $task );
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_simple_migration' );
 		$types  = array_column( $events, 'type' );
 
 		$this->assertContains( Migration_Events::TYPE_BATCH_STARTED, $types );
@@ -76,14 +74,13 @@ class Migration_Down_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_down_if_not_up(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$this->assertFalse( Simple_Migration::$up_called );
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_simple_migration', 1 );
 		shepherd()->dispatch( $task );
 
 		$this->assertFalse( Simple_Migration::$down_called );
@@ -93,10 +90,9 @@ class Migration_Down_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_fire_before_down_batch_processed_action(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -110,7 +106,7 @@ class Migration_Down_Test extends WPTestCase {
 			}
 		);
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_simple_migration', 1 );
 		shepherd()->dispatch( $task );
 
 		$this->assertTrue( $action_fired );
@@ -120,10 +116,9 @@ class Migration_Down_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_fire_post_down_batch_processed_action(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -137,7 +132,7 @@ class Migration_Down_Test extends WPTestCase {
 			}
 		);
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_simple_migration', 1 );
 		shepherd()->dispatch( $task );
 
 		$this->assertTrue( $action_fired );
@@ -147,20 +142,21 @@ class Migration_Down_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_call_before_and_after_hooks_on_migration(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$migration = $registry->get( 'tests_multi_batch_migration' );
 
 		$this->assertTrue( $migration->is_up_done() );
 
 		Multi_Batch_Migration::$before_calls = [];
 		Multi_Batch_Migration::$after_calls  = [];
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1 );
 		shepherd()->dispatch( $task );
 
 		$down_before_calls = array_filter(

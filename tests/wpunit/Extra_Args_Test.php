@@ -26,9 +26,9 @@ class Extra_Args_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_create_execute_task_with_extra_arguments(): void {
-		$migration = new Extra_Args_Migration();
 		$registry = Config::get_container()->get( Registry::class );
-		$registry->register( $migration );
+
+		$registry->register( 'tests_extra_args_migration', Extra_Args_Migration::class );
 
 		$up_spy = [];
 		$down_spy = [];

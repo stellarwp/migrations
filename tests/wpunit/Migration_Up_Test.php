@@ -28,10 +28,9 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_execute_a_simple_migration_up(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$this->assertFalse( Simple_Migration::$up_called );
 
@@ -46,10 +45,9 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_dispatch_execute_task_for_migration(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -61,7 +59,7 @@ class Migration_Up_Test extends WPTestCase {
 
 		$args = $calls[0]->get_args();
 		$this->assertEquals( 'up', $args[0] );
-		$this->assertEquals( $migration->get_id(), $args[1] );
+		$this->assertEquals( 'tests_simple_migration', $args[1] );
 		$this->assertEquals( 1, $args[2] );
 	}
 
@@ -69,18 +67,17 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_scheduled_event_in_migration_events(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$event = Migration_Events::get_first_by( 'migration_id', $migration->get_id() );
+		$event = Migration_Events::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $event );
-		$this->assertEquals( $migration->get_id(), $event['migration_id'] );
+		$this->assertEquals( 'tests_simple_migration', $event['migration_id'] );
 		$this->assertEquals( Migration_Events::TYPE_SCHEDULED, $event['type'] );
 	}
 
@@ -88,16 +85,15 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_completed_event_after_migration_finishes(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		// Get all events for this migration.
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_simple_migration' );
 
 		$types = array_column( $events, 'type' );
 
@@ -110,10 +106,9 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_not_run_migration_twice(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -136,15 +131,15 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_execute_multiple_migrations(): void {
-		$registry   = Config::get_container()->get( Registry::class );
-		$migration1 = new Simple_Migration();
-		$migration2 = new Multi_Batch_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration1 );
-		$registry->register( $migration2 );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$migration2 = $registry->get( 'tests_multi_batch_migration' );
 
 		$this->assertTrue( Simple_Migration::$up_called );
 		$this->assertTrue( $migration2->is_up_done() );
@@ -154,12 +149,11 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_migration_if_already_done(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		Simple_Migration::$up_called = true;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -174,10 +168,9 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_fire_before_batch_processed_action(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix        = Config::get_hook_prefix();
 		$action_fired  = false;
@@ -196,7 +189,7 @@ class Migration_Up_Test extends WPTestCase {
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$this->assertTrue( $action_fired );
-		$this->assertSame( $migration, $received_args['mig'] );
+		$this->assertInstanceOf( Simple_Migration::class, $received_args['mig'] );
 		$this->assertEquals( 1, $received_args['batch'] );
 		$this->assertEquals( 'up', $received_args['method'] );
 	}
@@ -205,10 +198,9 @@ class Migration_Up_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_fire_post_batch_processed_action(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix       = Config::get_hook_prefix();
 		$action_fired = false;

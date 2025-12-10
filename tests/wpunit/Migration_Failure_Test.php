@@ -28,10 +28,9 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_failed_event_on_failure(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -41,7 +40,7 @@ class Migration_Failure_Test extends WPTestCase {
 			// Expected exception.
 		}
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_migration' );
 
 		$failed_events = array_filter(
 			$events,
@@ -55,12 +54,11 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_store_error_message_in_failed_event(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_Migration::$error_message = 'Custom test error message';
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -70,7 +68,7 @@ class Migration_Failure_Test extends WPTestCase {
 			// Expected exception.
 		}
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_migration' );
 
 		$failed_event = array_filter(
 			$events,
@@ -87,10 +85,9 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_trigger_rollback_on_up_failure(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -107,10 +104,9 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_fire_batch_failed_action_on_failure(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
 		$prefix       = Config::get_hook_prefix();
 		$action_fired = false;
@@ -142,13 +138,12 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_handle_failure_at_specific_batch(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_At_Batch_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_At_Batch_Migration::$fail_at_batch = 2;
 		Failing_At_Batch_Migration::$total_batches = 5;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_at_batch_migration', Failing_At_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -167,13 +162,12 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_schedule_down_after_up_failure(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_At_Batch_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_At_Batch_Migration::$fail_at_batch = 2;
 		Failing_At_Batch_Migration::$total_batches = 5;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_at_batch_migration', Failing_At_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -183,7 +177,7 @@ class Migration_Failure_Test extends WPTestCase {
 			// Expected exception.
 		}
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_at_batch_migration' );
 
 		$scheduled_events = array_filter(
 			$events,
@@ -202,13 +196,12 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_execute_rollback_after_failure(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_At_Batch_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_At_Batch_Migration::$fail_at_batch = 2;
 		Failing_At_Batch_Migration::$total_batches = 5;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_at_batch_migration', Failing_At_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -225,12 +218,11 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_throw_shepherd_fail_without_retry_exception(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
-		$task = new Execute( 'up', $migration->get_id(), 1 );
+		$task = new Execute( 'up', 'tests_failing_migration', 1 );
 
 		$this->expectException( ShepherdTaskFailWithoutRetryException::class );
 
@@ -241,16 +233,15 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_not_trigger_rollback_on_down_failure(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Failing_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_Migration::$up_attempted     = true;
 		Failing_Migration::$should_fail      = false;
 		Failing_Migration::$should_fail_down = true;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_failing_migration', 1 );
 
 		try {
 			$task->process();
