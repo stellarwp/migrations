@@ -128,15 +128,9 @@ class Is_Applicable_Test extends WPTestCase {
 	public function it_should_create_dynamic_applicable_migration(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$should_be_applicable = true;
-
-		$migration = new class( $should_be_applicable ) extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
-			private static bool $applicable;
+		$migration = new class() extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
+			private static bool $applicable = true;
 			public static bool $up_called = false;
-
-			public function __construct( bool $applicable ) {
-				self::$applicable = $applicable;
-			}
 
 			public function get_total_batches(): int {
 				return 1;

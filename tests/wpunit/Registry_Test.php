@@ -152,37 +152,7 @@ class Registry_Test extends WPTestCase {
 	public function it_should_accept_migration_id_at_max_length(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
-			public function is_applicable(): bool {
-				return true;
-			}
-
-			public function get_total_batches(): int {
-				return 1;
-			}
-
-			public function get_label(): string {
-				return 'Test Migration';
-			}
-
-			public function get_description(): string {
-				return 'This is a test migration.';
-			}
-
-			public function is_up_done(): bool {
-				return false;
-			}
-
-			public function is_down_done(): bool {
-				return true;
-			}
-
-			public function up( int $batch ): void {}
-
-			public function down( int $batch ): void {}
-		};
-
-		$registry->register( $migration );
+		$registry->register( str_repeat( 'a', 191 ), Simple_Migration::class );
 
 		$this->assertCount( 1, $registry );
 		$this->assertInstanceOf( Simple_Migration::class, $registry->get( str_repeat( 'a', 191 ) ) );
