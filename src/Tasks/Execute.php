@@ -54,14 +54,17 @@ class Execute extends Task_Abstract {
 	 */
 	public function process(): void {
 		$args                              = $this->get_args();
-		[ $method, $migration_id, $batch ] = $args;
+		[ $method, $migration_id, $batch ] = [ (string) $args[0], (string) $args[1], (int) $args[2] ];
 
 		unset( $args[0], $args[1], $args[2] );
 		$extra_args = $args;
 
 		$container = Config::get_container();
-		$registry  = $container->get( Registry::class );
 
+		/** @var Registry $registry */
+		$registry = $container->get( Registry::class );
+
+		/** @var Migration|null $migration */
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
@@ -201,7 +204,12 @@ class Execute extends Task_Abstract {
 					],
 				]
 			);
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 ) ) );
+
+			/** @var array<mixed> $extra_args */
+			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 );
+
+			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$extra_args ) );
+
 			return;
 		}
 
@@ -223,8 +231,12 @@ class Execute extends Task_Abstract {
 	 */
 	public function get_max_retries(): int {
 		$container = Config::get_container();
-		$registry  = $container->get( Registry::class );
-		$migration = $registry->get( $this->get_args()[1] );
+
+		/** @var Registry $registry */
+		$registry = $container->get( Registry::class );
+
+		/** @var Migration|null $migration */
+		$migration = $registry->get( (string) $this->get_args()[1] );
 
 		if ( ! $migration ) {
 			return 0;
@@ -239,7 +251,7 @@ class Execute extends Task_Abstract {
 	 * @return string
 	 */
 	public function get_task_prefix(): string {
-		return 'mig_' . $this->get_args()[0] . '_';
+		return 'mig_' . (string) $this->get_args()[0] . '_';
 	}
 
 	/**

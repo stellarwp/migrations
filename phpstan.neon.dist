@@ -8,30 +8,24 @@ includes:
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 
 parameters:
+	tmpDir: phpstan-cache
 	parallel:
 		jobSize: 10
-		maximumNumberOfProcesses: 32
+		maximumNumberOfProcesses: 10
 		minimumNumberOfJobsPerProcess: 2
-	level: 5
-	inferPrivatePropertyTypeFromConstructor: true
+		processTimeout: 600.0
+	level: max
 	reportUnmatchedIgnoredErrors: false
-	treatPhpDocTypesAsCertain: false
-	scanDirectories:
-		- vendor/stellarwp/shepherd/src/
-
-	# Paths to be analyzed.
-	paths:
-		- %currentWorkingDirectory%/src
-
 	ignoreErrors:
-		- '#Cannot assign new offset to.*Column_Collection#'
-		- '#StellarWP\\Schema\\Collections\\Column_Collection does not accept StellarWP\\Schema\\Columns\\Contracts\\#'
-		# Uses func_get_args()
-		- '#^Function add_query_arg invoked with [123] parameters?, 0 required\.$#'
-		# Uses func_get_args()
-		- '#^Function apply_filters(_ref_array)? invoked with [34567] parameters, 2 required\.$#'
-		- '#^Constant WP_CONTENT_DIR not found\.$#'
-		- '#^Constant WP_CONTENT_URL not found\.$#'
-		- '#^Constant WPMU_PLUGIN_URL not found\.$#'
-		- '#^Constant WP_PLUGIN_DIR not found\.$#'
-		- '#^Constant WP_PLUGIN_URL not found\.$#'
+		- identifier: cast.string
+		- identifier: cast.int
+	scanDirectories:
+		- vendor
+	paths:
+		- migrations.php
+		- src
+	excludePaths:
+		analyseAndScan:
+			- vendor/lucatume/wp-browser/includes/core-phpunit/includes/object-cache.php
+			- vendor/lucatume/wp-browser/includes/pluggables
+			- '**/node_modules/**'

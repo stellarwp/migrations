@@ -61,7 +61,9 @@ class Provider extends Provider_Abstract {
 
 		add_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_migrations' ] );
 
-		$this->container->get( Shepherd_Provider::class )->register();
+		/** @var Shepherd_Provider $shepherd_provider */
+		$shepherd_provider = $this->container->get( Shepherd_Provider::class );
+		$shepherd_provider->register();
 	}
 
 	/**
@@ -88,7 +90,10 @@ class Provider extends Provider_Abstract {
 		add_action( "stellarwp_migrations_{$prefix}_tables_registered", [ $this, 'on_migrations_schema_up' ] );
 
 		$this->container->singleton( Registry::class );
-		$this->container->get( Tables_Provider::class )->register();
+
+		/** @var Tables_Provider $tables_provider */
+		$tables_provider = $this->container->get( Tables_Provider::class );
+		$tables_provider->register();
 	}
 
 	/**
@@ -180,6 +185,7 @@ class Provider extends Provider_Abstract {
 		 */
 		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
 
+		/** @var Registry $migrations_registry */
 		$migrations_registry = $this->container->get( Registry::class );
 
 		/** @var Migration $migration */
@@ -198,6 +204,7 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
+			/** @var array{0: string, 1: string, 2: int, ...} $args */
 			$args = [ 'up', $migration->get_id(), 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
 
 			Migration_Events::insert(

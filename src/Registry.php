@@ -23,6 +23,9 @@ use RuntimeException;
  * @since 0.0.1
  *
  * @package StellarWP\Migrations\Registry
+ *
+ * @implements ArrayAccess<string, Migration>
+ * @implements Iterator<string, Migration>
  */
 class Registry implements ArrayAccess, Iterator, Countable {
 	/**
@@ -39,7 +42,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<Migration> $migrations An array of migrations.
+	 * @param array<mixed> $migrations An array of migrations.
 	 *
 	 * @return void
 	 *
@@ -87,7 +90,13 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @inheritDoc
 	 */
 	public function current(): Migration {
-		return current( $this->migrations );
+		$current = current( $this->migrations );
+
+		if ( $current === false ) {
+			throw new RuntimeException( 'Cannot get current migration: iterator is invalid.' );
+		}
+
+		return $current;
 	}
 
 	/**
