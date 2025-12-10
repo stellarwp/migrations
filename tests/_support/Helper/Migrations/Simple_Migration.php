@@ -37,9 +37,9 @@ class Simple_Migration extends Migration_Abstract {
 	 * @return void
 	 */
 	public static function reset(): void {
-		self::$up_called   = false;
-		self::$down_called = false;
-		self::$up_batches  = [];
+		self::$up_called    = false;
+		self::$down_called  = false;
+		self::$up_batches   = [];
 		self::$down_batches = [];
 	}
 

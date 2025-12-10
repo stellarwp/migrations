@@ -27,8 +27,8 @@ class Extra_Args_Migration extends Migration_Abstract {
 	 * @return void
 	 */
 	public static function reset(): void {
-		self::$up_batch_count      = 0;
-		self::$down_batch_count    = 0;
+		self::$up_batch_count   = 0;
+		self::$down_batch_count = 0;
 	}
 
 	public function get_id(): string {
@@ -60,7 +60,7 @@ class Extra_Args_Migration extends Migration_Abstract {
 	}
 
 	public function up( int $batch, ...$extra_args ): void {
-		self::$up_batch_count++;
+		++self::$up_batch_count;
 		do_action( 'stellarwp_migrations_tests_extra_args_migration_up_batch_processed', $batch, $extra_args );
 
 		if ( 4 === self::$up_batch_count ) {
@@ -69,7 +69,7 @@ class Extra_Args_Migration extends Migration_Abstract {
 	}
 
 	public function down( int $batch, ...$extra_args ): void {
-		self::$down_batch_count++;
+		++self::$down_batch_count;
 		do_action( 'stellarwp_migrations_tests_extra_args_migration_down_batch_processed', $batch, $extra_args );
 	}
 

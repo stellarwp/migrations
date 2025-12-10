@@ -163,7 +163,7 @@ class Registry_Test extends WPTestCase {
 	public function it_should_accept_migration_id_at_max_length(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
+		$migration = new class() extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
 			public function get_id(): string {
 				return str_repeat( 'a', 191 );
 			}
@@ -209,7 +209,7 @@ class Registry_Test extends WPTestCase {
 	public function it_should_throw_if_migration_id_is_too_long(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
+		$migration = new class() extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
 			public function get_id(): string {
 				return str_repeat( 'a', 192 );
 			}
@@ -283,9 +283,13 @@ class Registry_Test extends WPTestCase {
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$triggered = false;
-		$this->set_fn_return( '_doing_it_wrong', function() use ( &$triggered ) {
-			$triggered = true;
-		}, true );
+		$this->set_fn_return(
+			'_doing_it_wrong',
+			function () use ( &$triggered ) {
+				$triggered = true;
+			},
+			true
+		);
 
 		$registry->register( $migration );
 		$this->assertTrue( $triggered );

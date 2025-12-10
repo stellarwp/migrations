@@ -6,7 +6,6 @@ namespace StellarWP\Migrations;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
-use RuntimeException;
 use StellarWP\Migrations\Tests\Traits\With_Uopz;
 use function StellarWP\Shepherd\shepherd;
 
@@ -85,9 +84,13 @@ class Provider_Test extends WPTestCase {
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$triggered = false;
-		$this->set_fn_return( '_doing_it_wrong', function() use ( &$triggered ) {
-			$triggered = true;
-		}, true );
+		$this->set_fn_return(
+			'_doing_it_wrong',
+			function () use ( &$triggered ) {
+				$triggered = true;
+			},
+			true 
+		);
 
 		$registry->register( new Simple_Migration() );
 		$this->assertTrue( $triggered );

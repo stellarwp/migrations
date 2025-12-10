@@ -52,7 +52,7 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	public function is_up_done(): bool {
 		$count = (int) DB::get_var(
 			DB::prepare(
-				"SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+				'SELECT COUNT(*) FROM %i WHERE meta_key = %s',
 				DB::prefix( 'postmeta' ),
 				self::OLD_META_KEY
 			)
@@ -64,7 +64,7 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	public function is_down_done(): bool {
 		$count = (int) DB::get_var(
 			DB::prepare(
-				"SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+				'SELECT COUNT(*) FROM %i WHERE meta_key = %s',
 				DB::prefix( 'postmeta' ),
 				self::NEW_META_KEY
 			)
@@ -76,7 +76,7 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	public function up( int $batch ): void {
 		DB::query(
 			DB::prepare(
-				"UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1",
+				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1',
 				DB::prefix( 'postmeta' ),
 				self::NEW_META_KEY,
 				self::OLD_META_KEY
@@ -87,7 +87,7 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	public function down( int $batch ): void {
 		DB::query(
 			DB::prepare(
-				"UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1",
+				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1',
 				DB::prefix( 'postmeta' ),
 				self::OLD_META_KEY,
 				self::NEW_META_KEY

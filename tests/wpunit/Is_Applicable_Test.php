@@ -25,7 +25,7 @@ class Is_Applicable_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_non_applicable_migrations(): void {
-		$registry      = Config::get_container()->get( Registry::class );
+		$registry       = Config::get_container()->get( Registry::class );
 		$not_applicable = new Not_Applicable_Migration();
 
 		$registry->register( $not_applicable );
