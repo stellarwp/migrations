@@ -36,10 +36,6 @@ Extend `Migration_Abstract` and implement the required methods:
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
 
 class Rename_Meta_Key extends Migration_Abstract {
-    public function get_id(): string {
-        return 'my_plugin_rename_meta_key_v1';
-    }
-
     public function is_applicable(): bool {
         // Return true if the pre-conditions are met. You should not consider if the migration has been run or not here.
         return true;

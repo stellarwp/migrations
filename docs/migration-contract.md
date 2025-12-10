@@ -8,16 +8,6 @@ All migrations must implement `StellarWP\Migrations\Contracts\Migration`.
 
 ### Methods
 
-#### `get_id(): string`
-
-Returns a unique identifier for the migration. Maximum length is 191 characters.
-
-```php
-public function get_id(): string {
-    return 'my_plugin_migration_name_v1';
-}
-```
-
 #### `is_applicable(): bool`
 
 Determines whether the migration should run on the current site. This should return a consistent value regardless of whether the migration has run.
@@ -173,10 +163,6 @@ public function down( int $batch, ...$extra_args ): void {
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
 
 class My_Migration extends Migration_Abstract {
-    public function get_id(): string {
-        return 'my_migration';
-    }
-
     public function is_applicable(): bool {
         return true;
     }

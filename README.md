@@ -27,10 +27,6 @@ $container->get( Provider::class )->register();
 
 // Create a migration.
 class Rename_Meta_Key extends Migration_Abstract {
-    public function get_id(): string {
-        return 'my_plugin_rename_meta_key_v1';
-    }
-
     public function is_applicable(): bool {
         return true;
     }
