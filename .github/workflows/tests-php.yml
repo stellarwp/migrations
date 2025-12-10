@@ -1,4 +1,4 @@
-name: 'Tests'
+name: "Tests"
 on:
   pull_request:
 jobs:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       # ------------------------------------------------------------------------------
       # Set up PHP to run slic
       # ------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ jobs:
       # Checkout slic
       # ------------------------------------------------------------------------------
       - name: Checkout slic
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: stellarwp/slic
           ref: main
