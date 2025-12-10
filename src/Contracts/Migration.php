@@ -2,7 +2,7 @@
 /**
  * Migration contract.
  *
- * @package StellarWP\Migrations
+ * @package StellarWP\Migrations\Contracts
  */
 
 declare(strict_types=1);
@@ -17,17 +17,6 @@ namespace StellarWP\Migrations\Contracts;
  * @package StellarWP\Migrations\Contracts
  */
 interface Migration {
-	/**
-	 * Get the migration ID.
-	 *
-	 * Maximum length is 191 characters!
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return string
-	 */
-	public function get_id(): string;
-
 	/**
 	 * Get the migration label.
 	 *

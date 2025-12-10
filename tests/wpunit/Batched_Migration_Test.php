@@ -30,7 +30,7 @@ class Batched_Migration_Test extends WPTestCase {
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -44,11 +44,10 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_track_batch_numbers_correctly(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -61,11 +60,10 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_dispatch_next_batch_task_after_each_batch(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -87,11 +85,10 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_call_before_hook_for_each_batch(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -111,11 +108,10 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_call_after_hook_for_each_batch(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -135,16 +131,15 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_record_batch_started_events_for_each_batch(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
 
 		$batch_started_events = array_values(
 			array_filter(
@@ -161,16 +156,15 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_record_batch_completed_events_for_intermediate_batches(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
 
 		$batch_completed_events = array_values(
 			array_filter(
@@ -187,16 +181,15 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_record_single_completed_event_at_end(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
 
 		$completed_events = array_values(
 			array_filter(
@@ -213,11 +206,12 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_execute_multiple_batches_for_down(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 3;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
+
+		$migration = $registry->get( 'tests_multi_batch_migration' );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -227,7 +221,7 @@ class Batched_Migration_Test extends WPTestCase {
 		Multi_Batch_Migration::$before_calls = [];
 		Multi_Batch_Migration::$after_calls  = [];
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1 );
 		shepherd()->dispatch( $task );
 
 		$this->assertCount( 3, Multi_Batch_Migration::$down_batches );
@@ -239,11 +233,12 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_handle_single_batch_migration(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
 
 		Multi_Batch_Migration::$total_batches = 1;
 
-		$registry->register( $migration );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
+
+		$migration = $registry->get( 'tests_multi_batch_migration' );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );

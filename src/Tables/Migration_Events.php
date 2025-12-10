@@ -4,7 +4,7 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Tables;
+ * @package StellarWP\Migrations\Tables
  */
 
 namespace StellarWP\Migrations\Tables;
@@ -23,7 +23,7 @@ use StellarWP\Schema\Columns\PHP_Types;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Shepherd\Tables;
+ * @package StellarWP\Migrations\Tables
  */
 class Migration_Events extends Table_Abstract {
 	/**
