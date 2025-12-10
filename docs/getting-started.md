@@ -95,15 +95,20 @@ class Rename_Meta_Key extends Migration_Abstract {
 
 ## Registering Migrations
 
-Register your migrations with the registry before the scheduling action fires:
+Register your migrations with the registry before the scheduling action fires. Each migration requires a unique ID (string) and the migration class name:
 
 ```php
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 
 $registry = Config::get_container()->get( Registry::class );
-$registry->register( new Rename_Meta_Key() );
+$registry->register( 'my_plugin_rename_meta_key', Rename_Meta_Key::class );
 ```
+
+The migration ID must be:
+
+- A unique string identifier (max 191 characters)
+- Stable across requests (used to track migration state)
 
 Migrations are automatically scheduled to run on the `shutdown` hook.
 

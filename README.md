@@ -78,9 +78,9 @@ class Rename_Meta_Key extends Migration_Abstract {
     }
 }
 
-// Register the migration.
+// Register the migration with a unique ID.
 $registry = Config::get_container()->get( Registry::class );
-$registry->register( new Rename_Meta_Key() );
+$registry->register( 'my_plugin_rename_meta_key', Rename_Meta_Key::class );
 ```
 
 ## Documentation

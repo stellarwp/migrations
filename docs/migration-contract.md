@@ -191,6 +191,8 @@ The `Registry` class stores and manages migrations. It implements `ArrayAccess`,
 
 ### Registering Migrations
 
+Migrations are registered using a unique ID and class name:
+
 ```php
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
@@ -198,24 +200,33 @@ use StellarWP\Migrations\Registry;
 $registry = Config::get_container()->get( Registry::class );
 
 // Via register method.
-$registry->register( new My_Migration() );
+$registry->register( 'my_plugin_migration', My_Migration::class );
 
 // Via array access.
-$registry[] = new My_Migration();
+$registry['my_plugin_migration'] = My_Migration::class;
+
+// Via constructor (for multiple migrations).
+$registry = new Registry( [
+    'my_plugin_migration_1' => My_Migration::class,
+    'my_plugin_migration_2' => Another_Migration::class,
+] );
 ```
 
 ### Retrieving Migrations
 
+The registry returns a new instance of the migration class each time:
+
 ```php
-$migration = $registry->get( 'my_migration_id' );
+$migration = $registry->get( 'my_plugin_migration' );
 
 // Or via array access.
-$migration = $registry['my_migration_id'];
+$migration = $registry['my_plugin_migration'];
 ```
 
 ### Constraints
 
-- Migration IDs must be 191 characters or fewer.
+- Migration IDs must be strings with a maximum of 191 characters.
+- Migration values must be class-strings (fully qualified class names).
 - Migrations cannot be registered after the `stellarwp_migrations_{prefix}_schedule_migrations` action has fired.
 
 ## Migration Events Table
