@@ -104,7 +104,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 			$this->assertEmpty( get_user_meta( $uid, 'learndash_student', true ) );
 		}
 
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 		$registry->register( 'tests_student_meta_migration', Student_Meta_Migration::class );
 
 		$migration = $registry->get( 'tests_student_meta_migration' );
