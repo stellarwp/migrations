@@ -88,7 +88,9 @@ class Provider extends Provider_Abstract {
 		add_action( "stellarwp_migrations_{$prefix}_tables_registered", [ $this, 'on_migrations_schema_up' ] );
 
 		$this->container->singleton( Registry::class );
-		$this->container->get( Tables_Provider::class )->register();
+
+		$tables_provider = $this->container->get( Tables_Provider::class );
+		$tables_provider->register();
 	}
 
 	/**
@@ -198,6 +200,7 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
+			/** @var array{0: string, 1: string, 2: int, ...} $args */
 			$args = [ 'up', $migration_id, 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
 
 			Migration_Events::insert(

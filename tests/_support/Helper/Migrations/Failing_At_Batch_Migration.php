@@ -79,12 +79,12 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 			throw new RuntimeException( sprintf( 'Migration failed at batch %d', $batch ) );
 		}
 
-		self::$up_batch_count++;
+		++self::$up_batch_count;
 		self::$up_batches[] = $batch;
 	}
 
 	public function down( int $batch ): void {
 		self::$down_batches[] = $batch;
-		self::$up_batch_count--;
+		--self::$up_batch_count;
 	}
 }

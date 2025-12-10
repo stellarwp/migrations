@@ -23,6 +23,9 @@ use RuntimeException;
  * @since 0.0.1
  *
  * @package StellarWP\Migrations
+ *
+ * @implements ArrayAccess<string, class-string<Migration>>
+ * @implements Iterator<string, Migration>
  */
 class Registry implements ArrayAccess, Iterator, Countable {
 	/**
@@ -60,8 +63,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param string $migration_id    The migration ID.
-	 * @param string $migration_class The migration class to register.
+	 * @param string                  $migration_id    The migration ID.
+	 * @param class-string<Migration> $migration_class The migration class to register.
 	 *
 	 * @return void
 	 *
@@ -84,10 +87,13 @@ class Registry implements ArrayAccess, Iterator, Countable {
 
 	/**
 	 * @inheritDoc
+	 *
+	 * @return Migration|null
 	 */
-	public function current(): Migration {
+	public function current(): ?Migration {
 		$migration_class = current( $this->migrations );
-		return new $migration_class();
+
+		return $migration_class === false ? null : new $migration_class();
 	}
 
 	/**
@@ -130,8 +136,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string $offset The offset to set.
-	 * @param string $value  The migration class to set.
+	 * @param string                  $offset The offset to set.
+	 * @param class-string<Migration> $value  The migration class to set.
 	 *
 	 * @return void
 	 *

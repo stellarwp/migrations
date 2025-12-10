@@ -5,9 +5,6 @@ namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Extra_Args_Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
-use StellarWP\Migrations\Tasks\Execute;
-use function StellarWP\Shepherd\shepherd;
 
 class Extra_Args_Test extends WPTestCase {
 	/**
@@ -30,16 +27,26 @@ class Extra_Args_Test extends WPTestCase {
 
 		$registry->register( 'tests_extra_args_migration', Extra_Args_Migration::class );
 
-		$up_spy = [];
+		$up_spy   = [];
 		$down_spy = [];
 
-		add_action( 'stellarwp_migrations_tests_extra_args_migration_up_batch_processed', function( $batch, $extra_args ) use ( &$up_spy ) {
-			$up_spy[] = compact( 'batch', 'extra_args' );
-		}, 10, 2 );
+		add_action(
+			'stellarwp_migrations_tests_extra_args_migration_up_batch_processed',
+			function ( $batch, $extra_args ) use ( &$up_spy ) {
+				$up_spy[] = compact( 'batch', 'extra_args' );
+			},
+			10,
+			2
+		);
 
-		add_action( 'stellarwp_migrations_tests_extra_args_migration_down_batch_processed', function( $batch, $extra_args ) use ( &$down_spy ) {
-			$down_spy[] = compact( 'batch', 'extra_args' );
-		}, 10, 2 );
+		add_action(
+			'stellarwp_migrations_tests_extra_args_migration_down_batch_processed',
+			function ( $batch, $extra_args ) use ( &$down_spy ) {
+				$down_spy[] = compact( 'batch', 'extra_args' );
+			},
+			10,
+			2
+		);
 
 		$prefix = Config::get_hook_prefix();
 

@@ -29,3 +29,6 @@ DOCKER_ENV
 Dockerfile-*
 output.log
 docker_tag
+
+# PHPStan cache
+phpstan-cache
