@@ -31,10 +31,6 @@ class Not_Applicable_Migration extends Migration_Abstract {
 		self::$down_called = false;
 	}
 
-	public function get_id(): string {
-		return 'tests_not_applicable_migration';
-	}
-
 	public function get_total_batches(): int {
 		return 1;
 	}

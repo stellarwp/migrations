@@ -30,7 +30,7 @@ use function StellarWP\Shepherd\shepherd;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Tasks;
+ * @package StellarWP\Migrations\Tasks
  */
 class Execute extends Task_Abstract {
 	/**
@@ -60,11 +60,7 @@ class Execute extends Task_Abstract {
 		$extra_args = $args;
 
 		$container = Config::get_container();
-
-		/** @var Registry $registry */
-		$registry = $container->get( Registry::class );
-
-		/** @var Migration|null $migration */
+		$registry  = $container->get( Registry::class );
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
@@ -84,7 +80,7 @@ class Execute extends Task_Abstract {
 
 		Migration_Events::insert(
 			[
-				'migration_id' => $migration->get_id(),
+				'migration_id' => $migration_id,
 				'type'         => Migration_Events::TYPE_BATCH_STARTED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
@@ -155,7 +151,7 @@ class Execute extends Task_Abstract {
 
 			Migration_Events::insert(
 				[
-					'migration_id' => $migration->get_id(),
+					'migration_id' => $migration_id,
 					'type'         => Migration_Events::TYPE_FAILED,
 					'data'         => [
 						'args'    => [ $method, $migration_id, $batch, ...$extra_args ],
@@ -167,7 +163,7 @@ class Execute extends Task_Abstract {
 			if ( 'up' === $method ) {
 				Migration_Events::insert(
 					[
-						'migration_id' => $migration->get_id(),
+						'migration_id' => $migration_id,
 						'type'         => Migration_Events::TYPE_SCHEDULED,
 						'data'         => [
 							'args'    => [ 'down', $migration_id, 1, ...$extra_args ],
@@ -197,7 +193,7 @@ class Execute extends Task_Abstract {
 		if ( ! $is_completed ) {
 			Migration_Events::insert(
 				[
-					'migration_id' => $migration->get_id(),
+					'migration_id' => $migration_id,
 					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
 					'data'         => [
 						'args' => [ $method, $migration_id, $batch, ...$extra_args ],
@@ -215,7 +211,7 @@ class Execute extends Task_Abstract {
 
 		Migration_Events::insert(
 			[
-				'migration_id' => $migration->get_id(),
+				'migration_id' => $migration_id,
 				'type'         => Migration_Events::TYPE_COMPLETED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
@@ -232,10 +228,7 @@ class Execute extends Task_Abstract {
 	public function get_max_retries(): int {
 		$container = Config::get_container();
 
-		/** @var Registry $registry */
-		$registry = $container->get( Registry::class );
-
-		/** @var Migration|null $migration */
+		$registry  = $container->get( Registry::class );
 		$migration = $registry->get( (string) $this->get_args()[1] );
 
 		if ( ! $migration ) {

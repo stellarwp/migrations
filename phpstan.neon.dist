@@ -6,6 +6,7 @@ includes:
 	- phar://phpstan.phar/conf/bleedingEdge.neon
 	# Include this extension
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+	- vendor/dpanta94/phpstan-containers/extension.neon
 
 parameters:
 	tmpDir: phpstan-cache
@@ -16,11 +17,12 @@ parameters:
 		processTimeout: 600.0
 	level: max
 	reportUnmatchedIgnoredErrors: false
+	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		- identifier: cast.string
 		- identifier: cast.int
 	scanDirectories:
-		- vendor
+		- vendor/stellarwp/shepherd/src/
 	paths:
 		- migrations.php
 		- src

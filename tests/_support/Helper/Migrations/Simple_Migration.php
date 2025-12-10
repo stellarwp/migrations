@@ -43,10 +43,6 @@ class Simple_Migration extends Migration_Abstract {
 		self::$down_batches = [];
 	}
 
-	public function get_id(): string {
-		return 'tests_simple_migration';
-	}
-
 	public function get_total_batches(): int {
 		return 1;
 	}

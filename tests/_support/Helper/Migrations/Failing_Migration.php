@@ -68,10 +68,6 @@ class Failing_Migration extends Migration_Abstract {
 		return 'This migration fails intentionally.';
 	}
 
-	public function get_id(): string {
-		return 'tests_failing_migration';
-	}
-
 	public function is_applicable(): bool {
 		return true;
 	}

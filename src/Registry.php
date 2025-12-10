@@ -4,7 +4,7 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Registry
+ * @package StellarWP\Migrations
  */
 
 declare(strict_types=1);
@@ -22,9 +22,9 @@ use RuntimeException;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Registry
+ * @package StellarWP\Migrations
  *
- * @implements ArrayAccess<string, Migration>
+ * @implements ArrayAccess<string, class-string<Migration>>
  * @implements Iterator<string, Migration>
  */
 class Registry implements ArrayAccess, Iterator, Countable {
@@ -33,7 +33,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @var array<Migration>
+	 * @var array<string, class-string<Migration>>
 	 */
 	protected array $migrations = [];
 
@@ -42,20 +42,19 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<Migration> $migrations An array of migrations.
+	 * @param array<string, class-string<Migration>> $migrations An array of Migration IDs to Migration class-strings.
 	 *
 	 * @return void
 	 *
 	 * @throws RuntimeException If the migration is not a valid migration.
 	 */
 	public function __construct( array $migrations = [] ) {
-		foreach ( $migrations as $migration ) {
-			// @phpstan-ignore-next-line -- We might be receiving a non-migration object here.
-			if ( ! $migration instanceof Migration ) {
-				throw new RuntimeException( 'You should pass an array of migrations to the Registry constructor.' );
+		foreach ( $migrations as $migration_id => $migration ) {
+			if ( ! ( is_string( $migration_id ) && is_string( $migration ) ) ) {
+				throw new RuntimeException( 'You should pass a map of Migration IDs to Migration class-strings to the Registry constructor.' );
 			}
 
-			$this->register( $migration );
+			$this->register( $migration_id, $migration );
 		}
 	}
 
@@ -64,27 +63,26 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param Migration $migration The migration to register.
+	 * @param string                  $migration_id    The migration ID.
+	 * @param class-string<Migration> $migration_class The migration class to register.
 	 *
 	 * @return void
 	 *
 	 * @throws RuntimeException If the migration is too late to be registered.
 	 */
-	public function register( Migration $migration ): void {
+	public function register( string $migration_id, string $migration_class ): void {
 		$prefix = Config::get_hook_prefix();
 		if ( did_action( "stellarwp_migrations_{$prefix}_schedule_migrations" ) ) {
 			_doing_it_wrong( __FUNCTION__, 'Too late to add a migration to the registry.', '0.0.1' );
 			return;
 		}
 
-		$migration_id = $migration->get_id();
-
 		// MySQL index limitations.
 		if ( strlen( $migration_id ) > 191 ) {
 			throw new RuntimeException( "Migration ID {$migration_id} is too long." );
 		}
 
-		$this->migrations[ $migration_id ] = $migration;
+		$this->migrations[ $migration_id ] = $migration_class;
 	}
 
 	/**
@@ -93,20 +91,16 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return Migration|null
 	 */
 	public function current(): ?Migration {
-		$current = current( $this->migrations );
+		$migration_class = current( $this->migrations );
 
-		if ( $current === false ) {
-			return null;
-		}
-
-		return $current;
+		return $migration_class === false ? null : new $migration_class();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function key(): ?string {
-		return (string) key( $this->migrations );
+		return key( $this->migrations );
 	}
 
 	/**
@@ -135,17 +129,25 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return Migration|null
 	 */
 	public function offsetGet( $offset ): ?Migration {
-		return $this->migrations[ $offset ] ?? null;
+		$migration_class = $this->migrations[ $offset ] ?? null;
+		return $migration_class ? new $migration_class() : null;
 	}
 
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string    $offset The offset to set.
-	 * @param Migration $value  The value to set.
+	 * @param string                  $offset The offset to set.
+	 * @param class-string<Migration> $value  The migration class to set.
+	 *
+	 * @return void
+	 *
+	 * @throws RuntimeException If the offset is not a string.
 	 */
 	public function offsetSet( $offset, $value ): void {
-		$this->register( $value );
+		if ( ! ( is_string( $offset ) && is_string( $value ) ) ) {
+			throw new RuntimeException( 'You should provide a string as the migration ID to set a migration in the registry.' );
+		}
+		$this->register( $offset, $value );
 	}
 
 	/**
@@ -188,7 +190,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return Migration|null
 	 */
 	public function get( string $migration_id ): ?Migration {
-		return $this->migrations[ $migration_id ] ?? null;
+		return $this->offsetGet( $migration_id );
 	}
 
 	/**

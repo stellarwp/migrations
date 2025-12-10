@@ -4,7 +4,7 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Tables;
+ * @package StellarWP\Migrations\Tables
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Tables;
+ * @package StellarWP\Migrations\Tables
  */
 class Provider extends Provider_Abstract {
 	/**

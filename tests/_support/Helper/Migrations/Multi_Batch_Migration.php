@@ -61,10 +61,6 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		self::$after_calls      = [];
 	}
 
-	public function get_id(): string {
-		return 'tests_multi_batch_migration';
-	}
-
 	public function is_applicable(): bool {
 		return true;
 	}

@@ -47,12 +47,11 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_schedule_migrations(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
 		$this->assertCount( 0, $registry );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$this->assertCount( 1, $registry );
 
@@ -75,10 +74,9 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_trigger_doing_it_wrong_if_registering_migration_after_schedule(): void {
-		$registry   = Config::get_container()->get( Registry::class );
-		$migration1 = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration1 );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -92,7 +90,7 @@ class Provider_Test extends WPTestCase {
 			true 
 		);
 
-		$registry->register( new Simple_Migration() );
+		$registry->register( 'tests_simple_migration_2', Simple_Migration::class );
 		$this->assertTrue( $triggered );
 	}
 
@@ -100,10 +98,9 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_scheduling_when_cli_only_filter_returns_true(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
@@ -123,10 +120,9 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_fire_pre_and_post_schedule_migrations_actions(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$prefix     = Config::get_hook_prefix();
 		$pre_fired  = false;
