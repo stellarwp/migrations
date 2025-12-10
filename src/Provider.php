@@ -61,9 +61,7 @@ class Provider extends Provider_Abstract {
 
 		add_action( "shepherd_{$prefix}_tables_registered", [ $this, 'register_migrations' ] );
 
-		/** @var Shepherd_Provider $shepherd_provider */
-		$shepherd_provider = $this->container->get( Shepherd_Provider::class );
-		$shepherd_provider->register();
+		$this->container->get( Shepherd_Provider::class )->register();
 	}
 
 	/**
@@ -91,7 +89,6 @@ class Provider extends Provider_Abstract {
 
 		$this->container->singleton( Registry::class );
 
-		/** @var Tables_Provider $tables_provider */
 		$tables_provider = $this->container->get( Tables_Provider::class );
 		$tables_provider->register();
 	}
@@ -185,7 +182,6 @@ class Provider extends Provider_Abstract {
 		 */
 		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
 
-		/** @var Registry $migrations_registry */
 		$migrations_registry = $this->container->get( Registry::class );
 
 		/** @var Migration $migration */

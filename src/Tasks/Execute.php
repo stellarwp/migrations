@@ -60,11 +60,7 @@ class Execute extends Task_Abstract {
 		$extra_args = $args;
 
 		$container = Config::get_container();
-
-		/** @var Registry $registry */
-		$registry = $container->get( Registry::class );
-
-		/** @var Migration|null $migration */
+		$registry  = $container->get( Registry::class );
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
@@ -232,10 +228,7 @@ class Execute extends Task_Abstract {
 	public function get_max_retries(): int {
 		$container = Config::get_container();
 
-		/** @var Registry $registry */
-		$registry = $container->get( Registry::class );
-
-		/** @var Migration|null $migration */
+		$registry  = $container->get( Registry::class );
 		$migration = $registry->get( (string) $this->get_args()[1] );
 
 		if ( ! $migration ) {
