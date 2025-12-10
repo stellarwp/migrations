@@ -129,8 +129,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	/**
 	 * @inheritDoc
 	 *
-	 * @param string    $offset The offset to set.
-	 * @param string    $value  The migration class to set.
+	 * @param string $offset The offset to set.
+	 * @param string $value  The migration class to set.
 	 *
 	 * @return void
 	 *
