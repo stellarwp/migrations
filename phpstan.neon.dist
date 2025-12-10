@@ -22,7 +22,7 @@ parameters:
 		- identifier: cast.string
 		- identifier: cast.int
 	scanDirectories:
-		- vendor/stellarwp/shepherd/src/
+		- vendor/
 	paths:
 		- migrations.php
 		- src
