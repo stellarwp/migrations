@@ -17,17 +17,6 @@ use StellarWP\DB\QueryBuilder\QueryBuilder;
  */
 class Student_Meta_Migration extends Migration_Abstract {
 	/**
-	 * Returns the unique migration identifier.
-	 *
-	 * @since TBD
-	 *
-	 * @return string Migration slug.
-	 */
-	public function get_id(): string {
-		return 'tests_student_meta_migration';
-	}
-
-	/**
 	 * Checks if the migration is applicable to the current site.
 	 *
 	 * @since TBD

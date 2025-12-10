@@ -24,7 +24,7 @@ use function StellarWP\Shepherd\shepherd;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Provider
+ * @package StellarWP\Migrations
  */
 class Provider extends Provider_Abstract {
 
@@ -185,7 +185,7 @@ class Provider extends Provider_Abstract {
 		$migrations_registry = $this->container->get( Registry::class );
 
 		/** @var Migration $migration */
-		foreach ( $migrations_registry as $migration ) {
+		foreach ( $migrations_registry as $migration_id => $migration ) {
 			if ( ! $migration->is_applicable() ) {
 				continue;
 			}
@@ -194,18 +194,18 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			$event = Migration_Events::get_first_by( 'migration_id', $migration->get_id() );
+			$event = Migration_Events::get_first_by( 'migration_id', $migration_id );
 
 			if ( $event ) {
 				continue;
 			}
 
 			/** @var array{0: string, 1: string, 2: int, ...} $args */
-			$args = [ 'up', $migration->get_id(), 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
+			$args = [ 'up', $migration_id, 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
 
 			Migration_Events::insert(
 				[
-					'migration_id' => $migration->get_id(),
+					'migration_id' => $migration_id,
 					'type'         => Migration_Events::TYPE_SCHEDULED,
 					'data'         => [
 						'args' => $args,

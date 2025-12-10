@@ -50,10 +50,6 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 		self::$down_batches   = [];
 	}
 
-	public function get_id(): string {
-		return 'tests_failing_at_batch_migration';
-	}
-
 	public function get_total_batches(): int {
 		return self::$total_batches;
 	}

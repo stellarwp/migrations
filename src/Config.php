@@ -2,10 +2,10 @@
 /**
  * Migrations Config
  *
- * @package StellarWP\Migrations\Config
+ * @package StellarWP\Migrations
  */
 
-declare( strict_types=1 );
+declare(strict_types=1);
 
 namespace StellarWP\Migrations;
 
@@ -17,7 +17,7 @@ use StellarWP\ContainerContract\ContainerInterface;
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Config
+ * @package StellarWP\Migrations
  */
 class Config {
 	/**
