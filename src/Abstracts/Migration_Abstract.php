@@ -71,17 +71,6 @@ abstract class Migration_Abstract implements Migration {
 	}
 
 	/**
-	 * Whether the migration can be repeated.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return bool
-	 */
-	public function is_repeatable(): bool {
-		return false;
-	}
-
-	/**
 	 * Get the number of retries per batch.
 	 *
 	 * @since 0.0.1

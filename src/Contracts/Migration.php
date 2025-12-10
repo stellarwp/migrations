@@ -83,15 +83,6 @@ interface Migration {
 	public function can_run(): bool;
 
 	/**
-	 * Whether the migration can be repeated.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return bool
-	 */
-	public function is_repeatable(): bool;
-
-	/**
 	 * Whether the migration has been completed.
 	 *
 	 * @since 0.0.1
