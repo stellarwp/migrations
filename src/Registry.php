@@ -88,6 +88,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 
 	/**
 	 * @inheritDoc
+	 *
+	 * @throws RuntimeException If the iterator is invalid.
 	 */
 	public function current(): Migration {
 		$current = current( $this->migrations );

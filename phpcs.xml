@@ -3,10 +3,12 @@
 	<rule ref="StellarWP">
 		<exclude name="StellarWP.Classes.ValidClassName.NotSnakeCase"/>
 	</rule>
+
 	<rule ref="WordPress-VIP-Go"/>
 	<rule ref="WordPress-Extra"/>
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
+
 	<rule ref="WordPress">
 		<exclude name="WordPress.Files.FileName"/>
 		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
@@ -16,14 +18,21 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="stellarwp-migrations" />
+			<property name="text_domain" type="array">
+				<element value="stellarwp-migrations" />
+			</property>
 		</properties>
 	</rule>
 
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 
+	<!-- Exclude deprecated sniffs -->
+	<exclude name="Generic.Debug.JSHint"/>
+
 	<!-- General exclusions -->
+	<exclude-pattern>*/docs/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/phpstan-cache/*</exclude-pattern>
 	<exclude-pattern>*/tests/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
-	<exclude-pattern>*/docs/*</exclude-pattern>
 </ruleset>
