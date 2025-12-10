@@ -66,6 +66,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @param string                  $migration_id    The migration ID.
 	 * @param class-string<Migration> $migration_class The migration class to register.
 	 *
+	 * // phpcs:disable Squiz.Commenting.FunctionComment.IncorrectTypeHint
+	 *
 	 * @return void
 	 *
 	 * @throws RuntimeException If the migration is too late to be registered.
@@ -84,6 +86,8 @@ class Registry implements ArrayAccess, Iterator, Countable {
 
 		$this->migrations[ $migration_id ] = $migration_class;
 	}
+
+	// phpcs:enable Squiz.Commenting.FunctionComment.IncorrectTypeHint
 
 	/**
 	 * @inheritDoc
