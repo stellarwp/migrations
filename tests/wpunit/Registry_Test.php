@@ -33,25 +33,22 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_register_a_migration(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		$this->assertCount( 1, $registry );
-		$this->assertTrue( isset( $registry[ $migration->get_id() ] ) );
+		$this->assertTrue( isset( $registry['tests_simple_migration'] ) );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_register_multiple_migrations(): void {
-		$registry   = Config::get_container()->get( Registry::class );
-		$migration1 = new Simple_Migration();
-		$migration2 = new Multi_Batch_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration1 );
-		$registry->register( $migration2 );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$this->assertCount( 2, $registry );
 	}
@@ -60,14 +57,13 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_get_a_migration_by_id(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
-		$retrieved = $registry->get( $migration->get_id() );
+		$retrieved = $registry->get( 'tests_simple_migration' );
 
-		$this->assertSame( $migration, $retrieved );
+		$this->assertInstanceOf( Simple_Migration::class, $retrieved );
 	}
 
 	/**
@@ -85,40 +81,36 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_allow_array_access_set(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry[] = $migration;
+		$registry['tests_simple_migration'] = Simple_Migration::class;
 
 		$this->assertCount( 1, $registry );
-		$this->assertSame( $migration, $registry[ $migration->get_id() ] );
+		$this->assertInstanceOf( Simple_Migration::class, $registry['tests_simple_migration'] );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_allow_array_access_set_with_explicit_key(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry['custom_key'] = $migration;
+		$registry['custom_key'] = Simple_Migration::class;
 
 		$this->assertCount( 1, $registry );
-		$this->assertSame( $migration, $registry[ $migration->get_id() ] );
-		$this->assertFalse( isset( $registry['custom_key'] ) );
-		$this->assertTrue( isset( $registry['tests_simple_migration'] ) );
+		$this->assertInstanceOf( Simple_Migration::class, $registry['custom_key'] );
+		$this->assertTrue( isset( $registry['custom_key'] ) );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_allow_array_access_isset(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
-		$this->assertTrue( isset( $registry[ $migration->get_id() ] ) );
+		$this->assertTrue( isset( $registry['tests_simple_migration'] ) );
 		$this->assertFalse( isset( $registry['non_existent'] ) );
 	}
 
@@ -126,13 +118,12 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_allow_array_access_unset(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 		$this->assertCount( 1, $registry );
 
-		unset( $registry[ $migration->get_id() ] );
+		unset( $registry['tests_simple_migration'] );
 		$this->assertCount( 0, $registry );
 	}
 
@@ -141,11 +132,9 @@ class Registry_Test extends WPTestCase {
 	 */
 	public function it_should_be_iterable(): void {
 		$registry   = Config::get_container()->get( Registry::class );
-		$migration1 = new Simple_Migration();
-		$migration2 = new Multi_Batch_Migration();
 
-		$registry->register( $migration1 );
-		$registry->register( $migration2 );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		$ids = [];
 		foreach ( $registry as $id => $migration ) {
@@ -153,8 +142,8 @@ class Registry_Test extends WPTestCase {
 		}
 
 		$this->assertCount( 2, $ids );
-		$this->assertContains( $migration1->get_id(), $ids );
-		$this->assertContains( $migration2->get_id(), $ids );
+		$this->assertContains( 'tests_simple_migration', $ids );
+		$this->assertContains( 'tests_multi_batch_migration', $ids );
 	}
 
 	/**
@@ -163,44 +152,10 @@ class Registry_Test extends WPTestCase {
 	public function it_should_accept_migration_id_at_max_length(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
-			public function get_id(): string {
-				return str_repeat( 'a', 191 );
-			}
-
-			public function is_applicable(): bool {
-				return true;
-			}
-
-			public function get_total_batches(): int {
-				return 1;
-			}
-
-			public function get_label(): string {
-				return 'Test Migration';
-			}
-
-			public function get_description(): string {
-				return 'This is a test migration.';
-			}
-
-			public function is_up_done(): bool {
-				return false;
-			}
-
-			public function is_down_done(): bool {
-				return true;
-			}
-
-			public function up( int $batch ): void {}
-
-			public function down( int $batch ): void {}
-		};
-
-		$registry->register( $migration );
+		$registry->register( str_repeat( 'a', 191 ), Simple_Migration::class );
 
 		$this->assertCount( 1, $registry );
-		$this->assertSame( $migration, $registry->get( str_repeat( 'a', 191 ) ) );
+		$this->assertInstanceOf( Simple_Migration::class, $registry->get( str_repeat( 'a', 191 ) ) );
 	}
 
 	/**
@@ -209,57 +164,24 @@ class Registry_Test extends WPTestCase {
 	public function it_should_throw_if_migration_id_is_too_long(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$migration = new class extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
-			public function get_id(): string {
-				return str_repeat( 'a', 192 );
-			}
-			public function get_total_batches(): int {
-				return 1;
-			}
-
-			public function get_label(): string {
-				return 'Test Migration';
-			}
-
-			public function get_description(): string {
-				return 'This is a test migration.';
-			}
-
-			public function is_applicable(): bool {
-				return true;
-			}
-
-			public function is_up_done(): bool {
-				return false;
-			}
-
-			public function is_down_done(): bool {
-				return true;
-			}
-
-			public function up( int $batch ): void {}
-
-			public function down( int $batch ): void {}
-		};
-
 		$this->expectException( RuntimeException::class );
 		$this->expectExceptionMessage( 'too long' );
 
-		$registry->register( $migration );
+		$registry->register( str_repeat( 'a', 192 ), Simple_Migration::class );
 	}
 
 	/**
 	 * @test
 	 */
 	public function it_should_accept_migrations_via_constructor(): void {
-		$migration1 = new Simple_Migration();
-		$migration2 = new Multi_Batch_Migration();
-
-		$registry = new Registry( [ $migration1, $migration2 ] );
+		$registry = new Registry( [
+			'tests_simple_migration' => Simple_Migration::class,
+			'tests_multi_batch_migration' => Multi_Batch_Migration::class,
+		] );
 
 		$this->assertCount( 2, $registry );
-		$this->assertSame( $migration1, $registry->get( $migration1->get_id() ) );
-		$this->assertSame( $migration2, $registry->get( $migration2->get_id() ) );
+		$this->assertInstanceOf( Simple_Migration::class, $registry->get( 'tests_simple_migration' ) );
+		$this->assertInstanceOf( Multi_Batch_Migration::class, $registry->get( 'tests_multi_batch_migration' ) );
 	}
 
 	/**
@@ -267,7 +189,7 @@ class Registry_Test extends WPTestCase {
 	 */
 	public function it_should_throw_if_non_migration_passed_to_constructor(): void {
 		$this->expectException( RuntimeException::class );
-		$this->expectExceptionMessage( 'You should pass an array of migrations to the Registry constructor.' );
+		$this->expectExceptionMessage( 'You should pass a map of Migration IDs to Migration class-strings to the Registry constructor.' );
 
 		new Registry( [ 'not a migration' ] );
 	}
@@ -277,7 +199,6 @@ class Registry_Test extends WPTestCase {
 	 */
 	public function it_should_trigger_doing_it_wrong_if_registering_after_schedule_action(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
 		$prefix    = Config::get_hook_prefix();
 
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -287,7 +208,7 @@ class Registry_Test extends WPTestCase {
 			$triggered = true;
 		}, true );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 		$this->assertTrue( $triggered );
 	}
 
@@ -297,9 +218,5 @@ class Registry_Test extends WPTestCase {
 	public function cleanup(): void {
 		Simple_Migration::reset();
 		Multi_Batch_Migration::reset();
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 }

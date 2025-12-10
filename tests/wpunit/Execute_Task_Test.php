@@ -116,12 +116,11 @@ class Execute_Task_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_process_migration_up(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
-		$task = new Execute( 'up', $migration->get_id(), 1 );
+		$task = new Execute( 'up', 'tests_simple_migration', 1 );
 		$task->process();
 
 		$this->assertTrue( Simple_Migration::$up_called );
@@ -131,14 +130,13 @@ class Execute_Task_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_process_migration_down(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		Simple_Migration::$up_called = true;
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_simple_migration', 1 );
 		$task->process();
 
 		$this->assertTrue( Simple_Migration::$down_called );
@@ -148,14 +146,13 @@ class Execute_Task_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_if_already_done(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Simple_Migration();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		Simple_Migration::$up_called = true;
 
-		$task = new Execute( 'up', $migration->get_id(), 1 );
+		$task = new Execute( 'up', 'tests_simple_migration', 1 );
 		$task->process();
 
 		$this->assertEmpty( Simple_Migration::$up_batches );
@@ -167,9 +164,5 @@ class Execute_Task_Test extends WPTestCase {
 	public function cleanup(): void {
 		Simple_Migration::reset();
 		tests_migrations_clear_calls_data();
-
-		global $wp_actions;
-		$prefix = Config::get_hook_prefix();
-		unset( $wp_actions[ "stellarwp_migrations_{$prefix}_schedule_migrations" ] );
 	}
 }

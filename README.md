@@ -27,10 +27,6 @@ $container->get( Provider::class )->register();
 
 // Create a migration.
 class Rename_Meta_Key extends Migration_Abstract {
-    public function get_id(): string {
-        return 'my_plugin_rename_meta_key_v1';
-    }
-
     public function is_applicable(): bool {
         return true;
     }
@@ -82,9 +78,9 @@ class Rename_Meta_Key extends Migration_Abstract {
     }
 }
 
-// Register the migration.
+// Register the migration with a unique ID.
 $registry = Config::get_container()->get( Registry::class );
-$registry->register( new Rename_Meta_Key() );
+$registry->register( 'my_plugin_rename_meta_key', Rename_Meta_Key::class );
 ```
 
 ## Documentation
@@ -92,6 +88,7 @@ $registry->register( new Rename_Meta_Key() );
 - [Getting Started](./docs/getting-started.md) - Installation and basic usage.
 - [Migration Contract](./docs/migration-contract.md) - Full API reference.
 - [Hooks Reference](./docs/hooks.md) - Available actions and filters.
+- [Tests](./docs/test.md) - Test setup instructions.
 
 ## Contributing
 

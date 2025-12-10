@@ -37,15 +37,18 @@ class Real_Migration_Test extends WPTestCase {
 		$this->assertEquals( 1, $counts['old_count'] );
 		$this->assertEquals( 0, $counts['new_count'] );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
+
+		$migration = $registry->get( 'tests_switch_post_meta_key' );
 
 		$this->assertFalse( $migration->is_up_done() );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$migration = $registry->get( 'tests_switch_post_meta_key' );
 
 		$this->assertTrue( $migration->is_up_done() );
 
@@ -70,10 +73,9 @@ class Real_Migration_Test extends WPTestCase {
 		$this->assertEquals( 5, $counts['old_count'] );
 		$this->assertEquals( 0, $counts['new_count'] );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -92,10 +94,9 @@ class Real_Migration_Test extends WPTestCase {
 	public function it_should_process_correct_number_of_batches(): void {
 		Switch_Post_Meta_Key::create_dummy_data( 3 );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -107,7 +108,7 @@ class Real_Migration_Test extends WPTestCase {
 		foreach ( $calls as $index => $call ) {
 			$args = $call->get_args();
 			$this->assertEquals( 'up', $args[0] );
-			$this->assertEquals( $migration->get_id(), $args[1] );
+			$this->assertEquals( 'tests_switch_post_meta_key', $args[1] );
 			$this->assertEquals( $index + 1, $args[2] ); // Batch numbers 1, 2, 3.
 		}
 	}
@@ -118,10 +119,9 @@ class Real_Migration_Test extends WPTestCase {
 	public function it_should_rollback_and_restore_original_state(): void {
 		$data = Switch_Post_Meta_Key::create_dummy_data( 3 );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -131,8 +131,10 @@ class Real_Migration_Test extends WPTestCase {
 
 		tests_migrations_clear_calls_data();
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1 );
 		shepherd()->dispatch( $task );
+
+		$migration = $registry->get( 'tests_switch_post_meta_key' );
 
 		$this->assertTrue( $migration->is_down_done() );
 
@@ -150,17 +152,16 @@ class Real_Migration_Test extends WPTestCase {
 	public function it_should_rollback_correct_number_of_batches(): void {
 		Switch_Post_Meta_Key::create_dummy_data( 3 );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		tests_migrations_clear_calls_data();
 
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1 );
 		shepherd()->dispatch( $task );
 
 		$calls = tests_migrations_get_calls_data();
@@ -170,7 +171,7 @@ class Real_Migration_Test extends WPTestCase {
 		foreach ( $calls as $call ) {
 			$args = $call->get_args();
 			$this->assertEquals( 'down', $args[0] );
-			$this->assertEquals( $migration->get_id(), $args[1] );
+			$this->assertEquals( 'tests_switch_post_meta_key', $args[1] );
 		}
 	}
 
@@ -178,10 +179,11 @@ class Real_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_skip_migration_when_no_data_to_migrate(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
+
+		$migration = $registry->get( 'tests_switch_post_meta_key' );
 
 		$this->assertTrue( $migration->is_up_done() );
 
@@ -203,15 +205,14 @@ class Real_Migration_Test extends WPTestCase {
 	public function it_should_record_all_migration_events(): void {
 		Switch_Post_Meta_Key::create_dummy_data( 2 );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', $migration->get_id() );
+		$events = Migration_Events::get_all_by( 'migration_id', 'tests_switch_post_meta_key' );
 		$types  = array_column( $events, 'type' );
 
 		$this->assertContains( Migration_Events::TYPE_SCHEDULED, $types );
@@ -229,10 +230,9 @@ class Real_Migration_Test extends WPTestCase {
 	public function it_should_handle_migration_then_rollback_then_migration_again(): void {
 		Switch_Post_Meta_Key::create_dummy_data( 2 );
 
-		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Switch_Post_Meta_Key();
+		$registry = Config::get_container()->get( Registry::class );
 
-		$registry->register( $migration );
+		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
@@ -241,14 +241,14 @@ class Real_Migration_Test extends WPTestCase {
 		$this->assertTrue( $up_results_1['success'] );
 
 		tests_migrations_clear_calls_data();
-		$task = new Execute( 'down', $migration->get_id(), 1 );
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1 );
 		shepherd()->dispatch( $task );
 
 		$down_results = Switch_Post_Meta_Key::verify_down_results();
 		$this->assertTrue( $down_results['success'] );
 
 		tests_migrations_clear_calls_data();
-		$task = new Execute( 'up', $migration->get_id(), 1 );
+		$task = new Execute( 'up', 'tests_switch_post_meta_key', 1 );
 		shepherd()->dispatch( $task );
 
 		$up_results_2 = Switch_Post_Meta_Key::verify_up_results();

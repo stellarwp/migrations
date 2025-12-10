@@ -17,17 +17,6 @@ use StellarWP\DB\QueryBuilder\QueryBuilder;
  */
 class Student_Meta_Migration extends Migration_Abstract {
 	/**
-	 * Returns the unique migration identifier.
-	 *
-	 * @since TBD
-	 *
-	 * @return string Migration slug.
-	 */
-	public function get_id(): string {
-		return 'tests_student_meta_migration';
-	}
-
-	/**
 	 * Checks if the migration is applicable to the current site.
 	 *
 	 * @since TBD
@@ -46,8 +35,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	 * @return int Total number of batches.
 	 */
 	public function get_total_batches(): int {
-		// We divide by 1 because we process one record per batch.
-		return (int) $this->get_base_query()->count() / 1;
+		return $this->get_distinct_user_count();
 	}
 
 	/**
@@ -58,7 +46,24 @@ class Student_Meta_Migration extends Migration_Abstract {
 	 * @return bool True if the migration has been completed, false otherwise.
 	 */
 	public function is_up_done(): bool {
-		return $this->get_base_query()->count() === 0;
+		return $this->get_distinct_user_count() === 0;
+	}
+
+	/**
+	 * Gets the count of distinct users that need to be migrated.
+	 *
+	 * @since TBD
+	 *
+	 * @return int Count of distinct users.
+	 */
+	private function get_distinct_user_count(): int {
+		// We count distinct users because each user can have multiple matching meta rows.
+		$user_ids = $this->get_base_query()
+			->select( 'access_meta.user_id' )
+			->distinct()
+			->getAll();
+
+		return is_array( $user_ids ) ? count( $user_ids ) : 0;
 	}
 
 	/**
@@ -85,6 +90,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	public function up( int $batch ): void {
 		$data = $this->get_base_query()
 			->select( 'access_meta.user_id' )
+			->distinct()
 			->orderBy( 'access_meta.user_id', 'ASC' )
 			->limit( 1 )
 			->getAll();

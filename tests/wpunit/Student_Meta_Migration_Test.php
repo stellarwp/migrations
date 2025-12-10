@@ -100,15 +100,18 @@ class Student_Meta_Migration_Test extends WPTestCase {
 	public function it_should_migrate_multiple_posts_and_verify_values_preserved( Closure $fixture ): void {
 		$uids = $fixture();
 
-		$migration = new Student_Meta_Migration();
-
-		$this->assertEquals( count( $uids ), $migration->get_total_batches() );
 		foreach ( $uids as $uid ) {
 			$this->assertEmpty( get_user_meta( $uid, 'learndash_student', true ) );
 		}
 
 		$registry  = Config::get_container()->get( Registry::class );
-		$registry->register( $migration );
+		$registry->register( 'tests_student_meta_migration', Student_Meta_Migration::class );
+
+		$migration = $registry->get( 'tests_student_meta_migration' );
+
+		$this->assertInstanceOf( Student_Meta_Migration::class, $migration );
+
+		$this->assertEquals( count( $uids ), $migration->get_total_batches() );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
