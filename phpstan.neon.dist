@@ -16,6 +16,7 @@ parameters:
 		processTimeout: 600.0
 	level: max
 	reportUnmatchedIgnoredErrors: false
+	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		- identifier: cast.string
 		- identifier: cast.int

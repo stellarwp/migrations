@@ -50,7 +50,6 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 */
 	public function __construct( array $migrations = [] ) {
 		foreach ( $migrations as $migration ) {
-			// @phpstan-ignore-next-line -- We might be receiving a non-migration object here.
 			if ( ! $migration instanceof Migration ) {
 				throw new RuntimeException( 'You should pass an array of migrations to the Registry constructor.' );
 			}
