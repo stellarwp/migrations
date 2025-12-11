@@ -23,8 +23,6 @@ use InvalidArgumentException;
 use StellarWP\Migrations\Tables\Migration_Events;
 use function StellarWP\Shepherd\shepherd;
 
-// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
-
 /**
  * Task to run a migration's up() method.
  *
