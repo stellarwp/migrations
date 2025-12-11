@@ -131,7 +131,7 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_be_iterable(): void {
-		$registry   = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
@@ -174,10 +174,12 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_accept_migrations_via_constructor(): void {
-		$registry = new Registry( [
-			'tests_simple_migration' => Simple_Migration::class,
-			'tests_multi_batch_migration' => Multi_Batch_Migration::class,
-		] );
+		$registry = new Registry(
+			[
+				'tests_simple_migration'      => Simple_Migration::class,
+				'tests_multi_batch_migration' => Multi_Batch_Migration::class,
+			] 
+		);
 
 		$this->assertCount( 2, $registry );
 		$this->assertInstanceOf( Simple_Migration::class, $registry->get( 'tests_simple_migration' ) );
@@ -198,15 +200,19 @@ class Registry_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_trigger_doing_it_wrong_if_registering_after_schedule_action(): void {
-		$registry  = Config::get_container()->get( Registry::class );
-		$prefix    = Config::get_hook_prefix();
+		$registry = Config::get_container()->get( Registry::class );
+		$prefix   = Config::get_hook_prefix();
 
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$triggered = false;
-		$this->set_fn_return( '_doing_it_wrong', function() use ( &$triggered ) {
-			$triggered = true;
-		}, true );
+		$this->set_fn_return(
+			'_doing_it_wrong',
+			function () use ( &$triggered ) {
+				$triggered = true;
+			},
+			true
+		);
 
 		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 		$this->assertTrue( $triggered );

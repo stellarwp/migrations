@@ -47,7 +47,10 @@ class Provider extends Provider_Abstract {
 		// Bind after all tables are registered.
 		$implementation_id = self::get_safe_dynamic_prefix_implementation_id();
 		$this->container->singleton( $implementation_id, Safe_Dynamic_Prefix::class );
-		$this->container->get( $implementation_id )->calculate_longest_table_name( $this->tables );
+
+		/** @var Safe_Dynamic_Prefix $safe_dynamic_prefix */
+		$safe_dynamic_prefix = $this->container->get( $implementation_id );
+		$safe_dynamic_prefix->calculate_longest_table_name( $this->tables );
 
 		try {
 			Register::table( Migration_Events::class );

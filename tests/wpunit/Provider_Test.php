@@ -82,9 +82,13 @@ class Provider_Test extends WPTestCase {
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$triggered = false;
-		$this->set_fn_return( '_doing_it_wrong', function() use ( &$triggered ) {
-			$triggered = true;
-		}, true );
+		$this->set_fn_return(
+			'_doing_it_wrong',
+			function () use ( &$triggered ) {
+				$triggered = true;
+			},
+			true 
+		);
 
 		$registry->register( 'tests_simple_migration_2', Simple_Migration::class );
 		$this->assertTrue( $triggered );

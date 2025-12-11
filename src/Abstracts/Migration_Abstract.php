@@ -127,7 +127,7 @@ abstract class Migration_Abstract implements Migration {
 	 * Runs after each batch of the rollback.
 	 *
 	 * @param int  $batch        The batch number.
-	 * @param bool $is_completed Whether there are more batches to run.
+	 * @param bool $is_completed Whether the roll-back has been completed.
 	 *
 	 * @return void
 	 */
@@ -138,21 +138,10 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return bool
+	 * @return bool Whether the migration can run.
 	 */
 	public function can_run(): bool {
 		return true;
-	}
-
-	/**
-	 * Whether the migration can be repeated.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return bool
-	 */
-	public function is_repeatable(): bool {
-		return false;
 	}
 
 	/**
@@ -160,7 +149,7 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return int
+	 * @return int The number of retries per batch.
 	 */
 	public function get_number_of_retries_per_batch(): int {
 		return 0;
@@ -171,7 +160,7 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array
+	 * @return array<string> The tags associated with the migration.
 	 */
 	public function get_tags(): array {
 		return [];
@@ -184,7 +173,7 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @param int $batch The batch number.
 	 *
-	 * @return array
+	 * @return array<mixed>
 	 */
 	public function get_up_extra_args_for_batch( int $batch ): array {
 		return [];
@@ -197,7 +186,7 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @param int $batch The batch number.
 	 *
-	 * @return array
+	 * @return array<mixed>
 	 */
 	public function get_down_extra_args_for_batch( int $batch ): array {
 		return [];

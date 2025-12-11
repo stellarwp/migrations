@@ -71,18 +71,6 @@ public function can_run(): bool {
 
 Default implementation returns `true`.
 
-#### `is_repeatable(): bool`
-
-Determines whether the migration can be run multiple times.
-
-```php
-public function is_repeatable(): bool {
-    return false;
-}
-```
-
-Default implementation returns `false`.
-
 #### `get_number_of_retries_per_batch(): int`
 
 Returns the number of times to retry a failed batch before giving up.
@@ -276,7 +264,6 @@ public function down( int $batch, ...$extra_args ): void {
 | `before_down()` | No-op |
 | `after_down()` | No-op |
 | `can_run()` | `true` |
-| `is_repeatable()` | `false` |
 | `get_number_of_retries_per_batch()` | `0` |
 | `get_tags()` | `[]` |
 | `get_up_extra_args_for_batch()` | `[]` |

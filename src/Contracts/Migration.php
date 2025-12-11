@@ -60,7 +60,7 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_tags(): array;
 
@@ -83,15 +83,6 @@ interface Migration extends JsonSerializable {
 	 * @return bool
 	 */
 	public function can_run(): bool;
-
-	/**
-	 * Whether the migration can be repeated.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return bool
-	 */
-	public function is_repeatable(): bool;
 
 	/**
 	 * Whether the migration has been completed.
@@ -186,7 +177,7 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @param int $batch The batch number.
 	 *
-	 * @return array
+	 * @return array<mixed>
 	 */
 	public function get_up_extra_args_for_batch( int $batch ): array;
 
@@ -197,7 +188,7 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @param int $batch The batch number.
 	 *
-	 * @return array
+	 * @return array<mixed>
 	 */
 	public function get_down_extra_args_for_batch( int $batch ): array;
 

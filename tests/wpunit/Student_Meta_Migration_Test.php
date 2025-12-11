@@ -27,7 +27,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 		yield 'no data to migrate' => [
 			function (): array {
 				return [];
-			}
+			},
 		];
 
 		yield 'single post course access from' => [
@@ -38,7 +38,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 				add_user_meta( $uid, 'course_1_access_from', '2025-01-01' );
 
 				return [ $uid ];
-			}
+			},
 		];
 
 		yield 'single post group access from' => [
@@ -49,7 +49,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 				add_user_meta( $uid, 'group_1_access_from', '2025-01-01' );
 
 				return [ $uid ];
-			}
+			},
 		];
 
 		yield 'multiple posts course access from' => [
@@ -62,7 +62,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 				}
 
 				return $uids;
-			}
+			},
 		];
 
 		yield 'multiple posts group access from' => [
@@ -75,7 +75,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 				}
 
 				return $uids;
-			}
+			},
 		];
 
 		yield 'multiple posts course and group access from' => [
@@ -89,7 +89,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 				}
 
 				return $uids;
-			}
+			},
 		];
 	}
 
@@ -104,7 +104,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 			$this->assertEmpty( get_user_meta( $uid, 'learndash_student', true ) );
 		}
 
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 		$registry->register( 'tests_student_meta_migration', Student_Meta_Migration::class );
 
 		$migration = $registry->get( 'tests_student_meta_migration' );
