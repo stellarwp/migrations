@@ -2,13 +2,13 @@
 /**
  * Migrations
  *
- * A library for offloading tasks to background processes.
+ * A library for running reversible migrations.
  *
- * @package Migrations
+ * @package StellarWP\Migrations
  *
  * @wordpress-plugin
  * Plugin Name: Migrations
- * Description: A library for running migrations.
+ * Description: A library for running reversible migrations.
  * Version:     0.0.1
  * Author:      StellarWP
  * Author URI:  https://stellarwp.com
