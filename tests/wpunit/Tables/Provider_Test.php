@@ -12,7 +12,7 @@ class Provider_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_use_different_instances_for_safe_dynamic_prefix(): void {
-		$container = Config::get_container();
+		$container            = Config::get_container();
 		$safe_dynamic_prefix1 = $container->get( Safe_Dynamic_Prefix::class );
 		$safe_dynamic_prefix2 = $container->get( Provider::get_safe_dynamic_prefix_implementation_id() );
 
