@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Tasks;
 
+use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Migrations\Config;
@@ -52,7 +53,7 @@ class Execute extends Task_Abstract {
 	 */
 	public function process(): void {
 		$args                              = $this->get_args();
-		[ $method, $migration_id, $batch ] = [ (string) $args[0], (string) $args[1], (int) $args[2] ];
+		[ $method, $migration_id, $batch ] = [ Cast::to_string( $args[0] ), Cast::to_string( $args[1] ), Cast::to_int( $args[2] ) ];
 
 		unset( $args[0], $args[1], $args[2] );
 		$extra_args = $args;
@@ -227,7 +228,7 @@ class Execute extends Task_Abstract {
 		$container = Config::get_container();
 
 		$registry  = $container->get( Registry::class );
-		$migration = $registry->get( (string) $this->get_args()[1] );
+		$migration = $registry->get( Cast::to_string( $this->get_args()[1] ) );
 
 		if ( ! $migration ) {
 			return 0;
@@ -242,7 +243,7 @@ class Execute extends Task_Abstract {
 	 * @return string
 	 */
 	public function get_task_prefix(): string {
-		return 'mig_' . (string) $this->get_args()[0] . '_';
+		return 'mig_' . Cast::to_string( $this->get_args()[0] ) . '_';
 	}
 
 	/**

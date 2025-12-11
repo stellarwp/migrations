@@ -18,9 +18,6 @@ parameters:
 	level: max
 	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
-	ignoreErrors:
-		- identifier: cast.string
-		- identifier: cast.int
 	scanDirectories:
 		- vendor/
 	paths:
