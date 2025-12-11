@@ -128,12 +128,16 @@ class Migration_Events extends Table_Abstract {
 	 * @return Table_Schema The schema for version 0.0.1.
 	 */
 	public static function get_schema_version_0_0_1(): Table_Schema {
-		$columns   = new Column_Collection();
-		$columns[] = new ID( 'id' );
-		$columns[] = ( new String_Column( 'migration_id' ) )->set_length( 191 )->set_is_index( true );
-		$columns[] = ( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true );
-		$columns[] = ( new Text_Column( 'data' ) )->set_nullable( true )->set_php_type( PHP_Types::JSON );
-		$columns[] = new Created_At( 'created_at' );
+		$columns = new Column_Collection(
+			[
+				new ID( 'id' ),
+				( new String_Column( 'migration_id' ) )->set_length( 191 )->set_is_index( true ),
+				( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true ),
+				( new Text_Column( 'data' ) )->set_nullable( true )->set_php_type( PHP_Types::JSON ),
+				new Created_At( 'created_at' ),
+			]
+		);
+
 		return new Table_Schema( self::table_name( true ), $columns );
 	}
 }

@@ -130,7 +130,7 @@ class Is_Applicable_Test extends WPTestCase {
 
 		$migration = new class() extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
 			private static bool $applicable = true;
-			public static bool $up_called = false;
+			public static bool $up_called   = false;
 
 			public function get_total_batches(): int {
 				return 1;

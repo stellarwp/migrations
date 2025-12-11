@@ -9,7 +9,6 @@ use StellarWP\Migrations\Tests\Migrations\Failing_At_Batch_Migration;
 use StellarWP\Migrations\Tables\Migration_Events;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
-use function StellarWP\Shepherd\shepherd;
 
 class Migration_Failure_Test extends WPTestCase {
 	/**
@@ -108,8 +107,8 @@ class Migration_Failure_Test extends WPTestCase {
 
 		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
-		$prefix       = Config::get_hook_prefix();
-		$action_fired = false;
+		$prefix             = Config::get_hook_prefix();
+		$action_fired       = false;
 		$received_exception = null;
 
 		add_action(
