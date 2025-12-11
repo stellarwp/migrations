@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Tasks;
 
+use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Migrations\Config;
@@ -22,8 +23,6 @@ use Exception;
 use InvalidArgumentException;
 use StellarWP\Migrations\Tables\Migration_Events;
 use function StellarWP\Shepherd\shepherd;
-
-// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
 /**
  * Task to run a migration's up() method.
@@ -54,14 +53,13 @@ class Execute extends Task_Abstract {
 	 */
 	public function process(): void {
 		$args                              = $this->get_args();
-		[ $method, $migration_id, $batch ] = $args;
+		[ $method, $migration_id, $batch ] = [ Cast::to_string( $args[0] ), Cast::to_string( $args[1] ), Cast::to_int( $args[2] ) ];
 
 		unset( $args[0], $args[1], $args[2] );
 		$extra_args = $args;
 
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
-
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
@@ -201,7 +199,12 @@ class Execute extends Task_Abstract {
 					],
 				]
 			);
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 ) ) );
+
+			/** @var array<mixed> $extra_args */
+			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 );
+
+			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$extra_args ) );
+
 			return;
 		}
 
@@ -223,8 +226,9 @@ class Execute extends Task_Abstract {
 	 */
 	public function get_max_retries(): int {
 		$container = Config::get_container();
+
 		$registry  = $container->get( Registry::class );
-		$migration = $registry->get( $this->get_args()[1] );
+		$migration = $registry->get( Cast::to_string( $this->get_args()[1] ) );
 
 		if ( ! $migration ) {
 			return 0;
@@ -239,7 +243,7 @@ class Execute extends Task_Abstract {
 	 * @return string
 	 */
 	public function get_task_prefix(): string {
-		return 'mig_' . $this->get_args()[0] . '_';
+		return 'mig_' . Cast::to_string( $this->get_args()[0] ) . '_';
 	}
 
 	/**

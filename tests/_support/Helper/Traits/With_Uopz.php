@@ -10,11 +10,11 @@ trait With_Uopz {
 	 * The following properties are static to cover data providers where 2 diff. instances of the test case are used:
 	 * one to build the data sets, the other to run the tests.
 	 */
-	private static array $uopz_set_returns = [];
-	private static array $uopz_redefines = [];
+	private static array $uopz_set_returns    = [];
+	private static array $uopz_redefines      = [];
 	private static array $uopz_set_properties = [];
-	private static array $uopz_add_class_fns = [];
-	private static array $uopz_del_functions = [];
+	private static array $uopz_add_class_fns  = [];
+	private static array $uopz_del_functions  = [];
 	/**
 	 * @var array<class-string>
 	 */
@@ -89,8 +89,8 @@ trait With_Uopz {
 	/**
 	 * @after
 	 */
-	public function unset_uopz_class_mocks():void {
-		if(function_exists( 'uopz_unset_mock' ) ) {
+	public function unset_uopz_class_mocks(): void {
+		if ( function_exists( 'uopz_unset_mock' ) ) {
 			foreach ( self::$uopz_class_mocks as $class ) {
 				uopz_unset_mock( $class );
 			}
@@ -151,9 +151,9 @@ trait With_Uopz {
 		}
 
 		// Static class const redefinition.
-		$class = $const;
+		$class                 = $const;
 		list( $const, $value ) = $args;
-		$previous_value = defined( $class . '::' . $const ) ?
+		$previous_value        = defined( $class . '::' . $const ) ?
 			constant( $class . '::' . $const )
 			: null;
 

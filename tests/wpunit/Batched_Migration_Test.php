@@ -43,7 +43,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_track_batch_numbers_correctly(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -59,7 +59,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_dispatch_next_batch_task_after_each_batch(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -84,7 +84,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_call_before_hook_for_each_batch(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -107,7 +107,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_call_after_hook_for_each_batch(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -130,7 +130,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_batch_started_events_for_each_batch(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -155,7 +155,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_batch_completed_events_for_intermediate_batches(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -180,7 +180,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_record_single_completed_event_at_end(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -205,7 +205,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_execute_multiple_batches_for_down(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
@@ -232,7 +232,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_handle_single_batch_migration(): void {
-		$registry  = Config::get_container()->get( Registry::class );
+		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 1;
 

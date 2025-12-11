@@ -58,7 +58,7 @@ interface Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_tags(): array;
 
@@ -175,7 +175,7 @@ interface Migration {
 	 *
 	 * @param int $batch The batch number.
 	 *
-	 * @return array
+	 * @return array<mixed>
 	 */
 	public function get_up_extra_args_for_batch( int $batch ): array;
 
@@ -186,7 +186,7 @@ interface Migration {
 	 *
 	 * @param int $batch The batch number.
 	 *
-	 * @return array
+	 * @return array<mixed>
 	 */
 	public function get_down_extra_args_for_batch( int $batch ): array;
 }
