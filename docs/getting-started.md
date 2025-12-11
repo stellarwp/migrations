@@ -144,18 +144,30 @@ public function is_up_done(): bool {
 
 ## Lifecycle Hooks
 
-Override `before()` and `after()` for custom logic around each batch:
+Override the lifecycle methods for custom logic around each batch:
 
 ```php
-public function before( int $batch, string $context ): void {
-    // Runs before each batch. $context is 'up' or 'down'.
-    error_log( "Starting batch {$batch} for {$context}" );
+public function before_up( int $batch ): void {
+    // Runs before each batch of the migration.
+    error_log( "Starting up batch {$batch}" );
 }
 
-public function after( int $batch, string $context, bool $is_complete ): void {
-    // Runs after each batch.
-    if ( $is_complete ) {
-        error_log( "Migration {$context} completed" );
+public function after_up( int $batch, bool $is_completed ): void {
+    // Runs after each batch of the migration.
+    if ( $is_completed ) {
+        error_log( 'Migration completed' );
+    }
+}
+
+public function before_down( int $batch ): void {
+    // Runs before each batch of the rollback.
+    error_log( "Starting down batch {$batch}" );
+}
+
+public function after_down( int $batch, bool $is_completed ): void {
+    // Runs after each batch of the rollback.
+    if ( $is_completed ) {
+        error_log( 'Rollback completed' );
     }
 }
 ```

@@ -8,6 +8,44 @@ All migrations must implement `StellarWP\Migrations\Contracts\Migration`.
 
 ### Methods
 
+#### `get_label(): string`
+
+Returns a human-readable label for the migration.
+
+```php
+public function get_label(): string {
+    return 'Rename Meta Key';
+}
+```
+
+#### `get_description(): string`
+
+Returns a description of what the migration does.
+
+```php
+public function get_description(): string {
+    return 'Renames the old_key meta key to new_key for all posts.';
+}
+```
+
+#### `get_total_batches(): int`
+
+Returns the total number of batches for the migration. Used for progress tracking.
+
+```php
+public function get_total_batches(): int {
+    global $wpdb;
+    $count = (int) $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+            $wpdb->postmeta,
+            'old_key'
+        )
+    );
+    return (int) ceil( $count / 100 );
+}
+```
+
 #### `is_applicable(): bool`
 
 Determines whether the migration should run on the current site. This should return a consistent value regardless of whether the migration has run.
@@ -18,6 +56,44 @@ public function is_applicable(): bool {
     return get_option( 'my_plugin_needs_migration' ) === 'yes';
 }
 ```
+
+#### `can_run(): bool`
+
+Determines whether the migration can currently run. Unlike `is_applicable()`, this can change based on runtime conditions.
+
+```php
+public function can_run(): bool {
+    // Only run during off-peak hours.
+    $hour = (int) date( 'G' );
+    return $hour < 6 || $hour > 22;
+}
+```
+
+Default implementation returns `true`.
+
+#### `get_number_of_retries_per_batch(): int`
+
+Returns the number of times to retry a failed batch before giving up.
+
+```php
+public function get_number_of_retries_per_batch(): int {
+    return 3;
+}
+```
+
+Default implementation returns `0`.
+
+#### `get_tags(): array`
+
+Returns an array of tags for categorizing or filtering migrations.
+
+```php
+public function get_tags(): array {
+    return [ 'database', 'meta' ];
+}
+```
+
+Default implementation returns an empty array.
 
 #### `is_up_done(): bool`
 
@@ -89,23 +165,45 @@ public function down( int $batch ): void {
 }
 ```
 
-#### `before( int $batch, string $context ): void`
+#### `before_up( int $batch ): void`
 
-Called before each batch executes. The `$context` parameter is either `'up'` or `'down'`.
+Called before each batch of the migration executes.
 
 ```php
-public function before( int $batch, string $context ): void {
-    // Custom pre-batch logic.
+public function before_up( int $batch ): void {
+    // Custom pre-batch logic for migrations.
 }
 ```
 
-#### `after( int $batch, string $context, bool $is_complete ): void`
+#### `after_up( int $batch, bool $is_completed ): void`
 
-Called after each batch executes. The `$is_complete` parameter indicates whether the migration/rollback has finished.
+Called after each batch of the migration executes. The `$is_completed` parameter indicates whether the migration has finished.
 
 ```php
-public function after( int $batch, string $context, bool $is_complete ): void {
-    if ( $is_complete ) {
+public function after_up( int $batch, bool $is_completed ): void {
+    if ( $is_completed ) {
+        // Cleanup or notification logic.
+    }
+}
+```
+
+#### `before_down( int $batch ): void`
+
+Called before each batch of the rollback executes.
+
+```php
+public function before_down( int $batch ): void {
+    // Custom pre-batch logic for rollbacks.
+}
+```
+
+#### `after_down( int $batch, bool $is_completed ): void`
+
+Called after each batch of the rollback executes. The `$is_completed` parameter indicates whether the rollback has finished.
+
+```php
+public function after_down( int $batch, bool $is_completed ): void {
+    if ( $is_completed ) {
         // Cleanup or notification logic.
     }
 }
@@ -157,7 +255,21 @@ public function down( int $batch, ...$extra_args ): void {
 
 ## Abstract Class: `Migration_Abstract`
 
-`StellarWP\Migrations\Abstracts\Migration_Abstract` provides default empty implementations for `before()`, `after()`, `get_up_extra_args_for_batch()`, and `get_down_extra_args_for_batch()`. Extend this class to avoid implementing these methods when not needed.
+`StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
+
+| Method | Default Value |
+|--------|---------------|
+| `before_up()` | No-op |
+| `after_up()` | No-op |
+| `before_down()` | No-op |
+| `after_down()` | No-op |
+| `can_run()` | `true` |
+| `get_number_of_retries_per_batch()` | `0` |
+| `get_tags()` | `[]` |
+| `get_up_extra_args_for_batch()` | `[]` |
+| `get_down_extra_args_for_batch()` | `[]` |
+
+Extend this class to avoid implementing these methods when not needed.
 
 ```php
 use StellarWP\Migrations\Abstracts\Migration_Abstract;

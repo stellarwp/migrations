@@ -29,6 +29,18 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	 */
 	private static array $created_meta_values = [];
 
+	public function get_total_batches(): int {
+		return count( self::$created_post_ids );
+	}
+
+	public function get_label(): string {
+		return 'Switch Post Meta Key Migration';
+	}
+
+	public function get_description(): string {
+		return 'This migration switches the post meta key from old to new.';
+	}
+
 	public function is_applicable(): bool {
 		return true;
 	}

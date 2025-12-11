@@ -123,6 +123,58 @@ class Is_Applicable_Test extends WPTestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function it_should_create_dynamic_applicable_migration(): void {
+		$registry = Config::get_container()->get( Registry::class );
+
+		$migration = new class() extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
+			private static bool $applicable = true;
+			public static bool $up_called = false;
+
+			public function get_total_batches(): int {
+				return 1;
+			}
+
+			public function get_label(): string {
+				return 'Dynamic Applicable Migration';
+			}
+
+			public function get_description(): string {
+				return 'This is a dynamic migration that is applicable if the $applicable property is true.';
+			}
+
+			public function is_applicable(): bool {
+				return self::$applicable;
+			}
+
+			public function is_up_done(): bool {
+				return self::$up_called;
+			}
+
+			public function is_down_done(): bool {
+				return ! self::$up_called;
+			}
+
+			public function up( int $batch ): void {
+				self::$up_called = true;
+			}
+
+			public function down( int $batch ): void {
+				self::$up_called = false;
+			}
+		};
+
+		$registry->register( 'tests_dynamic_applicable', get_class( $migration ) );
+
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$event = Migration_Events::get_first_by( 'migration_id', 'tests_dynamic_applicable' );
+		$this->assertNotNull( $event );
+	}
+
+	/**
 	 * @after
 	 */
 	public function cleanup(): void {

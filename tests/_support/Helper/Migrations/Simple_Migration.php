@@ -43,6 +43,18 @@ class Simple_Migration extends Migration_Abstract {
 		self::$down_batches = [];
 	}
 
+	public function get_total_batches(): int {
+		return 1;
+	}
+
+	public function get_label(): string {
+		return 'Simple Migration';
+	}
+
+	public function get_description(): string {
+		return 'This is a simple migration that runs a single batch.';
+	}
+
 	public function is_applicable(): bool {
 		return true;
 	}

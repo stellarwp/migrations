@@ -188,6 +188,10 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
+			if ( ! $migration->can_run() ) {
+				continue;
+			}
+
 			$event = Migration_Events::get_first_by( 'migration_id', $migration_id );
 
 			if ( $event ) {

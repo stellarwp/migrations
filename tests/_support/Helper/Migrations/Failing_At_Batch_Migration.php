@@ -50,6 +50,18 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 		self::$down_batches   = [];
 	}
 
+	public function get_total_batches(): int {
+		return self::$total_batches;
+	}
+
+	public function get_label(): string {
+		return 'Failing At Batch Migration';
+	}
+
+	public function get_description(): string {
+		return 'This migration fails at a specific batch number.';
+	}
+
 	public function is_applicable(): bool {
 		return true;
 	}

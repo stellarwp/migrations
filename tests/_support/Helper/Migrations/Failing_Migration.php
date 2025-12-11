@@ -56,6 +56,18 @@ class Failing_Migration extends Migration_Abstract {
 		self::$should_fail_down = false;
 	}
 
+	public function get_total_batches(): int {
+		return 1;
+	}
+
+	public function get_label(): string {
+		return 'Failing Migration';
+	}
+
+	public function get_description(): string {
+		return 'This migration fails intentionally.';
+	}
+
 	public function is_applicable(): bool {
 		return true;
 	}
