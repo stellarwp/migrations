@@ -203,4 +203,28 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	public function flush(): void {
 		$this->migrations = [];
 	}
+
+	/**
+	 * Filter the migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param callable( Migration ): bool $callback The callback to filter the migrations.
+	 *
+	 * @return self
+	 */
+	public function filter( callable $callback ): self {
+		return new self( array_filter( $this->migrations, $callback ) );
+	}
+
+	/**
+	 * Get all the migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array<Migration>
+	 */
+	public function all(): array {
+		return $this->migrations;
+	}
 }
