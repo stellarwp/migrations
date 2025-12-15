@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Contracts;
 
+use JsonSerializable;
+
 /**
  * Interface for migrations.
  *
@@ -16,7 +18,7 @@ namespace StellarWP\Migrations\Contracts;
  *
  * @package StellarWP\Migrations\Contracts
  */
-interface Migration {
+interface Migration extends JsonSerializable {
 	/**
 	 * Get the migration label.
 	 *
@@ -189,4 +191,22 @@ interface Migration {
 	 * @return array<mixed>
 	 */
 	public function get_down_extra_args_for_batch( int $batch ): array;
+
+	/**
+	 * Convert the migration to an array.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array
+	 */
+	public function to_array(): array;
+
+	/**
+	 * Get the migration status.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 */
+	public function get_status(): string;
 }

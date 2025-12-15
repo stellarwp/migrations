@@ -163,18 +163,6 @@ class Student_Meta_Migration extends Migration_Abstract {
 		return __( 'Improves the way to identify students.', 'stellarwp-migrations' );
 	}
 
-
-	/**
-	 * Checks if the migration can be run again after completion.
-	 *
-	 * @since TBD
-	 *
-	 * @return bool True if the migration can be run again after completion, false otherwise.
-	 */
-	public function is_repeatable(): bool {
-		return true;
-	}
-
 	/**
 	 * Returns the list of tags for the migration.
 	 *
