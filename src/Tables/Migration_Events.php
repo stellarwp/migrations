@@ -51,7 +51,25 @@ class Migration_Events extends Table_Abstract {
 	 *
 	 * @var string
 	 */
+	const TYPE_DOWN_SCHEDULED = 'down-scheduled';
+
+	/**
+	 * The type of migration event.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
 	const TYPE_BATCH_STARTED = 'batch-started';
+
+	/**
+	 * The type of migration event.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	const TYPE_DOWN_BATCH_STARTED = 'down-batch-started';
 
 	/**
 	 * The type of migration event.
@@ -69,6 +87,15 @@ class Migration_Events extends Table_Abstract {
 	 *
 	 * @var string
 	 */
+	const TYPE_DOWN_BATCH_COMPLETED = 'down-batch-completed';
+
+	/**
+	 * The type of migration event.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
 	const TYPE_COMPLETED = 'completed';
 
 	/**
@@ -78,7 +105,25 @@ class Migration_Events extends Table_Abstract {
 	 *
 	 * @var string
 	 */
+	const TYPE_DOWN_COMPLETED = 'down-completed';
+
+	/**
+	 * The type of migration event.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
 	const TYPE_FAILED = 'failed';
+
+	/**
+	 * The type of migration event.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	const TYPE_DOWN_FAILED = 'down-failed';
 
 	/**
 	 * The base table name, without the table prefix.
