@@ -16,6 +16,7 @@ use StellarWP\Schema\Register;
 use StellarWP\DB\Database\Exceptions\DatabaseQueryException;
 use StellarWP\Migrations\Config;
 use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
+use StellarWP\Migrations\Tables\Migration_Executions;
 
 /**
  * Migrations Tables Service Provider
@@ -32,6 +33,7 @@ class Provider extends Provider_Abstract {
 	 */
 	private array $tables = [
 		Migration_Events::class,
+		Migration_Executions::class,
 	];
 
 	/**
@@ -54,6 +56,7 @@ class Provider extends Provider_Abstract {
 
 		try {
 			Register::table( Migration_Events::class );
+			Register::table( Migration_Executions::class );
 
 			/**
 			 * Fires an action when the Shepherd tables are registered.
