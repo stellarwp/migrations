@@ -3,6 +3,7 @@
   "description": "A test plugin for testing the migrations library.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
+  "version": "0.0.1",
   "config": {
     "platform": {
       "php": "7.4"
@@ -16,6 +17,12 @@
       "Test_Plugin\\": "src/"
     }
   },
+  "repositories": [
+    {
+        "type": "path",
+        "url": "../../plugins/migrations"
+    }
+  ],
   "authors": [
     {
       "name": "StellarWP",

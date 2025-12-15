@@ -214,7 +214,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return self
 	 */
 	public function filter( callable $callback ): self {
-		return new self( array_filter( $this->migrations, $callback ) );
+		return new self( array_filter( array_map( [ $this, 'get' ], $this->migrations ), $callback ) );
 	}
 
 	/**
