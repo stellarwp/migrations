@@ -3,7 +3,6 @@
 namespace StellarWP\Migrations;
 
 use Cli_integrationTester;
-use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
 
 class ListCest {
 	/**
