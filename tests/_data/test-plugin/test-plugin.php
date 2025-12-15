@@ -36,13 +36,16 @@ function test_plugin_get_container(): ContainerInterface {
 	return $container;
 }
 
-add_action( 'plugins_loaded', function() {
+add_action(
+	'plugins_loaded',
+	function () {
 
-	$container = test_plugin_get_container();
+		$container = test_plugin_get_container();
 
-	Config::set_container( $container );
-	Config::set_hook_prefix( 'bar' );
+		Config::set_container( $container );
+		Config::set_hook_prefix( 'bar' );
 
-	$container->register( Provider::class );
-	$container->register( MigrationsProvider::class );
-} );
+		$container->register( Provider::class );
+		$container->register( MigrationsProvider::class );
+	} 
+);
