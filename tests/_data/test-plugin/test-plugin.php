@@ -39,7 +39,6 @@ function test_plugin_get_container(): ContainerInterface {
 add_action(
 	'plugins_loaded',
 	function () {
-
 		$container = test_plugin_get_container();
 
 		Config::set_container( $container );
@@ -47,5 +46,5 @@ add_action(
 
 		$container->register( Provider::class );
 		$container->register( MigrationsProvider::class );
-	} 
+	}
 );
