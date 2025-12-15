@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Abstracts;
 
 use StellarWP\Migrations\Contracts\Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
 use RuntimeException;
 
 /**
@@ -233,4 +232,5 @@ abstract class Migration_Abstract implements Migration {
 	 */
 	public function get_status(): string {
 		return self::STATUS_PENDING;
+	}
 }
