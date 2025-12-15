@@ -87,8 +87,8 @@ class Migration_Executions extends Table_Abstract {
 			[
 				new ID( 'id' ),
 				( new String_Column( 'migration_id' ) )->set_length( 191 )->set_is_index( true ),
-				( new Datetime_Column( 'start_date_gmt' ) )->set_nullable( true ),
-				( new Datetime_Column( 'end_date_gmt' ) )->set_nullable( true ),
+				( new Datetime_Column( 'start_date' ) )->set_nullable( true ),
+				( new Datetime_Column( 'end_date' ) )->set_nullable( true ),
 				( new String_Column( 'status' ) )->set_length( 191 )->set_is_index( true ),
 				( new Integer_Column( 'items_number_total' ) )->set_nullable( true ),
 				( new Integer_Column( 'items_number_processed' ) )->set_nullable( true ),

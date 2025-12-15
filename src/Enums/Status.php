@@ -24,6 +24,7 @@ use MyCLabs\Enum\Enum;
  * @method static self PAUSED()
  * @method static self PENDING()
  * @method static self RUNNING()
+ * @method static self SCHEDULED()
  */
 class Status extends Enum {
 	/**
