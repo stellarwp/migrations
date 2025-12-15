@@ -16,11 +16,11 @@
  *
  * @SuppressWarnings(PHPMD)
 */
-class Cli_integrationTester extends \Codeception\Actor
-{
-    use _generated\Cli_integrationTesterActions;
+class Cli_integrationTester extends \Codeception\Actor {
 
-    /**
-     * Define custom actions here
-     */
+	use _generated\Cli_integrationTesterActions;
+
+	/**
+	 * Define custom actions here
+	 */
 }
