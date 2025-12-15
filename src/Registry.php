@@ -214,7 +214,16 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return self
 	 */
 	public function filter( callable $callback ): self {
-		return new self( array_filter( array_map( [ $this, 'get' ], $this->migrations ), $callback ) );
+		$migrations = $this->build_migrations();
+		$migrations = array_filter( $migrations, $callback );
+
+		$clean = [];
+
+		foreach ( $migrations as $migration_id => $migration ) {
+			$clean[ $migration_id ] = get_class( $migration );
+		}
+
+		return new self( $clean );
 	}
 
 	/**
@@ -225,6 +234,21 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 * @return array<Migration>
 	 */
 	public function all(): array {
-		return $this->migrations;
+		return $this->build_migrations();
+	}
+
+	/**
+	 * Build the migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array<Migration>
+	 */
+	private function build_migrations(): array {
+		$migrations = [];
+		foreach ( $this->migrations as $migration_id => $migration_class ) {
+			$migrations[ $migration_id ] = new $migration_class();
+		}
+		return $migrations;
 	}
 }

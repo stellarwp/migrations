@@ -75,7 +75,7 @@ class Commands {
 		$registry  = $container->get( Registry::class );
 
 		if ( ! empty( $tags ) ) {
-			$registry->filter( fn( Migration $migration ): bool => in_array( $tags, $migration->get_tags(), true ) );
+			$registry->filter( fn( ?Migration $migration ): bool => $migration && in_array( $tags, $migration->get_tags(), true ) );
 		}
 
 		$items = $registry->all();
@@ -85,10 +85,16 @@ class Commands {
 			return;
 		}
 
+		$migrations_as_arrays = [];
+
+		foreach ( $items as $migration_id => $migration ) {
+			$migrations_as_arrays[] = array_merge( [ 'id' => $migration_id ], $migration->to_array() );
+		}
+
 		Utils\format_items(
 			$format,
-			array_map( fn( Migration $migration ) => $migration->to_array(), $items ),
-			[ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'is_repeatable', 'status' ]
+			$migrations_as_arrays,
+			[ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'status' ]
 		);
 	}
 }
