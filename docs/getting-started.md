@@ -122,7 +122,7 @@ Migrations are automatically scheduled to run on the `shutdown` hook.
 
 For large datasets, implement batched migrations by processing a subset of data in each `up()` call. The library will continue calling `up()` with incrementing batch numbers until `is_up_done()` returns `true`.
 
-The `$batch_size` parameter contains the number of items to process in each batch, which is determined by the `get_default_batch_size()` method.
+The `$batch_size` parameter contains the number of items to process in each batch, which is determined by the `get_default_batch_size()` method if not overwritten.
 
 ```php
 public function get_default_batch_size(): int {
