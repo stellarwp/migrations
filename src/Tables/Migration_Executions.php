@@ -87,11 +87,16 @@ class Migration_Executions extends Table_Abstract {
 			[
 				new ID( 'id' ),
 				( new String_Column( 'migration_id' ) )->set_length( 191 )->set_is_index( true ),
-				( new Datetime_Column( 'start_date' ) )->set_nullable( true ),
-				( new Datetime_Column( 'end_date' ) )->set_nullable( true ),
+				// Start date is set when the execution is started.
+				( new Datetime_Column( 'start_date_gmt' ) )->set_nullable( true ),
+				// End date is set when the execution is completed (successfully or not).
+				( new Datetime_Column( 'end_date_gmt' ) )->set_nullable( true ),
 				( new String_Column( 'status' ) )->set_length( 191 )->set_is_index( true ),
-				( new Integer_Column( 'items_number_total' ) )->set_nullable( true ),
-				( new Integer_Column( 'items_number_processed' ) )->set_nullable( true ),
+				// Total items to process in the migration.
+				( new Integer_Column( 'items_total' ) ),
+				// Items processed so far.
+				( new Integer_Column( 'items_processed' ) ),
+				// Created at is set when the execution is created (e.g. scheduled). Useful for tracking the execution lifecycle.
 				new Created_At( 'created_at' ),
 			]
 		);

@@ -205,9 +205,10 @@ class Provider extends Provider_Abstract {
 
 			Migration_Executions::insert(
 				[
-					'migration_id'       => $migration_id,
-					'status'             => Status::SCHEDULED()->getValue(),
-					'items_number_total' => $migration->get_total_items(),
+					'migration_id'    => $migration_id,
+					'status'          => Status::SCHEDULED()->getValue(),
+					'items_total'     => $migration->get_total_items(),
+					'items_processed' => 0,
 				]
 			);
 			$execution_id = DB::last_insert_id();

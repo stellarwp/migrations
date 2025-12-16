@@ -235,8 +235,8 @@ class Execute extends Task_Abstract {
 			// Update the items number processed.
 			Migration_Executions::update_single(
 				[
-					'id'                     => $execution_id,
-					'items_number_processed' => Cast::to_int( $execution['items_number_total'] ) - $migration->get_total_items(),
+					'id'              => $execution_id,
+					'items_processed' => Cast::to_int( $execution['items_total'] ) - $migration->get_total_items(),
 				]
 			);
 
@@ -260,10 +260,10 @@ class Execute extends Task_Abstract {
 
 		Migration_Executions::update_single(
 			[
-				'id'                     => $execution_id,
-				'status'                 => Status::COMPLETED()->getValue(),
-				'end_date'               => current_time( 'mysql', true ),
-				'items_number_processed' => Cast::to_int( $execution['items_number_total'] ) - $migration->get_total_items(),
+				'id'              => $execution_id,
+				'status'          => Status::COMPLETED()->getValue(),
+				'end_date'        => current_time( 'mysql', true ),
+				'items_processed' => Cast::to_int( $execution['items_total'] ) - $migration->get_total_items(),
 			]
 		);
 	}

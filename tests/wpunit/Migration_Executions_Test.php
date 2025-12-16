@@ -16,10 +16,10 @@ class Migration_Executions_Test extends WPTestCase {
 		$migration_id = 'test_migration_' . uniqid();
 		$data         = [
 			'migration_id'           => $migration_id,
-			'start_date_gmt'         => current_time( 'mysql', true ),
+			'start_date'             => current_time( 'mysql', true ),
 			'status'                 => Status::RUNNING()->getValue(),
-			'items_number_total'     => 100,
-			'items_number_processed' => 0,
+			'items_total'     => 100,
+			'items_processed' => 0,
 		];
 
 		// Act.
@@ -38,10 +38,10 @@ class Migration_Executions_Test extends WPTestCase {
 		$migration_id = 'test_retrieval_' . uniqid();
 		$data         = [
 			'migration_id'           => $migration_id,
-			'start_date_gmt'         => current_time( 'mysql', true ),
+			'start_date'             => current_time( 'mysql', true ),
 			'status'                 => Status::RUNNING()->getValue(),
-			'items_number_total'     => 50,
-			'items_number_processed' => 25,
+			'items_total'     => 50,
+			'items_processed' => 25,
 		];
 		Migration_Executions::insert( $data );
 
@@ -52,8 +52,8 @@ class Migration_Executions_Test extends WPTestCase {
 		$this->assertNotNull( $execution );
 		$this->assertEquals( $migration_id, $execution['migration_id'] );
 		$this->assertEquals( Status::RUNNING()->getValue(), $execution['status'] );
-		$this->assertEquals( 50, $execution['items_number_total'] );
-		$this->assertEquals( 25, $execution['items_number_processed'] );
+		$this->assertEquals( 50, $execution['items_total'] );
+		$this->assertEquals( 25, $execution['items_processed'] );
 	}
 
 	/**
@@ -66,31 +66,31 @@ class Migration_Executions_Test extends WPTestCase {
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id,
-				'start_date_gmt'         => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
 				'status'                 => Status::RUNNING()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 0,
+				'items_total'     => 100,
+				'items_processed' => 0,
 			]
 		);
 
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id,
-				'start_date_gmt'         => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
 				'status'                 => Status::RUNNING()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 50,
+				'items_total'     => 100,
+				'items_processed' => 50,
 			]
 		);
 
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id,
-				'start_date_gmt'         => current_time( 'mysql', true ),
-				'end_date_gmt'           => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
+				'end_date'               => current_time( 'mysql', true ),
 				'status'                 => Status::COMPLETED()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 100,
+				'items_total'     => 100,
+				'items_processed' => 100,
 			]
 		);
 
@@ -104,7 +104,7 @@ class Migration_Executions_Test extends WPTestCase {
 	/**get_all_by
 	 * @test
 	 */
-	public function it_should_store_nullable_end_date_gmt(): void {
+	public function it_should_store_nullable_end_date(): void {
 		// Arrange.
 		$migration_id = 'test_nullable_' . uniqid();
 
@@ -112,10 +112,10 @@ class Migration_Executions_Test extends WPTestCase {
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id,
-				'start_date_gmt'         => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
 				'status'                 => Status::RUNNING()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 0,
+				'items_total'     => 100,
+				'items_processed' => 0,
 			]
 		);
 
@@ -123,13 +123,13 @@ class Migration_Executions_Test extends WPTestCase {
 
 		// Assert.
 		$this->assertNotNull( $execution );
-		$this->assertNull( $execution['end_date_gmt'] );
+		$this->assertNull( $execution['end_date'] );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_record_start_date_gmt(): void {
+	public function it_should_record_start_date(): void {
 		// Arrange.
 		$migration_id = 'test_start_date_' . uniqid();
 		$before       = current_time( 'mysql', true );
@@ -138,10 +138,10 @@ class Migration_Executions_Test extends WPTestCase {
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id,
-				'start_date_gmt'         => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
 				'status'                 => Status::RUNNING()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 0,
+				'items_total'     => 100,
+				'items_processed' => 0,
 			]
 		);
 
@@ -150,16 +150,16 @@ class Migration_Executions_Test extends WPTestCase {
 
 		// Assert.
 		$this->assertNotNull( $execution );
-		$this->assertArrayHasKey( 'start_date_gmt', $execution );
+		$this->assertArrayHasKey( 'start_date', $execution );
 
-		// Convert start_date_gmt to string for comparison if it's a DateTime object.
-		$start_date_gmt = $execution['start_date_gmt'];
-		if ( $start_date_gmt instanceof \DateTime ) {
-			$start_date_gmt = $start_date_gmt->format( 'Y-m-d H:i:s' );
+		// Convert start_date to string for comparison if it's a DateTime object.
+		$start_date = $execution['start_date'];
+		if ( $start_date instanceof \DateTime ) {
+			$start_date = $start_date->format( 'Y-m-d H:i:s' );
 		}
 
-		$this->assertGreaterThanOrEqual( $before, $start_date_gmt );
-		$this->assertLessThanOrEqual( $after, $start_date_gmt );
+		$this->assertGreaterThanOrEqual( $before, $start_date );
+		$this->assertLessThanOrEqual( $after, $start_date );
 	}
 
 	/**
@@ -196,21 +196,21 @@ class Migration_Executions_Test extends WPTestCase {
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id_running,
-				'start_date_gmt'         => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
 				'status'                 => Status::RUNNING()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 50,
+				'items_total'     => 100,
+				'items_processed' => 50,
 			]
 		);
 
 		Migration_Executions::insert(
 			[
 				'migration_id'           => $migration_id_completed,
-				'start_date_gmt'         => current_time( 'mysql', true ),
-				'end_date_gmt'           => current_time( 'mysql', true ),
+				'start_date'             => current_time( 'mysql', true ),
+				'end_date'               => current_time( 'mysql', true ),
 				'status'                 => Status::COMPLETED()->getValue(),
-				'items_number_total'     => 100,
-				'items_number_processed' => 100,
+				'items_total'     => 100,
+				'items_processed' => 100,
 			]
 		);
 
