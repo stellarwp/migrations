@@ -85,6 +85,16 @@ public function get_number_of_retries_per_batch(): int {
 
 Default implementation returns `0`.
 
+#### `get_default_batch_size(): int`
+
+Returns the default number of items to process per batch. This value is used when the migration is initially scheduled.
+
+```php
+public function get_default_batch_size(): int {
+    return 100;
+}
+```
+
 #### `get_tags(): array`
 
 Returns an array of tags for categorizing or filtering migrations.
@@ -131,123 +141,125 @@ public function is_down_done(): bool {
 }
 ```
 
-#### `up( int $batch ): void`
+#### `up( int $batch, int $batch_size ): void`
 
 Executes the migration logic for a single batch. Process a fixed number of records per call.
 
 ```php
-public function up( int $batch ): void {
+public function up( int $batch, int $batch_size ): void {
     global $wpdb;
     $wpdb->query(
         $wpdb->prepare(
-            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d",
             $wpdb->postmeta,
             'new_key',
-            'old_key'
+            'old_key',
+            $batch_size
         )
     );
 }
 ```
 
-#### `down( int $batch ): void`
+#### `down( int $batch, int $batch_size ): void`
 
 Reverts the migration logic for a single batch.
 
 ```php
-public function down( int $batch ): void {
+public function down( int $batch, int $batch_size ): void {
     global $wpdb;
     $wpdb->query(
         $wpdb->prepare(
-            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d",
             $wpdb->postmeta,
             'old_key',
-            'new_key'
+            'new_key',
+            $batch_size
         )
     );
 }
 ```
 
-#### `before_up( int $batch ): void`
+#### `before_up( int $batch, int $batch_size ): void`
 
 Called before each batch of the migration executes.
 
 ```php
-public function before_up( int $batch ): void {
+public function before_up( int $batch, int $batch_size ): void {
     // Custom pre-batch logic for migrations.
 }
 ```
 
-#### `after_up( int $batch, bool $is_completed ): void`
+#### `after_up( int $batch, int $batch_size, bool $is_completed ): void`
 
 Called after each batch of the migration executes. The `$is_completed` parameter indicates whether the migration has finished.
 
 ```php
-public function after_up( int $batch, bool $is_completed ): void {
+public function after_up( int $batch, int $batch_size, bool $is_completed ): void {
     if ( $is_completed ) {
         // Cleanup or notification logic.
     }
 }
 ```
 
-#### `before_down( int $batch ): void`
+#### `before_down( int $batch, int $batch_size ): void`
 
 Called before each batch of the rollback executes.
 
 ```php
-public function before_down( int $batch ): void {
+public function before_down( int $batch, int $batch_size ): void {
     // Custom pre-batch logic for rollbacks.
 }
 ```
 
-#### `after_down( int $batch, bool $is_completed ): void`
+#### `after_down( int $batch, int $batch_size, bool $is_completed ): void`
 
 Called after each batch of the rollback executes. The `$is_completed` parameter indicates whether the rollback has finished.
 
 ```php
-public function after_down( int $batch, bool $is_completed ): void {
+public function after_down( int $batch, int $batch_size, bool $is_completed ): void {
     if ( $is_completed ) {
         // Cleanup or notification logic.
     }
 }
 ```
 
-#### `get_up_extra_args_for_batch( int $batch ): array`
+#### `get_up_extra_args_for_batch( int $batch, int $batch_size ): array`
 
 Returns extra arguments to be passed to the `up()` method for a specific batch. This enables migrations to pass dynamic, batch-specific data to their processing methods.
 
-The `$batch` parameter is the batch number about to be processed. The returned array values are spread as additional arguments to the `up()` method.
+The `$batch` parameter is the batch number about to be processed. The `$batch_size` parameter is the number of items to process in this batch. The returned array values are spread as additional arguments to the `up()` method.
 
 ```php
-public function get_up_extra_args_for_batch( int $batch ): array {
+public function get_up_extra_args_for_batch( int $batch, int $batch_size ): array {
     // Return batch-specific data for the up migration.
-    return [ $this->get_items_for_batch( $batch ) ];
+    return [ $this->get_items_for_batch( $batch, $batch_size ) ];
 }
 ```
 
-#### `get_down_extra_args_for_batch( int $batch ): array`
+#### `get_down_extra_args_for_batch( int $batch, int $batch_size ): array`
 
 Returns extra arguments to be passed to the `down()` method for a specific batch. This enables migrations to pass dynamic, batch-specific data to their rollback methods.
 
-The `$batch` parameter is the batch number about to be processed. The returned array values are spread as additional arguments to the `down()` method.
+The `$batch` parameter is the batch number about to be processed. The `$batch_size` parameter is the number of items to process in this batch. The returned array values are spread as additional arguments to the `down()` method.
 
 ```php
-public function get_down_extra_args_for_batch( int $batch ): array {
+public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array {
     // Return batch-specific data for the down rollback.
-    return [ $this->get_items_for_batch( $batch ) ];
+    return [ $this->get_items_for_batch( $batch, $batch_size ) ];
 }
 ```
 
 When extra arguments are provided, your `up()` and `down()` methods should accept them as variadic parameters:
 
 ```php
-public function up( int $batch, ...$extra_args ): void {
+public function up( int $batch, int $batch_size, ...$extra_args ): void {
     $items = $extra_args[0] ?? [];
     foreach ( $items as $item ) {
         // Process item.
     }
 }
 
-public function down( int $batch, ...$extra_args ): void {
+public function down( int $batch, int $batch_size, ...$extra_args ): void {
     $items = $extra_args[0] ?? [];
     foreach ( $items as $item ) {
         // Revert item.
@@ -259,17 +271,17 @@ public function down( int $batch, ...$extra_args ): void {
 
 `StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
 
-| Method | Default Value |
-|--------|---------------|
-| `before_up()` | No-op |
-| `after_up()` | No-op |
-| `before_down()` | No-op |
-| `after_down()` | No-op |
-| `can_run()` | `true` |
-| `get_number_of_retries_per_batch()` | `0` |
-| `get_tags()` | `[]` |
-| `get_up_extra_args_for_batch()` | `[]` |
-| `get_down_extra_args_for_batch()` | `[]` |
+| Method                               | Default Value |
+|--------------------------------------|---------------|
+| `before_up()`                        | No-op         |
+| `after_up()`                         | No-op         |
+| `before_down()`                      | No-op         |
+| `after_down()`                       | No-op         |
+| `can_run()`                          | `true`        |
+| `get_number_of_retries_per_batch()` | `0`           |
+| `get_tags()`                         | `[]`          |
+| `get_up_extra_args_for_batch()`     | `[]`          |
+| `get_down_extra_args_for_batch()`   | `[]`          |
 
 Extend this class to avoid implementing these methods when not needed.
 
@@ -289,11 +301,15 @@ class My_Migration extends Migration_Abstract {
         // Implementation.
     }
 
-    public function up( int $batch ): void {
+    public function get_default_batch_size(): int {
+        return 100;
+    }
+
+    public function up( int $batch, int $batch_size ): void {
         // Implementation.
     }
 
-    public function down( int $batch ): void {
+    public function down( int $batch, int $batch_size ): void {
         // Implementation.
     }
 }

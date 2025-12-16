@@ -40,11 +40,12 @@ class Execute extends Task_Abstract {
 	 * @param string $method        The method to run.
 	 * @param string $migration_id  The migration id.
 	 * @param int    $batch         The batch number.
+	 * @param int    $batch_size    The batch size.
 	 * @param int    $execution_id  The execution id.
 	 * @param mixed  ...$extra_args Extra arguments controlled by each migration.
 	 */
-	public function __construct( string $method, string $migration_id, int $batch, int $execution_id, ...$extra_args ) {
-		parent::__construct( $method, $migration_id, $batch, $execution_id, ...$extra_args );
+	public function __construct( string $method, string $migration_id, int $batch, int $batch_size, int $execution_id, ...$extra_args ) {
+		parent::__construct( $method, $migration_id, $batch, $batch_size, $execution_id, ...$extra_args );
 	}
 
 	/**
@@ -56,9 +57,15 @@ class Execute extends Task_Abstract {
 	 */
 	public function process(): void {
 		$args = $this->get_args();
-		[ $method, $migration_id, $batch, $execution_id ] = [ Cast::to_string( $args[0] ), Cast::to_string( $args[1] ), Cast::to_int( $args[2] ), Cast::to_int( $args[3] ) ];
+		[ $method, $migration_id, $batch, $batch_size, $execution_id ] = [
+			Cast::to_string( $args[0] ), // Method.
+			Cast::to_string( $args[1] ), // Migration ID.
+			Cast::to_int( $args[2] ), // Batch.
+			Cast::to_int( $args[3] ), // Batch size.
+			Cast::to_int( $args[4] ), // Execution ID.
+		];
 
-		unset( $args[0], $args[1], $args[2], $args[3] );
+		unset( $args[0], $args[1], $args[2], $args[3], $args[4] ); // Remove default arguments.
 		$extra_args = $args;
 
 		$container = Config::get_container();
@@ -111,63 +118,77 @@ class Execute extends Task_Abstract {
 		$prefix = Config::get_hook_prefix();
 
 		try {
-			$migration->{"before_{$method}"}( $batch );
+			$migration->{"before_{$method}"}( $batch, $batch_size );
 
 			/**
 			 * Fires before a batch is processed.
 			 *
-			 * @param Migration $migration The migration instance.
-			 * @param int       $batch     The batch number.
-			 * @param string    $method    The method to run.
+			 * @param Migration $migration    The migration instance.
+			 * @param string    $method       The method to run.
+			 * @param int       $batch        The batch number.
+			 * @param int       $batch_size   The batch size.
+			 * @param int       $execution_id The execution id.
 			 */
-			do_action( "stellarwp_migrations_{$prefix}_before_{$method}_batch_processed", $migration, $batch, $method );
+			do_action( "stellarwp_migrations_{$prefix}_before_{$method}_batch_processed", $migration, $method, $batch, $batch_size, $execution_id );
 
 			/**
 			 * Fires before a batch is processed.
 			 *
-			 * @param Migration $migration The migration instance.
-			 * @param int       $batch     The batch number.
-			 * @param string    $method    The method to run.
+			 * @param Migration $migration    The migration instance.
+			 * @param string    $method       The method to run.
+			 * @param int       $batch        The batch number.
+			 * @param int       $batch_size   The batch size.
+			 * @param int       $execution_id The execution id.
 			 */
-			do_action( "stellarwp_migrations_{$prefix}_before_batch_processed", $migration, $batch, $method );
+			do_action( "stellarwp_migrations_{$prefix}_before_batch_processed", $migration, $method, $batch, $batch_size, $execution_id );
 
-			$migration->$method( $batch, ...$extra_args );
-
-			/**
-			 * Fires after a batch is processed successfully.
-			 *
-			 * @param Migration $migration The migration instance.
-			 * @param int       $batch     The batch number.
-			 * @param string    $method    The method to run.
-			 */
-			do_action( "stellarwp_migrations_{$prefix}_post_{$method}_batch_processed", $migration, $batch, $method );
+			$migration->$method( $batch, $batch_size, ...$extra_args );
 
 			/**
 			 * Fires after a batch is processed successfully.
 			 *
-			 * @param Migration $migration The migration instance.
-			 * @param int       $batch     The batch number.
-			 * @param string    $method    The method to run.
+			 * @param Migration $migration    The migration instance.
+			 * @param string    $method       The method to run.
+			 * @param int       $batch        The batch number.
+			 * @param int       $batch_size   The batch size.
+			 * @param int       $execution_id The execution id.
 			 */
-			do_action( "stellarwp_migrations_{$prefix}_post_batch_processed", $migration, $batch, $method );
+			do_action( "stellarwp_migrations_{$prefix}_post_{$method}_batch_processed", $migration, $method, $batch, $batch_size, $execution_id );
+
+			/**
+			 * Fires after a batch is processed successfully.
+			 *
+			 * @param Migration $migration    The migration instance.
+			 * @param string    $method       The method to run.
+			 * @param int       $batch        The batch number.
+			 * @param int       $batch_size   The batch size.
+			 * @param int       $execution_id The execution id.
+			 */
+			do_action( "stellarwp_migrations_{$prefix}_post_batch_processed", $migration, $method, $batch, $batch_size, $execution_id );
 		} catch ( Exception $e ) {
 			/**
 			 * Fires when a batch fails.
 			 *
-			 * @param Migration $migration The migration instance.
-			 * @param int       $batch     The batch number.
-			 * @param Exception $e         The exception.
+			 * @param Migration $migration    The migration instance.
+			 * @param string    $method       The method to run.
+			 * @param int       $batch        The batch number.
+			 * @param int       $batch_size   The batch size.
+			 * @param int       $execution_id The execution id.
+			 * @param Exception $e            The exception.
 			 */
-			do_action( "stellarwp_migrations_{$prefix}_{$method}_batch_failed", $migration, $batch, $e );
+			do_action( "stellarwp_migrations_{$prefix}_{$method}_batch_failed", $migration, $method, $batch, $batch_size, $execution_id, $e );
 
 			/**
 			 * Fires when a batch fails.
 			 *
-			 * @param Migration $migration The migration instance.
-			 * @param int       $batch     The batch number.
-			 * @param Exception $e         The exception.
+			 * @param Migration $migration    The migration instance.
+			 * @param string    $method       The method to run.
+			 * @param int       $batch        The batch number.
+			 * @param int       $batch_size   The batch size.
+			 * @param int       $execution_id The execution id.
+			 * @param Exception $e            The exception.
 			 */
-			do_action( "stellarwp_migrations_{$prefix}_batch_failed", $migration, $batch, $e );
+			do_action( "stellarwp_migrations_{$prefix}_batch_failed", $migration, $method, $batch, $batch_size, $execution_id, $e );
 
 			Migration_Events::insert(
 				[
@@ -203,7 +224,7 @@ class Execute extends Task_Abstract {
 				);
 
 				// If it failed we need to trigger the rollback.
-				shepherd()->dispatch( new self( 'down', $migration_id, 1, $execution_id, ...$migration->get_down_extra_args_for_batch( 1 ) ) );
+				shepherd()->dispatch( new self( 'down', $migration_id, 1, $batch_size, $execution_id, ...$migration->get_down_extra_args_for_batch( 1, $batch_size ) ) );
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
@@ -219,7 +240,7 @@ class Execute extends Task_Abstract {
 
 		$is_completed = $migration->$method_to_check_if_done();
 
-		$migration->{"after_{$method}"}( $batch, $is_completed );
+		$migration->{"after_{$method}"}( $batch, $batch_size, $is_completed );
 
 		if ( ! $is_completed ) {
 			Migration_Events::insert(
@@ -241,9 +262,9 @@ class Execute extends Task_Abstract {
 			);
 
 			/** @var array<mixed> $extra_args */
-			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 );
+			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1, $batch_size );
 
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, $execution_id, ...$extra_args ) );
+			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, $batch_size, $execution_id, ...$extra_args ) );
 
 			return;
 		}
