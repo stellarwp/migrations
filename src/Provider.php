@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations;
 
+use Exception;
 use StellarWP\DB\DB;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
@@ -203,7 +204,7 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			Migration_Executions::insert(
+			$insert_status = Migration_Executions::insert(
 				[
 					'migration_id'    => $migration_id,
 					'status'          => Status::SCHEDULED()->getValue(),
@@ -211,6 +212,17 @@ class Provider extends Provider_Abstract {
 					'items_processed' => 0,
 				]
 			);
+
+			if ( ! $insert_status ) {
+				throw new Exception(
+					sprintf(
+						// translators: %1$s is the migration ID.
+						__( 'Failed to insert migration execution for migration "%1$s"', 'stellarwp-migrations' ),
+						$migration_id
+					)
+				);
+			}
+
 			$execution_id = DB::last_insert_id();
 
 			/** @var array{0: string, 1: string, 2: int, 3: int, ...} $args */

@@ -203,7 +203,7 @@ class Execute extends Task_Abstract {
 				);
 
 				// If it failed we need to trigger the rollback.
-				shepherd()->dispatch( new self( 'down', $migration_id, 1, $execution_id, ...$migration->get_down_extra_args_for_batch( $batch ) ) );
+				shepherd()->dispatch( new self( 'down', $migration_id, 1, $execution_id, ...$migration->get_down_extra_args_for_batch( 1 ) ) );
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
