@@ -68,7 +68,7 @@ class Execute extends Task_Abstract {
 
 		if (
 			! $migration
-			|| empty( $execution )
+			|| ! $execution
 			|| ! is_array( $execution )
 		) {
 			throw new ShepherdTaskFailWithoutRetryException(
