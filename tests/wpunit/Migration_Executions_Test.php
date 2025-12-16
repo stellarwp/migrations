@@ -15,9 +15,9 @@ class Migration_Executions_Test extends WPTestCase {
 		// Arrange.
 		$migration_id = 'test_migration_' . uniqid();
 		$data         = [
-			'migration_id'           => $migration_id,
-			'start_date'             => current_time( 'mysql', true ),
-			'status'                 => Status::RUNNING()->getValue(),
+			'migration_id'    => $migration_id,
+			'start_date'      => current_time( 'mysql', true ),
+			'status'          => Status::RUNNING()->getValue(),
 			'items_total'     => 100,
 			'items_processed' => 0,
 		];
@@ -37,9 +37,9 @@ class Migration_Executions_Test extends WPTestCase {
 		// Arrange.
 		$migration_id = 'test_retrieval_' . uniqid();
 		$data         = [
-			'migration_id'           => $migration_id,
-			'start_date'             => current_time( 'mysql', true ),
-			'status'                 => Status::RUNNING()->getValue(),
+			'migration_id'    => $migration_id,
+			'start_date'      => current_time( 'mysql', true ),
+			'status'          => Status::RUNNING()->getValue(),
 			'items_total'     => 50,
 			'items_processed' => 25,
 		];
@@ -65,9 +65,9 @@ class Migration_Executions_Test extends WPTestCase {
 
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id,
-				'start_date'             => current_time( 'mysql', true ),
-				'status'                 => Status::RUNNING()->getValue(),
+				'migration_id'    => $migration_id,
+				'start_date'      => current_time( 'mysql', true ),
+				'status'          => Status::RUNNING()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 0,
 			]
@@ -75,9 +75,9 @@ class Migration_Executions_Test extends WPTestCase {
 
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id,
-				'start_date'             => current_time( 'mysql', true ),
-				'status'                 => Status::RUNNING()->getValue(),
+				'migration_id'    => $migration_id,
+				'start_date'      => current_time( 'mysql', true ),
+				'status'          => Status::RUNNING()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 50,
 			]
@@ -85,10 +85,10 @@ class Migration_Executions_Test extends WPTestCase {
 
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id,
-				'start_date'             => current_time( 'mysql', true ),
-				'end_date'               => current_time( 'mysql', true ),
-				'status'                 => Status::COMPLETED()->getValue(),
+				'migration_id'    => $migration_id,
+				'start_date'      => current_time( 'mysql', true ),
+				'end_date'        => current_time( 'mysql', true ),
+				'status'          => Status::COMPLETED()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 100,
 			]
@@ -111,9 +111,9 @@ class Migration_Executions_Test extends WPTestCase {
 		// Act.
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id,
-				'start_date'             => current_time( 'mysql', true ),
-				'status'                 => Status::RUNNING()->getValue(),
+				'migration_id'    => $migration_id,
+				'start_date'      => current_time( 'mysql', true ),
+				'status'          => Status::RUNNING()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 0,
 			]
@@ -137,9 +137,9 @@ class Migration_Executions_Test extends WPTestCase {
 		// Act.
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id,
-				'start_date'             => current_time( 'mysql', true ),
-				'status'                 => Status::RUNNING()->getValue(),
+				'migration_id'    => $migration_id,
+				'start_date'      => current_time( 'mysql', true ),
+				'status'          => Status::RUNNING()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 0,
 			]
@@ -195,9 +195,9 @@ class Migration_Executions_Test extends WPTestCase {
 
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id_running,
-				'start_date'             => current_time( 'mysql', true ),
-				'status'                 => Status::RUNNING()->getValue(),
+				'migration_id'    => $migration_id_running,
+				'start_date'      => current_time( 'mysql', true ),
+				'status'          => Status::RUNNING()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 50,
 			]
@@ -205,10 +205,10 @@ class Migration_Executions_Test extends WPTestCase {
 
 		Migration_Executions::insert(
 			[
-				'migration_id'           => $migration_id_completed,
-				'start_date'             => current_time( 'mysql', true ),
-				'end_date'               => current_time( 'mysql', true ),
-				'status'                 => Status::COMPLETED()->getValue(),
+				'migration_id'    => $migration_id_completed,
+				'start_date'      => current_time( 'mysql', true ),
+				'end_date'        => current_time( 'mysql', true ),
+				'status'          => Status::COMPLETED()->getValue(),
 				'items_total'     => 100,
 				'items_processed' => 100,
 			]
