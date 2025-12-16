@@ -66,10 +66,14 @@ class Execute extends Task_Abstract {
 		$migration = $registry->get( $migration_id );
 		$execution = Migration_Executions::get_first_by( 'id', $execution_id );
 
-		if ( ! $migration || ! $execution ) {
+		if (
+			! $migration
+			|| empty( $execution )
+			|| ! is_array( $execution )
+		) {
 			throw new ShepherdTaskFailWithoutRetryException(
 				sprintf(
-					'Migration "%s" or execution "%s" not found.',
+					'Migration "%1$s" or execution "%2$s" not found.',
 					$migration_id,
 					$execution_id
 				)
@@ -232,7 +236,7 @@ class Execute extends Task_Abstract {
 			Migration_Executions::update_single(
 				[
 					'id'                     => $execution_id,
-					'items_number_processed' => $execution['items_number_total'] - $migration->get_total_items(),
+					'items_number_processed' => Cast::to_int( $execution['items_number_total'] ) - $migration->get_total_items(),
 				]
 			);
 
@@ -259,7 +263,7 @@ class Execute extends Task_Abstract {
 				'id'                     => $execution_id,
 				'status'                 => Status::COMPLETED()->getValue(),
 				'end_date'               => current_time( 'mysql', true ),
-				'items_number_processed' => $execution['items_number_total'] - $migration->get_total_items(),
+				'items_number_processed' => Cast::to_int( $execution['items_number_total'] ) - $migration->get_total_items(),
 			]
 		);
 	}
