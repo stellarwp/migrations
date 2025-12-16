@@ -162,6 +162,8 @@ class Provider extends Provider_Abstract {
 	 *
 	 * @since 0.0.1
 	 *
+	 * @throws Exception If the migration execution cannot be inserted.
+	 *
 	 * @return void
 	 */
 	public function schedule_migrations(): void {
