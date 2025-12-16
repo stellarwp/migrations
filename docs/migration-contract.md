@@ -28,13 +28,14 @@ public function get_description(): string {
 }
 ```
 
-#### `get_total_batches(): int`
+#### `get_total_items(): int`
 
-Returns the total number of batches for the migration. Used for progress tracking.
+Returns the total number of items to process for the migration. Used for progress tracking.
 
 ```php
-public function get_total_batches(): int {
+public function get_total_items(): int {
     global $wpdb;
+
     $count = (int) $wpdb->get_var(
         $wpdb->prepare(
             "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
@@ -42,7 +43,8 @@ public function get_total_batches(): int {
             'old_key'
         )
     );
-    return (int) ceil( $count / 100 );
+
+    return $count;
 }
 ```
 

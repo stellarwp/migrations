@@ -36,13 +36,13 @@ interface Migration {
 	public function get_description(): string;
 
 	/**
-	 * Get the total number of batches.
+	 * Get the total number of items to process.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return int
 	 */
-	public function get_total_batches(): int;
+	public function get_total_items(): int;
 
 	/**
 	 * Get the number of retries per batch.

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Tasks;
 
+use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
@@ -38,10 +40,11 @@ class Execute extends Task_Abstract {
 	 * @param string $method        The method to run.
 	 * @param string $migration_id  The migration id.
 	 * @param int    $batch         The batch number.
+	 * @param int    $execution_id  The execution id.
 	 * @param mixed  ...$extra_args Extra arguments controlled by each migration.
 	 */
-	public function __construct( string $method, string $migration_id, int $batch, ...$extra_args ) {
-		parent::__construct( $method, $migration_id, $batch, ...$extra_args );
+	public function __construct( string $method, string $migration_id, int $batch, int $execution_id, ...$extra_args ) {
+		parent::__construct( $method, $migration_id, $batch, $execution_id, ...$extra_args );
 	}
 
 	/**
@@ -52,21 +55,27 @@ class Execute extends Task_Abstract {
 	 * @throws ShepherdTaskFailWithoutRetryException If the migration fails.
 	 */
 	public function process(): void {
-		$args                              = $this->get_args();
-		[ $method, $migration_id, $batch ] = [ Cast::to_string( $args[0] ), Cast::to_string( $args[1] ), Cast::to_int( $args[2] ) ];
+		$args = $this->get_args();
+		[ $method, $migration_id, $batch, $execution_id ] = [ Cast::to_string( $args[0] ), Cast::to_string( $args[1] ), Cast::to_int( $args[2] ), Cast::to_int( $args[3] ) ];
 
-		unset( $args[0], $args[1], $args[2] );
+		unset( $args[0], $args[1], $args[2], $args[3] );
 		$extra_args = $args;
 
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
 		$migration = $registry->get( $migration_id );
+		$execution = Migration_Executions::get_first_by( 'id', $execution_id );
 
-		if ( ! $migration ) {
+		if (
+			! $migration
+			|| empty( $execution )
+			|| ! is_array( $execution )
+		) {
 			throw new ShepherdTaskFailWithoutRetryException(
 				sprintf(
-					'Migration "%s" not found.',
-					$migration_id
+					'Migration "%1$s" or execution "%2$s" not found.',
+					$migration_id,
+					$execution_id
 				)
 			);
 		}
@@ -82,10 +91,22 @@ class Execute extends Task_Abstract {
 				'migration_id' => $migration_id,
 				'type'         => Migration_Events::TYPE_BATCH_STARTED,
 				'data'         => [
-					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
+					'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
 				],
 			]
 		);
+
+		// Update the execution status to running and record the start date.
+
+		if ( $batch === 1 ) {
+			Migration_Executions::update_single(
+				[
+					'id'         => $execution_id,
+					'status'     => Status::RUNNING()->getValue(),
+					'start_date' => current_time( 'mysql', true ),
+				]
+			);
+		}
 
 		$prefix = Config::get_hook_prefix();
 
@@ -153,25 +174,36 @@ class Execute extends Task_Abstract {
 					'migration_id' => $migration_id,
 					'type'         => Migration_Events::TYPE_FAILED,
 					'data'         => [
-						'args'    => [ $method, $migration_id, $batch, ...$extra_args ],
+						'args'    => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
 						'message' => $e->getMessage(),
 					],
 				]
 			);
 
+			Migration_Executions::update_single(
+				[
+					'id'       => $execution_id,
+					'status'   => Status::FAILED()->getValue(),
+					'end_date' => current_time( 'mysql', true ),
+				]
+			);
+
 			if ( 'up' === $method ) {
+				// Start the rollback from the first batch.
+
 				Migration_Events::insert(
 					[
 						'migration_id' => $migration_id,
 						'type'         => Migration_Events::TYPE_SCHEDULED,
 						'data'         => [
-							'args'    => [ 'down', $migration_id, 1, ...$extra_args ],
+							'args'    => [ 'down', $migration_id, 1, $execution_id, ...$extra_args ],
 							'message' => $e->getMessage(),
 						],
 					]
 				);
+
 				// If it failed we need to trigger the rollback.
-				shepherd()->dispatch( new self( 'down', $migration_id, 1, ...$migration->get_down_extra_args_for_batch( 1 ) ) );
+				shepherd()->dispatch( new self( 'down', $migration_id, 1, $execution_id, ...$migration->get_down_extra_args_for_batch( $batch ) ) );
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
@@ -195,15 +227,23 @@ class Execute extends Task_Abstract {
 					'migration_id' => $migration_id,
 					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
 					'data'         => [
-						'args' => [ $method, $migration_id, $batch, ...$extra_args ],
+						'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
 					],
+				]
+			);
+
+			// Update the items number processed.
+			Migration_Executions::update_single(
+				[
+					'id'              => $execution_id,
+					'items_processed' => Cast::to_int( $execution['items_total'] ) - $migration->get_total_items(),
 				]
 			);
 
 			/** @var array<mixed> $extra_args */
 			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1 );
 
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, ...$extra_args ) );
+			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, $execution_id, ...$extra_args ) );
 
 			return;
 		}
@@ -213,8 +253,17 @@ class Execute extends Task_Abstract {
 				'migration_id' => $migration_id,
 				'type'         => Migration_Events::TYPE_COMPLETED,
 				'data'         => [
-					'args' => [ $method, $migration_id, $batch, ...$extra_args ],
+					'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
 				],
+			]
+		);
+
+		Migration_Executions::update_single(
+			[
+				'id'              => $execution_id,
+				'status'          => Status::COMPLETED()->getValue(),
+				'end_date'        => current_time( 'mysql', true ),
+				'items_processed' => Cast::to_int( $execution['items_total'] ) - $migration->get_total_items(),
 			]
 		);
 	}
