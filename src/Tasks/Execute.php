@@ -242,25 +242,28 @@ class Execute extends Task_Abstract {
 
 		$migration->{"after_{$method}"}( $batch, $batch_size, $is_completed );
 
+		Migration_Events::insert(
+			[
+				'migration_id' => $migration_id,
+				'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
+				'data'         => [
+					'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
+				],
+			]
+		);
+
+		// Update the items number processed.
+
+		Migration_Executions::update_single(
+			[
+				'id'              => $execution_id,
+				'items_processed' => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
+			]
+		);
+
+		// If the migration is not completed, dispatch the next batch.
+
 		if ( ! $is_completed ) {
-			Migration_Events::insert(
-				[
-					'migration_id' => $migration_id,
-					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
-					'data'         => [
-						'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
-					],
-				]
-			);
-
-			// Update the items number processed.
-			Migration_Executions::update_single(
-				[
-					'id'              => $execution_id,
-					'items_processed' => Cast::to_int( $execution['items_total'] ) - $migration->get_total_items(),
-				]
-			);
-
 			/** @var array<mixed> $extra_args */
 			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1, $batch_size );
 
@@ -268,6 +271,8 @@ class Execute extends Task_Abstract {
 
 			return;
 		}
+
+		// If the migration is completed, mark the execution as completed.
 
 		Migration_Events::insert(
 			[
@@ -281,10 +286,9 @@ class Execute extends Task_Abstract {
 
 		Migration_Executions::update_single(
 			[
-				'id'              => $execution_id,
-				'status'          => Status::COMPLETED()->getValue(),
-				'end_date'        => current_time( 'mysql', true ),
-				'items_processed' => Cast::to_int( $execution['items_total'] ) - $migration->get_total_items(),
+				'id'       => $execution_id,
+				'status'   => Status::COMPLETED()->getValue(),
+				'end_date' => current_time( 'mysql', true ),
 			]
 		);
 	}
