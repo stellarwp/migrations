@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations;
 
+use StellarWP\DB\DB;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
@@ -202,13 +203,14 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			$execution_id = Migration_Executions::insert(
+			Migration_Executions::insert(
 				[
 					'migration_id'       => $migration_id,
 					'status'             => Status::SCHEDULED()->getValue(),
 					'items_number_total' => $migration->get_total_items(),
 				]
 			);
+			$execution_id = DB::last_insert_id();
 
 			/** @var array{0: string, 1: string, 2: int, 3: int, ...} $args */
 			$args = [ 'up', $migration_id, 1, $execution_id, ...$migration->get_up_extra_args_for_batch( 1 ) ];
