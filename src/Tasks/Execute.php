@@ -68,6 +68,9 @@ class Execute extends Task_Abstract {
 		unset( $args[0], $args[1], $args[2], $args[3], $args[4] ); // Remove default arguments.
 		$extra_args = $args;
 
+		$is_rollback    = 'down' === $method;
+		$operation_type = $is_rollback ? 'Rollback' : 'Migration';
+
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
 		$migration = $registry->get( $migration_id );
@@ -99,19 +102,19 @@ class Execute extends Task_Abstract {
 		$logger = Logger::for_execution( $execution_id );
 
 		$logger->info(
-			sprintf( 'Batch %d started', $batch ),
+			sprintf( '%s batch %d started.', $operation_type, $batch ),
 			[
-				'method' => $method,
-				'batch'  => $batch,
-				'size'   => $batch_size,
-				'args'   => $extra_args,
+				'method'     => $method,
+				'batch'      => $batch,
+				'batch_size' => $batch_size,
+				'extra_args' => $extra_args,
 			]
 		);
 
 		// Update the execution status to running and record the start date.
 
 		if (
-				'up' === $method // Only on the first batch for up migrations.
+				! $is_rollback // Rollback does not change the execution status.
 				&& 1 === $batch
 			) {
 
@@ -200,29 +203,34 @@ class Execute extends Task_Abstract {
 			do_action( "stellarwp_migrations_{$prefix}_batch_failed", $migration, $method, $batch, $batch_size, $execution_id, $e );
 
 			$logger->error(
-				sprintf( 'Batch %d failed: %s', $batch, $e->getMessage() ),
+				sprintf(
+					'%s batch %d failed: %s',
+					$operation_type,
+					$batch,
+					$e->getMessage()
+				),
 				[
-					'method'    => $method,
-					'batch'     => $batch,
-					'size'      => $batch_size,
-					'exception' => get_class( $e ),
-					'trace'     => $e->getTraceAsString(),
+					'method'     => $method,
+					'batch'      => $batch,
+					'batch_size' => $batch_size,
+					'extra_args' => $extra_args,
+					'exception'  => get_class( $e ),
+					'trace'      => $e->getTraceAsString(),
 				]
 			);
 
-			Migration_Executions::update_single(
-				[
-					'id'           => $execution_id,
-					'status'       => Status::FAILED()->getValue(),
-					'end_date_gmt' => current_time( 'mysql', true ),
-				]
-			);
+			if ( ! $is_rollback ) {
+				Migration_Executions::update_single(
+					[
+						'id'     => $execution_id,
+						'status' => Status::FAILED()->getValue(),
+					]
+				);
 
-			if ( 'up' === $method ) {
 				// Start the rollback from the first batch.
 
 				$logger->warning(
-					'Migration rollback scheduled',
+					'Rollback scheduled.',
 					[
 						'reason' => $e->getMessage(),
 					]
@@ -247,58 +255,78 @@ class Execute extends Task_Abstract {
 
 		$migration->{"after_{$method}"}( $batch, $batch_size, $is_completed );
 
-		// Update the items number processed.
+		// Update the items processed count for successful migrations.
 
-		Migration_Executions::update_single(
+		if ( ! $is_rollback ) {
+			Migration_Executions::update_single(
+				[
+					'id'              => $execution_id,
+					'items_processed' => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
+				]
+			);
+		}
+
+		$logger->info(
+			sprintf( '%s batch %d completed.', $operation_type, $batch ),
 			[
-				'id'              => $execution_id,
-				'items_processed' => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
+				'method'     => $method,
+				'batch'      => $batch,
+				'batch_size' => $batch_size,
+				'extra_args' => $extra_args,
 			]
 		);
 
 		// If the migration is not completed, dispatch the next batch.
 
 		if ( ! $is_completed ) {
+			$next_batch = $batch + 1;
+
+			/** @var array<mixed> $extra_args */
+			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $next_batch, $batch_size );
+
 			$logger->info(
-				sprintf( 'Batch %d completed', $batch ),
+				sprintf( '%s batch %d scheduled for execution.', $operation_type, $next_batch ),
 				[
-					'method'          => $method,
-					'batch'           => $batch,
-					'items_processed' => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
+					'method'     => $method,
+					'batch'      => $next_batch,
+					'batch_size' => $batch_size,
+					'extra_args' => $extra_args,
 				]
 			);
 
-			/** @var array<mixed> $extra_args */
-			$extra_args = $migration->{ "get_{$method}_extra_args_for_batch" }( $batch + 1, $batch_size );
-
-			shepherd()->dispatch( new self( $method, $migration_id, $batch + 1, $batch_size, $execution_id, ...$extra_args ) );
+			shepherd()->dispatch( new self( $method, $migration_id, $next_batch, $batch_size, $execution_id, ...$extra_args ) );
 
 			return;
 		}
 
-		// If the migration is completed, mark the execution as completed.
+		// Handle migration completion.
 
+		// Rollback completion.
 		if ( 'down' === $method ) {
-			// Skip marking the execution as completed for rollback.
-			return;
+			$logger->info(
+				'Migration rollback completed.',
+				[
+					'total_batches' => $batch,
+				]
+			);
+		} else {
+			// Successful migration completion.
+			$logger->info(
+				'Migration completed successfully.',
+				[
+					'total_batches' => $batch,
+				]
+			);
+
+			// Set the execution status to completed.
+			Migration_Executions::update_single(
+				[
+					'id'           => $execution_id,
+					'status'       => Status::COMPLETED()->getValue(),
+					'end_date_gmt' => current_time( 'mysql', true ),
+				]
+			);
 		}
-
-		$logger->info(
-			'Migration completed successfully',
-			[
-				'method'          => $method,
-				'total_batches'   => $batch,
-				'items_processed' => Cast::to_int( $execution['items_total'] ),
-			]
-		);
-
-		Migration_Executions::update_single(
-			[
-				'id'           => $execution_id,
-				'status'       => Status::COMPLETED()->getValue(),
-				'end_date_gmt' => current_time( 'mysql', true ),
-			]
-		);
 	}
 
 	/**

@@ -227,20 +227,24 @@ class Provider extends Provider_Abstract {
 			}
 
 			$execution_id = DB::last_insert_id();
+			$batch_number = 1;
 			$batch_size   = $migration->get_default_batch_size();
+
+			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
+			$args = [ 'up', $migration_id, $batch_number, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( $batch_number, $batch_size ) ];
+
+			// Log the migration scheduling.
 
 			$logger = Logger::for_execution( $execution_id );
 			$logger->info(
-				sprintf( 'Migration "%s" scheduled for execution', $migration_id ),
+				sprintf( 'Migration "%s" scheduled for execution.', $migration_id ),
 				[
-					'migration_id' => $migration_id,
-					'batch_size'   => $batch_size,
-					'total_items'  => $migration->get_total_items(),
+					'batch'       => $batch_number,
+					'batch_size'  => $batch_size,
+					'items_total' => $migration->get_total_items(),
+					'extra_args'  => $migration->get_up_extra_args_for_batch( $batch_number, $batch_size ),
 				]
 			);
-
-			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
-			$args = [ 'up', $migration_id, 1, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( 1, $batch_size ) ];
 
 			shepherd()->dispatch( new Execute( ...$args ) );
 		}

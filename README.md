@@ -91,12 +91,12 @@ Add custom logs to track migration progress and debug issues:
 public function up( int $batch, int $batch_size ): void {
     $logger = $this->get_logger();
 
-    $logger->info( 'Starting batch processing', [ 'batch' => $batch ] );
+    $logger->info( 'Starting batch processing.', [ 'batch' => $batch ] );
 
     // ... do migration work ...
 
     if ( $some_warning_condition ) {
-        $logger->warning( 'Found invalid data', [ 'record_id' => $id ] );
+        $logger->warning( 'Found invalid data.', [ 'record_id' => $id ] );
     }
 }
 ```

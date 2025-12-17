@@ -154,12 +154,12 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @return int|null The execution ID or null if not set.
 	 */
-	protected function get_execution_id(): ?int {
+	public function get_execution_id(): ?int {
 		return $this->execution_id;
 	}
 
 	/**
-	 * Gets a logger instance for this migration execution.
+	 * Gets a logger instance based on the current execution ID.
 	 *
 	 * @since TBD
 	 *
