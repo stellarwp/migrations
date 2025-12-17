@@ -106,8 +106,8 @@ class Execute extends Task_Abstract {
 		// Update the execution status to running and record the start date.
 
 		if (
-				'up' === $method // skip for rollback.
-				&& $batch === 1
+				'up' === $method // Only on the first batch for up migrations.
+				&& 1 === $batch
 			) {
 
 				Migration_Executions::update_single(
