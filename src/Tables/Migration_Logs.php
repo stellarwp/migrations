@@ -1,6 +1,6 @@
 <?php
 /**
- * The Migration Events table schema.
+ * The Migration Logs table schema.
  *
  * @since 0.0.1
  *
@@ -9,6 +9,7 @@
 
 namespace StellarWP\Migrations\Tables;
 
+use StellarWP\Schema\Columns\Referenced_ID;
 use StellarWP\Shepherd\Abstracts\Table_Abstract;
 use StellarWP\Schema\Collections\Column_Collection;
 use StellarWP\Schema\Columns\ID;
@@ -19,13 +20,13 @@ use StellarWP\Schema\Tables\Table_Schema;
 use StellarWP\Schema\Columns\PHP_Types;
 
 /**
- * Tasks table schema.
+ * Migration Logs table schema.
  *
  * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tables
  */
-class Migration_Events extends Table_Abstract {
+class Migration_Logs extends Table_Abstract {
 	/**
 	 * The schema version.
 	 *
@@ -36,58 +37,13 @@ class Migration_Events extends Table_Abstract {
 	const SCHEMA_VERSION = '0.0.1';
 
 	/**
-	 * The type of migration event.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	const TYPE_SCHEDULED = 'scheduled';
-
-	/**
-	 * The type of migration event.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	const TYPE_BATCH_STARTED = 'batch-started';
-
-	/**
-	 * The type of migration event.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	const TYPE_BATCH_COMPLETED = 'batch-completed';
-
-	/**
-	 * The type of migration event.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	const TYPE_COMPLETED = 'completed';
-
-	/**
-	 * The type of migration event.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	const TYPE_FAILED = 'failed';
-
-	/**
 	 * The base table name, without the table prefix.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
-	protected static $base_table_name = 'stellarwp_%s_migration_events';
+	protected static $base_table_name = 'stellarwp_%s_migration_logs';
 
 	/**
 	 * The table group.
@@ -105,7 +61,7 @@ class Migration_Events extends Table_Abstract {
 	 *
 	 * @var string
 	 */
-	protected static $schema_slug = 'stellarwp-migrations-%s-migration-events';
+	protected static $schema_slug = 'stellarwp-migrations-%s-migration-logs';
 
 	/**
 	 * Gets the schema history for the table.
@@ -131,8 +87,9 @@ class Migration_Events extends Table_Abstract {
 		$columns = new Column_Collection(
 			[
 				new ID( 'id' ),
-				( new String_Column( 'migration_id' ) )->set_length( 191 )->set_is_index( true ),
+				( new Referenced_ID( 'migration_execution_id' ) ),
 				( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true ),
+				( new String_Column( 'message' ) )->set_length( 1024 ),
 				( new Text_Column( 'data' ) )->set_nullable( true )->set_php_type( PHP_Types::JSON ),
 				new Created_At( 'created_at' ),
 			]
