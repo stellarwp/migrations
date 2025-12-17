@@ -262,9 +262,9 @@ class Execute extends Task_Abstract {
 			$logger->info(
 				sprintf( 'Batch %d completed', $batch ),
 				[
-					'method'           => $method,
-					'batch'            => $batch,
-					'items_processed'  => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
+					'method'          => $method,
+					'batch'           => $batch,
+					'items_processed' => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
 				]
 			);
 
