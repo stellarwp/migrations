@@ -200,7 +200,7 @@ class Commands {
 		$tasks = [];
 
 		for ( $i = $from_batch; $i <= $to_batch; $i += 1 ) {
-			$task = new Execute( 'up', $migration_id, $i, $batch_size, ...$migration->get_up_extra_args_for_batch( $i ) );
+			$task    = new Execute( 'up', $migration_id, $i, $batch_size, ...$migration->get_up_extra_args_for_batch( $i ) );
 			$tasks[] = $task;
 		}
 
@@ -215,7 +215,7 @@ class Commands {
 			'before' => function ( Task $task ) use ( $progress_bar ): void {
 				WP_CLI::log( "Running batch `{$task->get_args()[2]}` for migration `{$task->get_args()[1]}`." );
 			},
-			'after' => function ( Task $task ) use ( $progress_bar ): void {
+			'after'  => function ( Task $task ) use ( $progress_bar ): void {
 				$progress_bar->tick();
 			},
 			'always' => function ( array $tasks ) use ( $progress_bar ): void {
