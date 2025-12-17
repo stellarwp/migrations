@@ -24,40 +24,44 @@ abstract class Migration_Abstract implements Migration {
 	/**
 	 * Runs before each batch of the migration.
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function before_up( int $batch ): void {}
+	public function before_up( int $batch, int $batch_size ): void {}
 
 	/**
 	 * Runs after each batch of the migration.
 	 *
 	 * @param int  $batch        The batch number.
+	 * @param int  $batch_size   The batch size.
 	 * @param bool $is_completed Whether the migration has been completed.
 	 *
 	 * @return void
 	 */
-	public function after_up( int $batch, bool $is_completed ): void {}
+	public function after_up( int $batch, int $batch_size, bool $is_completed ): void {}
 
 	/**
 	 * Runs before each batch of the rollback.
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function before_down( int $batch ): void {}
+	public function before_down( int $batch, int $batch_size ): void {}
 
 	/**
 	 * Runs after each batch of the rollback.
 	 *
 	 * @param int  $batch        The batch number.
+	 * @param int  $batch_size   The batch size.
 	 * @param bool $is_completed Whether the roll-back has been completed.
 	 *
 	 * @return void
 	 */
-	public function after_down( int $batch, bool $is_completed ): void {}
+	public function after_down( int $batch, int $batch_size, bool $is_completed ): void {}
 
 	/**
 	 * Whether the migration can run.
@@ -97,11 +101,12 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return array<mixed>
 	 */
-	public function get_up_extra_args_for_batch( int $batch ): array {
+	public function get_up_extra_args_for_batch( int $batch, int $batch_size ): array {
 		return [];
 	}
 
@@ -110,11 +115,12 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return array<mixed>
 	 */
-	public function get_down_extra_args_for_batch( int $batch ): array {
+	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array {
 		return [];
 	}
 }

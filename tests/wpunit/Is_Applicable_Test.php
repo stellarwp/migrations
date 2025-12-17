@@ -132,7 +132,11 @@ class Is_Applicable_Test extends WPTestCase {
 			private static bool $applicable = true;
 			public static bool $up_called   = false;
 
-			public function get_total_batches(): int {
+			public function get_total_items(): int {
+				return 1;
+			}
+
+			public function get_default_batch_size(): int {
 				return 1;
 			}
 
@@ -156,11 +160,11 @@ class Is_Applicable_Test extends WPTestCase {
 				return ! self::$up_called;
 			}
 
-			public function up( int $batch ): void {
+			public function up( int $batch, int $batch_size ): void {
 				self::$up_called = true;
 			}
 
-			public function down( int $batch ): void {
+			public function down( int $batch, int $batch_size ): void {
 				self::$up_called = false;
 			}
 		};

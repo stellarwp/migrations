@@ -43,13 +43,15 @@ Fires before a batch is processed. `{method}` is either `up` or `down`.
 ```php
 add_action(
     "stellarwp_migrations_{prefix}_before_up_batch_processed",
-    function( $migration, $batch, $method ) {
+    function( $migration, $method, $batch, $batch_size, $execution_id ) {
         // $migration: Migration instance.
-        // $batch: Batch number (int).
         // $method: 'up' or 'down'.
+        // $batch: Batch number (int).
+        // $batch_size: Number of items to process in this batch (int).
+        // $execution_id: The execution ID (int).
     },
     10,
-    3
+    5
 );
 ```
 
@@ -60,11 +62,16 @@ Generic version that fires for both `up` and `down`.
 ```php
 add_action(
     "stellarwp_migrations_{prefix}_before_batch_processed",
-    function( $migration, $batch, $method ) {
+    function( $migration, $method, $batch, $batch_size, $execution_id ) {
         // Runs before any batch.
+        // $migration: Migration instance.
+        // $method: 'up' or 'down'.
+        // $batch: Batch number (int).
+        // $batch_size: Number of items to process in this batch (int).
+        // $execution_id: The execution ID (int).
     },
     10,
-    3
+    5
 );
 ```
 
@@ -75,11 +82,16 @@ Fires after a batch completes successfully. `{method}` is either `up` or `down`.
 ```php
 add_action(
     "stellarwp_migrations_{prefix}_post_up_batch_processed",
-    function( $migration, $batch, $method ) {
+    function( $migration, $method, $batch, $batch_size, $execution_id ) {
         // Batch completed successfully.
+        // $migration: Migration instance.
+        // $method: 'up' or 'down'.
+        // $batch: Batch number (int).
+        // $batch_size: Number of items to process in this batch (int).
+        // $execution_id: The execution ID (int).
     },
     10,
-    3
+    5
 );
 ```
 
@@ -90,11 +102,16 @@ Generic version that fires for both `up` and `down`.
 ```php
 add_action(
     "stellarwp_migrations_{prefix}_post_batch_processed",
-    function( $migration, $batch, $method ) {
+    function( $migration, $method, $batch, $batch_size, $execution_id ) {
         // Runs after any successful batch.
+        // $migration: Migration instance.
+        // $method: 'up' or 'down'.
+        // $batch: Batch number (int).
+        // $batch_size: Number of items to process in this batch (int).
+        // $execution_id: The execution ID (int).
     },
     10,
-    3
+    5
 );
 ```
 
@@ -107,12 +124,17 @@ Fires when a batch fails. `{method}` is either `up` or `down`.
 ```php
 add_action(
     "stellarwp_migrations_{prefix}_up_batch_failed",
-    function( $migration, $batch, $exception ) {
+    function( $migration, $method, $batch, $batch_size, $execution_id, $exception ) {
+        // $migration: Migration instance.
+        // $method: 'up' or 'down'.
+        // $batch: Batch number (int).
+        // $batch_size: Number of items to process in this batch (int).
+        // $execution_id: The execution ID (int).
         // $exception: The thrown Exception.
         error_log( "Migration failed: " . $exception->getMessage() );
     },
     10,
-    3
+    6
 );
 ```
 
@@ -123,17 +145,23 @@ Generic version that fires for both `up` and `down` failures.
 ```php
 add_action(
     "stellarwp_migrations_{prefix}_batch_failed",
-    function( $migration, $batch, $exception ) {
+    function( $migration, $method, $batch, $batch_size, $execution_id, $exception ) {
         // Handle any batch failure.
+        // $migration: Migration instance.
+        // $method: 'up' or 'down'.
+        // $batch: Batch number (int).
+        // $batch_size: Number of items to process in this batch (int).
+        // $execution_id: The execution ID (int).
+        // $exception: The thrown Exception.
     },
     10,
-    3
+    6
 );
 ```
 
 ## Filters
 
-#### `stellarwp_migrations_{prefix}_migrations_only_via_cli`
+### `stellarwp_migrations_{prefix}_migrations_only_via_cli`
 
 Controls whether migrations should only run via WP-CLI. Return `true` to prevent automatic scheduling.
 

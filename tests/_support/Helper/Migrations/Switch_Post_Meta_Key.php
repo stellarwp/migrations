@@ -29,8 +29,12 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	 */
 	private static array $created_meta_values = [];
 
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
 		return count( self::$created_post_ids );
+	}
+
+	public function get_default_batch_size(): int {
+		return 1;
 	}
 
 	public function get_label(): string {
@@ -69,24 +73,26 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 		return $count <= 0;
 	}
 
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		DB::query(
 			DB::prepare(
-				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1',
+				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d',
 				DB::prefix( 'postmeta' ),
 				self::NEW_META_KEY,
-				self::OLD_META_KEY
+				self::OLD_META_KEY,
+				$batch_size
 			)
 		);
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		DB::query(
 			DB::prepare(
-				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1',
+				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d',
 				DB::prefix( 'postmeta' ),
 				self::OLD_META_KEY,
-				self::NEW_META_KEY
+				self::NEW_META_KEY,
+				$batch_size
 			)
 		);
 	}

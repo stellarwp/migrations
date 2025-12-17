@@ -56,7 +56,11 @@ class Failing_Migration extends Migration_Abstract {
 		self::$should_fail_down = false;
 	}
 
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
+		return 1;
+	}
+
+	public function get_default_batch_size(): int {
 		return 1;
 	}
 
@@ -80,7 +84,7 @@ class Failing_Migration extends Migration_Abstract {
 		return self::$down_called || ! self::$up_attempted;
 	}
 
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		self::$up_attempted = true;
 
 		if ( self::$should_fail ) {
@@ -88,7 +92,7 @@ class Failing_Migration extends Migration_Abstract {
 		}
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		self::$down_called    = true;
 		self::$down_batches[] = $batch;
 

@@ -31,8 +31,12 @@ class Extra_Args_Migration extends Migration_Abstract {
 		self::$down_batch_count = 0;
 	}
 
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
 		return 4;
+	}
+
+	public function get_default_batch_size(): int {
+		return 1;
 	}
 
 	public function get_label(): string {
@@ -55,7 +59,7 @@ class Extra_Args_Migration extends Migration_Abstract {
 		return self::$down_batch_count >= 4;
 	}
 
-	public function up( int $batch, ...$extra_args ): void {
+	public function up( int $batch, int $batch_size, ...$extra_args ): void {
 		++self::$up_batch_count;
 		do_action( 'stellarwp_migrations_tests_extra_args_migration_up_batch_processed', $batch, $extra_args );
 
@@ -64,7 +68,7 @@ class Extra_Args_Migration extends Migration_Abstract {
 		}
 	}
 
-	public function down( int $batch, ...$extra_args ): void {
+	public function down( int $batch, int $batch_size, ...$extra_args ): void {
 		++self::$down_batch_count;
 		do_action( 'stellarwp_migrations_tests_extra_args_migration_down_batch_processed', $batch, $extra_args );
 	}
@@ -72,14 +76,14 @@ class Extra_Args_Migration extends Migration_Abstract {
 	/**
 	 * @inheritDoc
 	 */
-	public function get_up_extra_args_for_batch( int $batch ): array {
+	public function get_up_extra_args_for_batch( int $batch, int $batch_size ): array {
 		return [ "arg1_batch_up_{$batch}", "arg2_batch_up_{$batch}" ];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function get_down_extra_args_for_batch( int $batch ): array {
+	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array {
 		return [ "arg1_batch_down_{$batch}", "arg2_batch_down_{$batch}" ];
 	}
 }

@@ -65,8 +65,12 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		return true;
 	}
 
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
 		return self::$total_batches;
+	}
+
+	public function get_default_batch_size(): int {
+		return 1;
 	}
 
 	public function get_label(): string {
@@ -85,25 +89,25 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		return self::$up_batch_count <= 0;
 	}
 
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		++self::$up_batch_count;
 		self::$up_batches[] = $batch;
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		++self::$down_batch_count;
 		self::$down_batches[] = $batch;
 		--self::$up_batch_count;
 	}
 
-	public function before_up( int $batch ): void {
+	public function before_up( int $batch, int $batch_size ): void {
 		self::$before_calls[] = [
 			'batch'   => $batch,
 			'context' => 'up',
 		];
 	}
 
-	public function after_up( int $batch, bool $is_completed ): void {
+	public function after_up( int $batch, int $batch_size, bool $is_completed ): void {
 		self::$after_calls[] = [
 			'batch'   => $batch,
 			'context' => 'up',
@@ -111,14 +115,14 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		];
 	}
 
-	public function before_down( int $batch ): void {
+	public function before_down( int $batch, int $batch_size ): void {
 		self::$before_calls[] = [
 			'batch'   => $batch,
 			'context' => 'down',
 		];
 	}
 
-	public function after_down( int $batch, bool $is_completed ): void {
+	public function after_down( int $batch, int $batch_size, bool $is_completed ): void {
 		self::$after_calls[] = [
 			'batch'   => $batch,
 			'more'    => $is_completed,
