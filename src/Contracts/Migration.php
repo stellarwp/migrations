@@ -38,13 +38,13 @@ interface Migration extends JsonSerializable {
 	public function get_description(): string;
 
 	/**
-	 * Get the total number of batches.
+	 * Get the total number of items to process.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return int
 	 */
-	public function get_total_batches(): int;
+	public function get_total_items(): int;
 
 	/**
 	 * Get the number of retries per batch.
@@ -54,6 +54,16 @@ interface Migration extends JsonSerializable {
 	 * @return int
 	 */
 	public function get_number_of_retries_per_batch(): int;
+
+	/**
+	 * Get the default number of items to process per batch by default.
+	 * It can be overridden in the runtime.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return int
+	 */
+	public function get_default_batch_size(): int;
 
 	/**
 	 * Get the migration tags.
@@ -107,33 +117,36 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function up( int $batch ): void;
+	public function up( int $batch, int $batch_size ): void;
 
 	/**
 	 * Reverts the migration.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function down( int $batch ): void;
+	public function down( int $batch, int $batch_size ): void;
 
 	/**
 	 * Runs before each batch of the rollback.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function before_down( int $batch ): void;
+	public function before_down( int $batch, int $batch_size ): void;
 
 	/**
 	 * Runs before each batch of the migration.
@@ -141,10 +154,11 @@ interface Migration extends JsonSerializable {
 	 * @since 0.0.1
 	 *
 	 * @param int $batch The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function before_up( int $batch ): void;
+	public function before_up( int $batch, int $batch_size ): void;
 
 	/**
 	 * Runs after each batch of the migration.
@@ -152,11 +166,12 @@ interface Migration extends JsonSerializable {
 	 * @since 0.0.1
 	 *
 	 * @param int  $batch        The batch number.
+	 * @param int  $batch_size   The batch size.
 	 * @param bool $is_completed Whether the migration has been completed.
 	 *
 	 * @return void
 	 */
-	public function after_up( int $batch, bool $is_completed ): void;
+	public function after_up( int $batch, int $batch_size, bool $is_completed ): void;
 
 	/**
 	 * Runs after each batch of the rollback.
@@ -164,11 +179,12 @@ interface Migration extends JsonSerializable {
 	 * @since 0.0.1
 	 *
 	 * @param int  $batch        The batch number.
+	 * @param int  $batch_size   The batch size.
 	 * @param bool $is_completed Whether there are more batches to run.
 	 *
 	 * @return void
 	 */
-	public function after_down( int $batch, bool $is_completed ): void;
+	public function after_down( int $batch, int $batch_size, bool $is_completed ): void;
 
 	/**
 	 * Get extra arguments to be passed to the `up()` method for a specific batch.
@@ -176,10 +192,11 @@ interface Migration extends JsonSerializable {
 	 * @since 0.0.1
 	 *
 	 * @param int $batch The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return array<mixed>
 	 */
-	public function get_up_extra_args_for_batch( int $batch ): array;
+	public function get_up_extra_args_for_batch( int $batch, int $batch_size ): array;
 
 	/**
 	 * Get extra arguments to be passed to the `down()` method for a specific batch.
@@ -187,10 +204,11 @@ interface Migration extends JsonSerializable {
 	 * @since 0.0.1
 	 *
 	 * @param int $batch The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return array<mixed>
 	 */
-	public function get_down_extra_args_for_batch( int $batch ): array;
+	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array;
 
 	/**
 	 * Convert the migration to an array.

@@ -65,28 +65,34 @@ class Rename_Meta_Key extends Migration_Abstract {
         ) === 0;
     }
 
-    public function up( int $batch ): void {
+    public function get_default_batch_size(): int {
+        return 100;
+    }
+
+    public function up( int $batch, int $batch_size ): void {
         // Perform the migration for this batch.
         global $wpdb;
         $wpdb->query(
             $wpdb->prepare(
-                "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+                "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d",
                 $wpdb->postmeta,
                 'new_key',
-                'old_key'
+                'old_key',
+                $batch_size
             )
         );
     }
 
-    public function down( int $batch ): void {
+    public function down( int $batch, int $batch_size ): void {
         // Revert the migration for this batch.
         global $wpdb;
         $wpdb->query(
             $wpdb->prepare(
-                "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+                "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d",
                 $wpdb->postmeta,
                 'old_key',
-                'new_key'
+                'new_key',
+                $batch_size
             )
         );
     }
@@ -116,16 +122,23 @@ Migrations are automatically scheduled to run on the `shutdown` hook.
 
 For large datasets, implement batched migrations by processing a subset of data in each `up()` call. The library will continue calling `up()` with incrementing batch numbers until `is_up_done()` returns `true`.
 
+The `$batch_size` parameter contains the number of items to process in each batch, which is determined by the `get_default_batch_size()` method if not overwritten.
+
 ```php
-public function up( int $batch ): void {
-    // Process 100 records per batch.
+public function get_default_batch_size(): int {
+    return 100;
+}
+
+public function up( int $batch, int $batch_size ): void {
+    // Process batch_size records per batch.
     global $wpdb;
     $wpdb->query(
         $wpdb->prepare(
-            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100",
+            "UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d",
             $wpdb->postmeta,
             'new_key',
-            'old_key'
+            'old_key',
+            $batch_size
         )
     );
 }
@@ -147,24 +160,24 @@ public function is_up_done(): bool {
 Override the lifecycle methods for custom logic around each batch:
 
 ```php
-public function before_up( int $batch ): void {
+public function before_up( int $batch, int $batch_size ): void {
     // Runs before each batch of the migration.
-    error_log( "Starting up batch {$batch}" );
+    error_log( "Starting up batch {$batch} with size {$batch_size}" );
 }
 
-public function after_up( int $batch, bool $is_completed ): void {
+public function after_up( int $batch, int $batch_size, bool $is_completed ): void {
     // Runs after each batch of the migration.
     if ( $is_completed ) {
         error_log( 'Migration completed' );
     }
 }
 
-public function before_down( int $batch ): void {
+public function before_down( int $batch, int $batch_size ): void {
     // Runs before each batch of the rollback.
-    error_log( "Starting down batch {$batch}" );
+    error_log( "Starting down batch {$batch} with size {$batch_size}" );
 }
 
-public function after_down( int $batch, bool $is_completed ): void {
+public function after_down( int $batch, int $batch_size, bool $is_completed ): void {
     // Runs after each batch of the rollback.
     if ( $is_completed ) {
         error_log( 'Rollback completed' );

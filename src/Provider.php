@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations;
 
+use Exception;
+use StellarWP\DB\DB;
+use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
@@ -161,6 +165,8 @@ class Provider extends Provider_Abstract {
 	 *
 	 * @since 0.0.1
 	 *
+	 * @throws Exception If the migration execution cannot be inserted.
+	 *
 	 * @return void
 	 */
 	public function schedule_migrations(): void {
@@ -203,8 +209,30 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			/** @var array{0: string, 1: string, 2: int, ...} $args */
-			$args = [ 'up', $migration_id, 1, ...$migration->get_up_extra_args_for_batch( 1 ) ];
+			$insert_status = Migration_Executions::insert(
+				[
+					'migration_id'    => $migration_id,
+					'status'          => Status::SCHEDULED()->getValue(),
+					'items_total'     => $migration->get_total_items(),
+					'items_processed' => 0,
+				]
+			);
+
+			if ( ! $insert_status ) {
+				throw new Exception(
+					sprintf(
+						// translators: %1$s is the migration ID.
+						__( 'Failed to insert migration execution for migration "%1$s"', 'stellarwp-migrations' ),
+						$migration_id
+					)
+				);
+			}
+
+			$execution_id = DB::last_insert_id();
+			$batch_size   = $migration->get_default_batch_size();
+
+			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
+			$args = [ 'up', $migration_id, 1, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( 1, $batch_size ) ];
 
 			Migration_Events::insert(
 				[

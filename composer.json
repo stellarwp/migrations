@@ -34,6 +34,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
+    "myclabs/php-enum": "^1.8",
     "stellarwp/shepherd": "^0.0.9"
   },
   "require-dev": {

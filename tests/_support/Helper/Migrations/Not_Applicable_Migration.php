@@ -31,7 +31,11 @@ class Not_Applicable_Migration extends Migration_Abstract {
 		self::$down_called = false;
 	}
 
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
+		return 1;
+	}
+
+	public function get_default_batch_size(): int {
 		return 1;
 	}
 
@@ -55,11 +59,11 @@ class Not_Applicable_Migration extends Migration_Abstract {
 		return ! self::$up_called || self::$down_called;
 	}
 
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		self::$up_called = true;
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		self::$down_called = true;
 		self::$up_called   = false;
 	}
