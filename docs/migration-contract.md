@@ -397,7 +397,6 @@ $logger->debug( 'Query result', [ 'count' => 50 ] );
 - `warning( string $message, ?array $data = null )` - Log warning messages
 - `error( string $message, ?array $data = null )` - Log error messages
 - `debug( string $message, ?array $data = null )` - Log debug messages
-- `log( Log_Type $type, string $message, ?array $data = null )` - Log with a custom type
 
 ### Log Table Schema
 

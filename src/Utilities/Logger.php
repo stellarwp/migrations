@@ -58,10 +58,10 @@ class Logger {
 	 *
 	 * @since TBD
 	 *
-	 * @param string     $message The log message.
-	 * @param array|null $data    Optional. Additional data to store.
+	 * @param string            $message The log message.
+	 * @param array<mixed>|null $data    Optional. Additional data to store.
 	 *
-	 * @return int|false The insert ID on success, false on failure.
+	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	public function info( string $message, ?array $data = null ) {
 		return $this->log( Log_Type::INFO(), $message, $data );
@@ -72,10 +72,10 @@ class Logger {
 	 *
 	 * @since TBD
 	 *
-	 * @param string     $message The log message.
-	 * @param array|null $data    Optional. Additional data to store.
+	 * @param string            $message The log message.
+	 * @param array<mixed>|null $data    Optional. Additional data to store.
 	 *
-	 * @return int|false The insert ID on success, false on failure.
+	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	public function warning( string $message, ?array $data = null ) {
 		return $this->log( Log_Type::WARNING(), $message, $data );
@@ -86,10 +86,10 @@ class Logger {
 	 *
 	 * @since TBD
 	 *
-	 * @param string     $message The log message.
-	 * @param array|null $data    Optional. Additional data to store.
+	 * @param string            $message The log message.
+	 * @param array<mixed>|null $data    Optional. Additional data to store.
 	 *
-	 * @return int|false The insert ID on success, false on failure.
+	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	public function error( string $message, ?array $data = null ) {
 		return $this->log( Log_Type::ERROR(), $message, $data );
@@ -100,10 +100,10 @@ class Logger {
 	 *
 	 * @since TBD
 	 *
-	 * @param string     $message The log message.
-	 * @param array|null $data    Optional. Additional data to store.
+	 * @param string            $message The log message.
+	 * @param array<mixed>|null $data    Optional. Additional data to store.
 	 *
-	 * @return int|false The insert ID on success, false on failure.
+	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	public function debug( string $message, ?array $data = null ) {
 		return $this->log( Log_Type::DEBUG(), $message, $data );
@@ -118,7 +118,7 @@ class Logger {
 	 * @param string            $message The log message.
 	 * @param array<mixed>|null $data    Optional. Additional data to store.
 	 *
-	 * @return int|false The insert ID on success, false on failure.
+	 * @return bool|int The number of rows affected, or `false` on failure.
 	 */
 	protected function log( Log_Type $type, string $message, ?array $data = null ) {
 		$log_data = [

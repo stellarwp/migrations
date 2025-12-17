@@ -29,46 +29,7 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @var int|null
 	 */
-	protected ?int $execution_id = null;
-
-	/**
-	 * Sets the execution ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $execution_id The execution ID.
-	 *
-	 * @return void
-	 */
-	public function set_execution_id( int $execution_id ): void {
-		$this->execution_id = $execution_id;
-	}
-
-	/**
-	 * Gets the execution ID.
-	 *
-	 * @since TBD
-	 *
-	 * @return int|null The execution ID or null if not set.
-	 */
-	public function get_execution_id(): ?int {
-		return $this->execution_id;
-	}
-
-	/**
-	 * Gets a logger instance for this migration execution.
-	 *
-	 * @since TBD
-	 *
-	 * @return Logger|null The logger instance or null if no execution ID is set.
-	 */
-	public function get_logger(): ?Logger {
-		if ( null === $this->execution_id ) {
-			return null;
-		}
-
-		return Logger::for_execution( $this->execution_id );
-	}
+	private ?int $execution_id = null;
 
 	/**
 	 * Runs before each batch of the migration.
@@ -171,5 +132,44 @@ abstract class Migration_Abstract implements Migration {
 	 */
 	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array {
 		return [];
+	}
+
+	/**
+	 * Sets the execution ID.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $execution_id The execution ID.
+	 *
+	 * @return void
+	 */
+	public function set_execution_id( int $execution_id ): void {
+		$this->execution_id = $execution_id;
+	}
+
+	/**
+	 * Gets the execution ID.
+	 *
+	 * @since TBD
+	 *
+	 * @return int|null The execution ID or null if not set.
+	 */
+	protected function get_execution_id(): ?int {
+		return $this->execution_id;
+	}
+
+	/**
+	 * Gets a logger instance for this migration execution.
+	 *
+	 * @since TBD
+	 *
+	 * @return Logger|null The logger instance or null if no execution ID is set.
+	 */
+	protected function get_logger(): ?Logger {
+		if ( null === $this->execution_id ) {
+			return null;
+		}
+
+		return Logger::for_execution( $this->execution_id );
 	}
 }

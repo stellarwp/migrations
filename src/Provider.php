@@ -204,7 +204,7 @@ class Provider extends Provider_Abstract {
 			$existing_execution = Migration_Executions::get_first_by( 'migration_id', $migration_id );
 
 			if ( $existing_execution ) {
-				continue;
+				continue; // skip the automatic scheduling for this migration.
 			}
 
 			$insert_status = Migration_Executions::insert(
