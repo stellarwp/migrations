@@ -96,7 +96,7 @@ class Execute extends Task_Abstract {
 		Migration_Events::insert(
 			[
 				'migration_id' => $migration_id,
-				'type'         => Migration_Events::TYPE_BATCH_STARTED,
+				'type'         => 'up' === $method ? Migration_Events::TYPE_BATCH_STARTED : Migration_Events::TYPE_DOWN_BATCH_STARTED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch, $batch_size, $execution_id, ...$extra_args ],
 				],
@@ -197,7 +197,7 @@ class Execute extends Task_Abstract {
 			Migration_Events::insert(
 				[
 					'migration_id' => $migration_id,
-					'type'         => Migration_Events::TYPE_FAILED,
+					'type'         => 'up' === $method ? Migration_Events::TYPE_FAILED : Migration_Events::TYPE_DOWN_FAILED,
 					'data'         => [
 						'args'    => [ $method, $migration_id, $batch, $batch_size, $execution_id, ...$extra_args ],
 						'message' => $e->getMessage(),
@@ -219,7 +219,7 @@ class Execute extends Task_Abstract {
 				Migration_Events::insert(
 					[
 						'migration_id' => $migration_id,
-						'type'         => Migration_Events::TYPE_SCHEDULED,
+						'type'         => Migration_Events::TYPE_DOWN_SCHEDULED,
 						'data'         => [
 							'args'    => [ 'down', $migration_id, 1, $execution_id, ...$extra_args ],
 							'message' => $e->getMessage(),
@@ -261,7 +261,7 @@ class Execute extends Task_Abstract {
 			Migration_Events::insert(
 				[
 					'migration_id' => $migration_id,
-					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
+					'type'         => 'up' === $method ? Migration_Events::TYPE_BATCH_COMPLETED : Migration_Events::TYPE_DOWN_BATCH_COMPLETED,
 					'data'         => [
 						'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
 					],
@@ -286,7 +286,7 @@ class Execute extends Task_Abstract {
 		Migration_Events::insert(
 			[
 				'migration_id' => $migration_id,
-				'type'         => Migration_Events::TYPE_COMPLETED,
+				'type'         => 'up' === $method ? Migration_Events::TYPE_COMPLETED : Migration_Events::TYPE_DOWN_COMPLETED,
 				'data'         => [
 					'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
 				],

@@ -1,0 +1,42 @@
+{
+  "name": "stellarwp/test-plugin",
+  "description": "A test plugin for testing the migrations library.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "version": "0.0.1",
+  "config": {
+    "platform": {
+      "php": "7.4"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Test_Plugin\\": "src/"
+    }
+  },
+  "repositories": [
+    {
+        "type": "path",
+        "url": "../../plugins/migrations"
+    }
+  ],
+  "authors": [
+    {
+      "name": "StellarWP",
+      "email": "dev@stellarwp.com"
+    },
+    {
+      "name": "Dimitrios Pantazis",
+      "email": "dimi@stellarwp.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.4",
+    "lucatume/di52": "^4.0",
+    "stellarwp/migrations": "@dev"
+  }
+}
