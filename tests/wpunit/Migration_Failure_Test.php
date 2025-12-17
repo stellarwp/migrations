@@ -7,6 +7,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Failing_Migration;
 use StellarWP\Migrations\Tests\Migrations\Failing_At_Batch_Migration;
 use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 
@@ -53,6 +54,7 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_store_error_message_in_failed_event(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_Migration::$error_message = 'Custom test error message';
@@ -61,22 +63,29 @@ class Migration_Failure_Test extends WPTestCase {
 
 		$prefix = Config::get_hook_prefix();
 
+		// Act.
 		try {
 			do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 		} catch ( ShepherdTaskFailWithoutRetryException $e ) {
 			// Expected exception.
 		}
 
+		// Assert.
 		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_migration' );
 
-		$failed_event = array_filter(
+		$failed_events = array_filter(
 			$events,
 			fn( $event ) => $event['type'] === Migration_Events::TYPE_FAILED
 		);
 
-		$failed_event = reset( $failed_event );
+		$this->assertNotEmpty( $failed_events, 'Failed event should exist' );
 
-		$this->assertNotNull( $failed_event );
+		$failed_event = reset( $failed_events );
+
+		$this->assertNotFalse( $failed_event, 'Failed event should not be false' );
+		$this->assertIsArray( $failed_event, 'Failed event should be an array' );
+		$this->assertArrayHasKey( 'data', $failed_event );
+		$this->assertArrayHasKey( 'message', $failed_event['data'] );
 		$this->assertStringContainsString( 'Custom test error message', $failed_event['data']['message'] );
 	}
 
@@ -113,12 +122,12 @@ class Migration_Failure_Test extends WPTestCase {
 
 		add_action(
 			"stellarwp_migrations_{$prefix}_up_batch_failed",
-			function ( $mig, $batch, $e ) use ( &$action_fired, &$received_exception ) {
+			function ( $migration, $method, $batch, $batch_size, $execution_id, $e ) use ( &$action_fired, &$received_exception ) {
 				$action_fired       = true;
 				$received_exception = $e;
 			},
 			10,
-			3
+			6
 		);
 
 		try {
@@ -217,14 +226,26 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_throw_shepherd_fail_without_retry_exception(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
-		$task = new Execute( 'up', 'tests_failing_migration', 1 );
+		$execution_id = Migration_Executions::insert(
+			[
+				'migration_id'    => 'tests_failing_migration',
+				'status'          => 'scheduled',
+				'items_total'     => 1,
+				'items_processed' => 0,
+			]
+		);
 
+		$task = new Execute( 'up', 'tests_failing_migration', 1, 1, $execution_id );
+
+		// Assert.
 		$this->expectException( ShepherdTaskFailWithoutRetryException::class );
 
+		// Act.
 		$task->process();
 	}
 
@@ -232,22 +253,36 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_not_trigger_rollback_on_down_failure(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
-		Failing_Migration::$up_attempted     = true;
-		Failing_Migration::$should_fail      = false;
-		Failing_Migration::$should_fail_down = true;
+		Failing_Migration::$should_fail = false;
 
 		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
-		$task = new Execute( 'down', 'tests_failing_migration', 1 );
+		$prefix = Config::get_hook_prefix();
 
+		// Run the up migration first.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Verify up was successful.
+		$this->assertTrue( Failing_Migration::$up_attempted );
+
+		// Now make down fail.
+		Failing_Migration::$should_fail_down = true;
+
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
+
+		$task = new Execute( 'down', 'tests_failing_migration', 1, 1, $execution['id'] );
+
+		// Act.
 		try {
 			$task->process();
 		} catch ( ShepherdTaskFailWithoutRetryException $e ) {
 			// Expected exception.
 		}
 
+		// Assert.
 		// Verify no infinite loop - only one down attempt should occur.
 		$this->assertCount( 1, Failing_Migration::$down_batches );
 	}

@@ -178,20 +178,20 @@ class Migration_Up_Test extends WPTestCase {
 
 		add_action(
 			"stellarwp_migrations_{$prefix}_before_up_batch_processed",
-			function ( $mig, $batch, $method ) use ( &$action_fired, &$received_args ) {
+			function ( $mig, $method, $batch, $batch_size, $execution_id ) use ( &$action_fired, &$received_args ) {
 				$action_fired  = true;
-				$received_args = compact( 'mig', 'batch', 'method' );
+				$received_args = compact( 'mig', 'method', 'batch', 'batch_size', 'execution_id' );
 			},
 			10,
-			3
+			5
 		);
 
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$this->assertTrue( $action_fired );
 		$this->assertInstanceOf( Simple_Migration::class, $received_args['mig'] );
-		$this->assertEquals( 1, $received_args['batch'] );
 		$this->assertEquals( 'up', $received_args['method'] );
+		$this->assertEquals( 1, $received_args['batch'] );
 	}
 
 	/**

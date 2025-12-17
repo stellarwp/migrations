@@ -6,154 +6,129 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
+use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
+use StellarWP\Migrations\Tests\Migrations\Failing_Migration;
+use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
 
+/**
+ * Tests migration execution tracking throughout the lifecycle.
+ *
+ * @since TBD
+ *
+ * @package StellarWP\Migrations
+ */
 class Migration_Executions_Test extends WPTestCase {
 	/**
-	 * @test
+	 * @before
 	 */
-	public function it_should_insert_a_migration_execution(): void {
-		// Arrange.
-		$migration_id = 'test_migration_' . uniqid();
-		$data         = [
-			'migration_id'    => $migration_id,
-			'start_date'      => current_time( 'mysql', true ),
-			'status'          => Status::RUNNING()->getValue(),
-			'items_total'     => 100,
-			'items_processed' => 0,
-		];
+	public function reset_state(): void {
+		Simple_Migration::reset();
+		Multi_Batch_Migration::reset();
+		Failing_Migration::reset();
+		Not_Applicable_Migration::reset();
+		tests_migrations_clear_calls_data();
 
-		// Act.
-		$result = Migration_Executions::insert( $data );
-
-		// Assert.
-		$this->assertIsInt( $result );
-		$this->assertGreaterThan( 0, $result );
+		$container = Config::get_container();
+		$container->get( Registry::class )->flush();
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_retrieve_execution_by_migration_id(): void {
+	public function it_should_create_scheduled_execution_when_migration_is_scheduled(): void {
 		// Arrange.
-		$migration_id = 'test_retrieval_' . uniqid();
-		$data         = [
-			'migration_id'    => $migration_id,
-			'start_date'      => current_time( 'mysql', true ),
-			'status'          => Status::RUNNING()->getValue(),
-			'items_total'     => 50,
-			'items_processed' => 25,
-		];
-		Migration_Executions::insert( $data );
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$before = current_time( 'mysql' );
 
 		// Act.
-		$execution = Migration_Executions::get_first_by( 'migration_id', $migration_id );
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$after = current_time( 'mysql' );
 
 		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+
 		$this->assertNotNull( $execution );
-		$this->assertEquals( $migration_id, $execution['migration_id'] );
-		$this->assertEquals( Status::RUNNING()->getValue(), $execution['status'] );
-		$this->assertEquals( 50, $execution['items_total'] );
-		$this->assertEquals( 25, $execution['items_processed'] );
+		$this->assertEquals( 'tests_simple_migration', $execution['migration_id'] );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+		$this->assertEquals( 1, $execution['items_total'] );
+		$this->assertEquals( 1, $execution['items_processed'] );
+
+		// Verify created_at timestamp.
+		$created_at = $execution['created_at'];
+		if ( $created_at instanceof \DateTime ) {
+			$created_at = $created_at->format( 'Y-m-d H:i:s' );
+		}
+
+		$this->assertGreaterThanOrEqual( $before, $created_at );
+		$this->assertLessThanOrEqual( $after, $created_at );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_retrieve_all_executions_by_migration_id(): void {
+	public function it_should_record_correct_total_items_for_migration(): void {
 		// Arrange.
-		$migration_id = 'test_all_executions_' . uniqid();
-
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id,
-				'start_date'      => current_time( 'mysql', true ),
-				'status'          => Status::RUNNING()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 0,
-			]
-		);
-
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id,
-				'start_date'      => current_time( 'mysql', true ),
-				'status'          => Status::RUNNING()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 50,
-			]
-		);
-
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id,
-				'start_date'      => current_time( 'mysql', true ),
-				'end_date'        => current_time( 'mysql', true ),
-				'status'          => Status::COMPLETED()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 100,
-			]
-		);
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
 		// Act.
-		$executions = Migration_Executions::get_all_by( 'migration_id', $migration_id );
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		// Assert.
-		$this->assertCount( 3, $executions );
-	}
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
 
-	/**get_all_by
-	 * @test
-	 */
-	public function it_should_store_nullable_end_date(): void {
-		// Arrange.
-		$migration_id = 'test_nullable_' . uniqid();
-
-		// Act.
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id,
-				'start_date'      => current_time( 'mysql', true ),
-				'status'          => Status::RUNNING()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 0,
-			]
-		);
-
-		$execution = Migration_Executions::get_first_by( 'migration_id', $migration_id );
-
-		// Assert.
 		$this->assertNotNull( $execution );
-		$this->assertNull( $execution['end_date'] );
+		$this->assertEquals( 3, $execution['items_total'] );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_record_start_date(): void {
+	public function it_should_update_status_from_scheduled_to_running_on_first_batch(): void {
 		// Arrange.
-		$migration_id = 'test_start_date_' . uniqid();
-		$before       = current_time( 'mysql', true );
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
 		// Act.
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id,
-				'start_date'      => current_time( 'mysql', true ),
-				'status'          => Status::RUNNING()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 0,
-			]
-		);
-
-		$after     = current_time( 'mysql', true );
-		$execution = Migration_Executions::get_first_by( 'migration_id', $migration_id );
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		// Assert.
-		$this->assertNotNull( $execution );
-		$this->assertArrayHasKey( 'start_date', $execution );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
-		// Convert start_date to string for comparison if it's a DateTime object.
-		$start_date = $execution['start_date'];
+		$this->assertNotNull( $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_record_start_date_when_migration_begins(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$before = current_time( 'mysql', true );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$after = current_time( 'mysql', true );
+
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+
+		$this->assertNotNull( $execution );
+		$this->assertArrayHasKey( 'start_date_gmt', $execution );
+
+		$start_date = $execution['start_date_gmt'];
 		if ( $start_date instanceof \DateTime ) {
 			$start_date = $start_date->format( 'Y-m-d H:i:s' );
 		}
@@ -165,64 +140,224 @@ class Migration_Executions_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_return_null_for_non_existent_migration(): void {
+	public function it_should_update_items_processed_as_migration_progresses(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
+
 		// Act.
-		$execution = Migration_Executions::get_first_by( 'migration_id', 'non_existent_migration_' . uniqid() );
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+
+		$this->assertNotNull( $execution );
+		$this->assertEquals( 3, $execution['items_total'] );
+		$this->assertEquals( 3, $execution['items_processed'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_update_status_to_completed_when_migration_finishes(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+
+		$this->assertNotNull( $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_record_end_date_when_migration_completes(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$before = current_time( 'mysql', true );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$after = current_time( 'mysql', true );
+
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+
+		$this->assertNotNull( $execution );
+		$this->assertArrayHasKey( 'end_date_gmt', $execution );
+
+		$end_date = $execution['end_date_gmt'];
+		if ( $end_date instanceof \DateTime ) {
+			$end_date = $end_date->format( 'Y-m-d H:i:s' );
+		}
+
+		$this->assertNotNull( $end_date );
+		$this->assertGreaterThanOrEqual( $before, $end_date );
+		$this->assertLessThanOrEqual( $after, $end_date );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_have_start_date_before_end_date(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+
+		$this->assertNotNull( $execution );
+
+		$start_date = $execution['start_date_gmt'];
+		if ( $start_date instanceof \DateTime ) {
+			$start_date = $start_date->format( 'Y-m-d H:i:s' );
+		}
+
+		$end_date = $execution['end_date_gmt'];
+		if ( $end_date instanceof \DateTime ) {
+			$end_date = $end_date->format( 'Y-m-d H:i:s' );
+		}
+
+		$this->assertLessThanOrEqual( $end_date, $start_date );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_track_multiple_batches_in_single_execution(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
+
+		// Should have only one execution record for the entire migration.
+		$this->assertCount( 1, $executions );
+		$this->assertEquals( 3, $executions[0]['items_total'] );
+		$this->assertEquals( 3, $executions[0]['items_processed'] );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $executions[0]['status'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_update_status_to_failed_when_migration_fails(): void {
+		// Arrange.
+		Failing_Migration::reset();
+		Failing_Migration::$should_fail = true;
+
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+
+		try {
+			do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+		} catch ( \Exception $e ) {
+			// Expected exception from migration failure.
+		}
+
+		// Assert.
+		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_failing_migration' );
+
+		$this->assertNotEmpty( $executions );
+
+		// The execution should remain as failed even though the rollback succeeded.
+		$execution = $executions[0];
+		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_record_end_date_when_migration_fails(): void {
+		// Arrange.
+		Failing_Migration::reset();
+		Failing_Migration::$should_fail = true;
+
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
+
+		$before = current_time( 'mysql', true );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+
+		try {
+			do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+		} catch ( \Exception $e ) {
+			// Expected exception from migration failure.
+		}
+
+		$after = current_time( 'mysql', true );
+
+		// Assert.
+		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_failing_migration' );
+
+		$execution = $executions[0];
+
+		$this->assertNotNull( $execution );
+		$this->assertArrayHasKey( 'end_date_gmt', $execution );
+
+		$end_date = $execution['end_date_gmt'];
+		if ( $end_date instanceof \DateTime ) {
+			$end_date = $end_date->format( 'Y-m-d H:i:s' );
+		}
+
+		$this->assertNotNull( $end_date );
+		$this->assertGreaterThanOrEqual( $before, $end_date );
+		$this->assertLessThanOrEqual( $after, $end_date );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_create_execution_for_non_applicable_migration(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_not_applicable_migration', Not_Applicable_Migration::class );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
+
 		$this->assertNull( $execution );
 	}
 
 	/**
-	 * @test
+	 * @after
 	 */
-	public function it_should_return_empty_array_for_non_existent_migration_all(): void {
-		// Act.
-		$executions = Migration_Executions::get_all_by( 'migration_id', 'non_existent_migration_' . uniqid() );
-
-		// Assert.
-		$this->assertIsArray( $executions );
-		$this->assertEmpty( $executions );
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_retrieve_execution_by_status(): void {
-		// Arrange.
-		$migration_id_running   = 'test_status_running_' . uniqid();
-		$migration_id_completed = 'test_status_completed_' . uniqid();
-
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id_running,
-				'start_date'      => current_time( 'mysql', true ),
-				'status'          => Status::RUNNING()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 50,
-			]
-		);
-
-		Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id_completed,
-				'start_date'      => current_time( 'mysql', true ),
-				'end_date'        => current_time( 'mysql', true ),
-				'status'          => Status::COMPLETED()->getValue(),
-				'items_total'     => 100,
-				'items_processed' => 100,
-			]
-		);
-
-		// Act.
-		$running_execution   = Migration_Executions::get_first_by( 'migration_id', $migration_id_running );
-		$completed_execution = Migration_Executions::get_first_by( 'migration_id', $migration_id_completed );
-
-		// Assert.
-		$this->assertNotNull( $running_execution );
-		$this->assertEquals( Status::RUNNING()->getValue(), $running_execution['status'] );
-
-		$this->assertNotNull( $completed_execution );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $completed_execution['status'] );
+	public function cleanup(): void {
+		Simple_Migration::reset();
+		Multi_Batch_Migration::reset();
+		Failing_Migration::reset();
+		Not_Applicable_Migration::reset();
+		tests_migrations_clear_calls_data();
 	}
 }

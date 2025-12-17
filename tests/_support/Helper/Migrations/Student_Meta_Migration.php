@@ -28,14 +28,25 @@ class Student_Meta_Migration extends Migration_Abstract {
 	}
 
 	/**
-	 * Returns the total number of batches for the migration.
+	 * Returns the total number of items for the migration.
 	 *
 	 * @since TBD
 	 *
-	 * @return int Total number of batches.
+	 * @return int Total number of items.
 	 */
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
 		return $this->get_distinct_user_count();
+	}
+
+	/**
+	 * Returns the default batch size for the migration.
+	 *
+	 * @since TBD
+	 *
+	 * @return int Default batch size.
+	 */
+	public function get_default_batch_size(): int {
+		return 1;
 	}
 
 	/**
@@ -83,11 +94,12 @@ class Student_Meta_Migration extends Migration_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param int $batch The batch number.
+	 * @param int $batch      The batch number.
+	 * @param int $batch_size The batch size.
 	 *
 	 * @return void
 	 */
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		$data = $this->get_base_query()
 			->select( 'access_meta.user_id' )
 			->distinct()
@@ -111,7 +123,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 		}
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		// Not a destructive migration - we only add data. We don't need to rollback on failure.
 	}
 

@@ -111,7 +111,7 @@ class Student_Meta_Migration_Test extends WPTestCase {
 
 		$this->assertInstanceOf( Student_Meta_Migration::class, $migration );
 
-		$this->assertEquals( count( $uids ), $migration->get_total_batches() );
+		$this->assertEquals( count( $uids ), $migration->get_total_items() );
 
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );

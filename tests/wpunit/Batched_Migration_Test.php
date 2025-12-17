@@ -6,6 +6,7 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use function StellarWP\Shepherd\shepherd;
 
@@ -221,7 +222,9 @@ class Batched_Migration_Test extends WPTestCase {
 		Multi_Batch_Migration::$before_calls = [];
 		Multi_Batch_Migration::$after_calls  = [];
 
-		$task = new Execute( 'down', 'tests_multi_batch_migration', 1 );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution['id'] );
 		shepherd()->dispatch( $task );
 
 		$this->assertCount( 3, Multi_Batch_Migration::$down_batches );

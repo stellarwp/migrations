@@ -50,8 +50,12 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 		self::$down_batches   = [];
 	}
 
-	public function get_total_batches(): int {
+	public function get_total_items(): int {
 		return self::$total_batches;
+	}
+
+	public function get_default_batch_size(): int {
+		return 1;
 	}
 
 	public function get_label(): string {
@@ -74,7 +78,7 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 		return self::$up_batch_count <= 0;
 	}
 
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		if ( $batch === self::$fail_at_batch ) {
 			throw new RuntimeException( sprintf( 'Migration failed at batch %d', $batch ) );
 		}
@@ -83,7 +87,7 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 		self::$up_batches[] = $batch;
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		self::$down_batches[] = $batch;
 		--self::$up_batch_count;
 	}

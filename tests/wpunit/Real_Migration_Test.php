@@ -6,6 +6,7 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Switch_Post_Meta_Key;
 use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use function StellarWP\Shepherd\shepherd;
 
@@ -131,7 +132,9 @@ class Real_Migration_Test extends WPTestCase {
 
 		tests_migrations_clear_calls_data();
 
-		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1 );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
 		shepherd()->dispatch( $task );
 
 		$migration = $registry->get( 'tests_switch_post_meta_key' );
@@ -161,7 +164,9 @@ class Real_Migration_Test extends WPTestCase {
 
 		tests_migrations_clear_calls_data();
 
-		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1 );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
 		shepherd()->dispatch( $task );
 
 		$calls = tests_migrations_get_calls_data();
@@ -241,14 +246,16 @@ class Real_Migration_Test extends WPTestCase {
 		$this->assertTrue( $up_results_1['success'] );
 
 		tests_migrations_clear_calls_data();
-		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1 );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
 		shepherd()->dispatch( $task );
 
 		$down_results = Switch_Post_Meta_Key::verify_down_results();
 		$this->assertTrue( $down_results['success'] );
 
 		tests_migrations_clear_calls_data();
-		$task = new Execute( 'up', 'tests_switch_post_meta_key', 1 );
+		$task = new Execute( 'up', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
 		shepherd()->dispatch( $task );
 
 		$up_results_2 = Switch_Post_Meta_Key::verify_up_results();
