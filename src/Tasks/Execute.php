@@ -348,8 +348,8 @@ class Execute extends Task_Abstract {
 	protected function validate_args(): void {
 		$args = $this->get_args();
 
-		if ( count( $args ) < 3 ) {
-			throw new InvalidArgumentException( 'Execute task requires at least 3 arguments: method, migration_id, batch.' );
+		if ( count( $args ) < 5 ) {
+			throw new InvalidArgumentException( 'Execute task requires at least 5 arguments: method, migration_id, batch, batch_size, execution_id.' );
 		}
 
 		if ( ! in_array( $args[0], [ 'up', 'down' ], true ) ) {
@@ -366,6 +366,22 @@ class Execute extends Task_Abstract {
 
 		if ( $args[2] < 1 ) {
 			throw new InvalidArgumentException( 'Execute task batch must be greater than 0.' );
+		}
+
+		if ( ! is_int( $args[3] ) ) {
+			throw new InvalidArgumentException( 'Execute task batch_size must be an integer.' );
+		}
+
+		if ( $args[3] < 1 ) {
+			throw new InvalidArgumentException( 'Execute task batch_size must be greater than 0.' );
+		}
+
+		if ( ! is_int( $args[4] ) ) {
+			throw new InvalidArgumentException( 'Execute task execution_id must be an integer.' );
+		}
+
+		if ( $args[4] < 1 ) {
+			throw new InvalidArgumentException( 'Execute task execution_id must be greater than 0.' );
 		}
 	}
 }
