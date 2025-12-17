@@ -16,6 +16,7 @@ namespace StellarWP\Migrations\Tasks;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Utilities\Cast;
+use StellarWP\Migrations\Utilities\Logger;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Migrations\Config;
@@ -23,7 +24,6 @@ use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
 use Exception;
 use InvalidArgumentException;
-use StellarWP\Migrations\Tables\Migration_Events;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -87,19 +87,24 @@ class Execute extends Task_Abstract {
 			);
 		}
 
+		// Set the execution ID on the migration so it can access the logger.
+		$migration->set_execution_id( $execution_id );
+
 		$method_to_check_if_done = "is_{$method}_done";
 
 		if ( $migration->$method_to_check_if_done() ) {
 			return;
 		}
 
-		Migration_Events::insert(
+		$logger = Logger::for_execution( $execution_id );
+
+		$logger->info(
+			sprintf( 'Batch %d started', $batch ),
 			[
-				'migration_id' => $migration_id,
-				'type'         => Migration_Events::TYPE_BATCH_STARTED,
-				'data'         => [
-					'args' => [ $method, $migration_id, $batch, $batch_size, $execution_id, ...$extra_args ],
-				],
+				'method' => $method,
+				'batch'  => $batch,
+				'size'   => $batch_size,
+				'args'   => $extra_args,
 			]
 		);
 
@@ -194,14 +199,14 @@ class Execute extends Task_Abstract {
 			 */
 			do_action( "stellarwp_migrations_{$prefix}_batch_failed", $migration, $method, $batch, $batch_size, $execution_id, $e );
 
-			Migration_Events::insert(
+			$logger->error(
+				sprintf( 'Batch %d failed: %s', $batch, $e->getMessage() ),
 				[
-					'migration_id' => $migration_id,
-					'type'         => Migration_Events::TYPE_FAILED,
-					'data'         => [
-						'args'    => [ $method, $migration_id, $batch, $batch_size, $execution_id, ...$extra_args ],
-						'message' => $e->getMessage(),
-					],
+					'method'    => $method,
+					'batch'     => $batch,
+					'size'      => $batch_size,
+					'exception' => get_class( $e ),
+					'trace'     => $e->getTraceAsString(),
 				]
 			);
 
@@ -216,14 +221,10 @@ class Execute extends Task_Abstract {
 			if ( 'up' === $method ) {
 				// Start the rollback from the first batch.
 
-				Migration_Events::insert(
+				$logger->warning(
+					'Migration rollback scheduled',
 					[
-						'migration_id' => $migration_id,
-						'type'         => Migration_Events::TYPE_SCHEDULED,
-						'data'         => [
-							'args'    => [ 'down', $migration_id, 1, $execution_id, ...$extra_args ],
-							'message' => $e->getMessage(),
-						],
+						'reason' => $e->getMessage(),
 					]
 				);
 
@@ -258,13 +259,12 @@ class Execute extends Task_Abstract {
 		// If the migration is not completed, dispatch the next batch.
 
 		if ( ! $is_completed ) {
-			Migration_Events::insert(
+			$logger->info(
+				sprintf( 'Batch %d completed', $batch ),
 				[
-					'migration_id' => $migration_id,
-					'type'         => Migration_Events::TYPE_BATCH_COMPLETED,
-					'data'         => [
-						'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
-					],
+					'method'           => $method,
+					'batch'            => $batch,
+					'items_processed'  => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
 				]
 			);
 
@@ -283,13 +283,12 @@ class Execute extends Task_Abstract {
 			return;
 		}
 
-		Migration_Events::insert(
+		$logger->info(
+			'Migration completed successfully',
 			[
-				'migration_id' => $migration_id,
-				'type'         => Migration_Events::TYPE_COMPLETED,
-				'data'         => [
-					'args' => [ $method, $migration_id, $batch, $execution_id, ...$extra_args ],
-				],
+				'method'          => $method,
+				'total_batches'   => $batch,
+				'items_processed' => Cast::to_int( $execution['items_total'] ),
 			]
 		);
 
