@@ -76,10 +76,11 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	public function up( int $batch, int $batch_size ): void {
 		DB::query(
 			DB::prepare(
-				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1',
+				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d',
 				DB::prefix( 'postmeta' ),
 				self::NEW_META_KEY,
-				self::OLD_META_KEY
+				self::OLD_META_KEY,
+				$batch_size
 			)
 		);
 	}
@@ -87,10 +88,11 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	public function down( int $batch, int $batch_size ): void {
 		DB::query(
 			DB::prepare(
-				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 1',
+				'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d',
 				DB::prefix( 'postmeta' ),
 				self::OLD_META_KEY,
-				self::NEW_META_KEY
+				self::NEW_META_KEY,
+				$batch_size
 			)
 		);
 	}

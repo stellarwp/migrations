@@ -104,7 +104,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 			->select( 'access_meta.user_id' )
 			->distinct()
 			->orderBy( 'access_meta.user_id', 'ASC' )
-			->limit( 1 )
+			->limit( $batch_size )
 			->getAll();
 
 		if ( empty( $data ) || ! is_array( $data ) ) {
