@@ -11,6 +11,7 @@ use StellarWP\Migrations\Utilities\Logger;
 
 class Migration_Logs_Test extends WPTestCase {
 	use With_Uopz;
+
 	/**
 	 * @test
 	 */
