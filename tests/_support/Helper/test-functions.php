@@ -6,7 +6,8 @@ use StellarWP\Migrations\Config;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Provider;
 use StellarWP\Migrations\Tasks\Execute;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 /**
  * Drop the tables before and after the suite.
@@ -19,7 +20,8 @@ function tests_migrations_drop_tables() {
 
 	$tables        = [];
 	$table_classes = [
-		Migration_Events::class,
+		Migration_Executions::class,
+		Migration_Logs::class,
 	];
 
 	$longest_table_name = $safe_dynamic_prefix->get_longest_table_name( $table_classes );
@@ -42,7 +44,8 @@ function tests_migrations_drop_tables() {
  */
 function tests_migrations_raise_auto_increment(): void {
 	$tables = [
-		Migration_Events::base_table_name(),
+		Migration_Executions::base_table_name(),
+		Migration_Logs::base_table_name(),
 	];
 
 	foreach ( $tables as $offset => $table ) {

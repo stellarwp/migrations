@@ -6,7 +6,7 @@ A batched database migrations library for WordPress plugins powered by [Shepherd
 
 - **Batched execution** - Process large datasets incrementally without timeouts.
 - **Automatic rollback** - Failed migrations trigger automatic rollback via `down()`.
-- **Event tracking** - All migration activity is logged to a database table.
+- **Activity logging** - All migration activity is logged to a database table.
 - **Extensible hooks** - Actions and filters for custom behavior at each stage.
 - **WP-CLI ready** - Optional CLI-only mode for controlled migrations.
 
@@ -82,6 +82,26 @@ class Rename_Meta_Key extends Migration_Abstract {
 $registry = Config::get_container()->get( Registry::class );
 $registry->register( 'my_plugin_rename_meta_key', Rename_Meta_Key::class );
 ```
+
+## Logging
+
+Add custom logs to track migration progress and debug issues:
+
+```php
+public function up( int $batch, int $batch_size ): void {
+    $logger = Config::get_container()->get( Logger::class );
+
+    $logger->info( 'Starting batch processing.', [ 'batch' => $batch ] );
+
+    // ... do migration work ...
+
+    if ( $some_warning_condition ) {
+        $logger->warning( 'Found invalid data.', [ 'record_id' => $id ] );
+    }
+}
+```
+
+Available log levels: `info()`, `warning()`, `error()`, `debug()`
 
 ## Documentation
 

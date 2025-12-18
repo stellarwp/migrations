@@ -13,13 +13,13 @@ use Exception;
 use StellarWP\DB\DB;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Utilities\Logger;
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
-use StellarWP\Migrations\Tables\Migration_Events;
 use StellarWP\Migrations\Contracts\Migration;
 use function StellarWP\Shepherd\shepherd;
 
@@ -200,10 +200,11 @@ class Provider extends Provider_Abstract {
 				continue;
 			}
 
-			$event = Migration_Events::get_first_by( 'migration_id', $migration_id );
+			// Check if there is already an execution for this migration.
+			$existing_execution = Migration_Executions::get_first_by( 'migration_id', $migration_id );
 
-			if ( $event ) {
-				continue;
+			if ( $existing_execution ) {
+				continue; // skip the automatic scheduling for this migration.
 			}
 
 			$insert_status = Migration_Executions::insert(
@@ -226,18 +227,22 @@ class Provider extends Provider_Abstract {
 			}
 
 			$execution_id = DB::last_insert_id();
+			$batch_number = 1;
 			$batch_size   = $migration->get_default_batch_size();
 
 			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
-			$args = [ 'up', $migration_id, 1, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( 1, $batch_size ) ];
+			$args = [ 'up', $migration_id, $batch_number, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( $batch_number, $batch_size ) ];
 
-			Migration_Events::insert(
+			// Log the migration scheduling.
+
+			$logger = new Logger( $execution_id );
+			$logger->info(
+				sprintf( 'Migration "%s" scheduled for execution.', $migration_id ),
 				[
-					'migration_id' => $migration_id,
-					'type'         => Migration_Events::TYPE_SCHEDULED,
-					'data'         => [
-						'args' => $args,
-					],
+					'batch'       => $batch_number,
+					'batch_size'  => $batch_size,
+					'items_total' => $migration->get_total_items(),
+					'extra_args'  => $migration->get_up_extra_args_for_batch( $batch_number, $batch_size ),
 				]
 			);
 
