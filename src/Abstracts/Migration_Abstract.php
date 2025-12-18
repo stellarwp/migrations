@@ -23,6 +23,7 @@ use RuntimeException;
  * @package StellarWP\Migrations\Abstracts
  */
 abstract class Migration_Abstract implements Migration {
+
 	/**
 	 * The status of the migration.
 	 *

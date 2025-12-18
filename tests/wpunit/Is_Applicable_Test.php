@@ -6,7 +6,7 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Executions;
 
 class Is_Applicable_Test extends WPTestCase {
 	/**
@@ -46,9 +46,9 @@ class Is_Applicable_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$event = Migration_Events::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
 
-		$this->assertNull( $event );
+		$this->assertNull( $execution );
 	}
 
 	/**
@@ -95,11 +95,11 @@ class Is_Applicable_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$applicable_event = Migration_Events::get_first_by( 'migration_id', 'tests_simple_migration' );
-		$this->assertNotNull( $applicable_event );
+		$applicable_execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertNotNull( $applicable_execution );
 
-		$not_applicable_event = Migration_Events::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
-		$this->assertNull( $not_applicable_event );
+		$not_applicable_execution = Migration_Executions::get_first_by( 'migration_id', 'tests_not_applicable_migration' );
+		$this->assertNull( $not_applicable_execution );
 	}
 
 	/**
@@ -174,8 +174,8 @@ class Is_Applicable_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$event = Migration_Events::get_first_by( 'migration_id', 'tests_dynamic_applicable' );
-		$this->assertNotNull( $event );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_dynamic_applicable' );
+		$this->assertNotNull( $execution );
 	}
 
 	/**

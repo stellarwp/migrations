@@ -5,7 +5,7 @@ namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Switch_Post_Meta_Key;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use function StellarWP\Shepherd\shepherd;
@@ -207,26 +207,52 @@ class Real_Migration_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_record_all_migration_events(): void {
+	public function it_should_record_all_migration_logs(): void {
+		// Arrange.
 		Switch_Post_Meta_Key::create_dummy_data( 2 );
 
 		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_switch_post_meta_key', Switch_Post_Meta_Key::class );
 
+		// Act.
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_switch_post_meta_key' );
-		$types  = array_column( $events, 'type' );
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+		$this->assertNotNull( $execution );
+		$this->assertEquals( 'completed', $execution['status'] );
 
-		$this->assertContains( Migration_Events::TYPE_SCHEDULED, $types );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$this->assertNotEmpty( $logs, 'Should have log entries' );
 
-		$batch_started_count = count( array_filter( $types, fn( $t ) => $t === Migration_Events::TYPE_BATCH_STARTED ) );
-		$this->assertEquals( 2, $batch_started_count );
+		// Check for migration started log.
+		$started_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'started' ) !== false;
+			}
+		);
+		$this->assertNotEmpty( $started_logs, 'Should have migration started log' );
 
-		$this->assertContains( Migration_Events::TYPE_BATCH_COMPLETED, $types );
-		$this->assertContains( Migration_Events::TYPE_COMPLETED, $types );
+		// Check for migration completed log.
+		$completed_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'completed' ) !== false;
+			}
+		);
+		$this->assertNotEmpty( $completed_logs, 'Should have migration completed log' );
+
+		// Verify log types are valid.
+		foreach ( $logs as $log ) {
+			$this->assertContains(
+				$log['type'],
+				[ 'info', 'warning', 'error', 'debug' ],
+				'Log type should be valid'
+			);
+		}
 	}
 
 	/**

@@ -17,6 +17,7 @@ use StellarWP\DB\Database\Exceptions\DatabaseQueryException;
 use StellarWP\Migrations\Config;
 use StellarWP\Shepherd\Tables\Utility\Safe_Dynamic_Prefix;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Tables\Migration_Logs;
 
 /**
  * Migrations Tables Service Provider
@@ -32,7 +33,7 @@ class Provider extends Provider_Abstract {
 	 * @var array<int, class-string>
 	 */
 	private array $tables = [
-		Migration_Events::class,
+		Migration_Logs::class,
 		Migration_Executions::class,
 	];
 
@@ -55,7 +56,7 @@ class Provider extends Provider_Abstract {
 		$safe_dynamic_prefix->calculate_longest_table_name( $this->tables );
 
 		try {
-			Register::table( Migration_Events::class );
+			Register::table( Migration_Logs::class );
 			Register::table( Migration_Executions::class );
 
 			/**
