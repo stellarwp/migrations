@@ -90,8 +90,8 @@ class Execute extends Task_Abstract {
 			);
 		}
 
-		// Set the execution ID on the migration so it can access the logger.
-		$migration->set_execution_id( $execution_id );
+		// Bind the Logger to the container with the execution ID.
+		$container->singleton( Logger::class, fn() => new Logger( $execution_id ) );
 
 		$method_to_check_if_done = "is_{$method}_done";
 
@@ -99,7 +99,7 @@ class Execute extends Task_Abstract {
 			return;
 		}
 
-		$logger = Logger::for_execution( $execution_id );
+		$logger = $container->get( Logger::class );
 
 		$logger->info(
 			sprintf( '%s batch %d started.', $operation_type, $batch ),

@@ -271,15 +271,15 @@ public function down( int $batch, int $batch_size, ...$extra_args ): void {
 
 `StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
 
-| Method                               | Default Value |
-|--------------------------------------|---------------|
-| `before_up()`                        | No-op         |
-| `after_up()`                         | No-op         |
-| `before_down()`                      | No-op         |
-| `after_down()`                       | No-op         |
-| `can_run()`                          | `true`        |
+| Method                              | Default Value |
+| ----------------------------------- | ------------- |
+| `before_up()`                       | No-op         |
+| `after_up()`                        | No-op         |
+| `before_down()`                     | No-op         |
+| `after_down()`                      | No-op         |
+| `can_run()`                         | `true`        |
 | `get_number_of_retries_per_batch()` | `0`           |
-| `get_tags()`                         | `[]`          |
+| `get_tags()`                        | `[]`          |
 | `get_up_extra_args_for_batch()`     | `[]`          |
 | `get_down_extra_args_for_batch()`   | `[]`          |
 
@@ -367,12 +367,12 @@ The library provides comprehensive logging capabilities for tracking migration e
 
 The `Log_Type` enum provides the following log levels:
 
-| Type | Description |
-|------|-------------|
-| `INFO` | Informational messages about migration progress. |
-| `WARNING` | Warning messages for non-critical issues. |
-| `ERROR` | Error messages for failures and exceptions. |
-| `DEBUG` | Debug messages for troubleshooting. |
+| Type      | Description                                      |
+| --------- | ------------------------------------------------ |
+| `INFO`    | Informational messages about migration progress. |
+| `WARNING` | Warning messages for non-critical issues.        |
+| `ERROR`   | Error messages for failures and exceptions.      |
+| `DEBUG`   | Debug messages for troubleshooting.              |
 
 ### Using the Logger
 

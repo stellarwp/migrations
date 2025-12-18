@@ -207,15 +207,4 @@ interface Migration {
 	 * @return array<mixed>
 	 */
 	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array;
-
-	/**
-	 * Sets the current execution ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $execution_id The execution ID to set.
-	 *
-	 * @return void
-	 */
-	public function set_execution_id( int $execution_id ): void;
 }

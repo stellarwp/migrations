@@ -89,7 +89,7 @@ class Migration_Logs extends Table_Abstract {
 				new ID( 'id' ),
 				( new Referenced_ID( 'migration_execution_id' ) ),
 				( new String_Column( 'type' ) )->set_length( 191 )->set_is_index( true ),
-				( new String_Column( 'message' ) )->set_length( 1024 ),
+				new Text_Column( 'message' ),
 				( new Text_Column( 'data' ) )->set_nullable( true )->set_php_type( PHP_Types::JSON ),
 				new Created_At( 'created_at' ),
 			]
