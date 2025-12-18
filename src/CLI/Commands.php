@@ -300,18 +300,18 @@ class Commands {
 		$limit      = Utils\get_flag_value( $assoc_args, 'limit', 0 );
 		$table_name = Migration_Events::table_name();
 
-		$query = 'SELECT id, migration_id, type, data, created_at FROM %i WHERE migration_id = %s';
+		$query      = 'SELECT id, migration_id, type, data, created_at FROM %i WHERE migration_id = %s';
 		$query_args = [ $table_name, $migration_id ];
 
 		if ( $type ) {
-			$query .= ' AND type = %s';
+			$query       .= ' AND type = %s';
 			$query_args[] = $type;
 		}
 
 		$query .= ' ORDER BY created_at ASC';
 
 		if ( $limit > 0 ) {
-			$query .= ' LIMIT %d';
+			$query       .= ' LIMIT %d';
 			$query_args[] = (int) $limit;
 		}
 
@@ -341,7 +341,7 @@ class Commands {
 	 *
 	 * @return void
 	 */
-	private function run_operation ( Operation $operation, array $args, array $assoc_args ): void {
+	private function run_operation( Operation $operation, array $args, array $assoc_args ): void {
 		$migration_id = $args[0] ?? null;
 
 		if ( ! $migration_id ) {
