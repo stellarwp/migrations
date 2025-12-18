@@ -91,7 +91,7 @@ class Execute extends Task_Abstract {
 		}
 
 		// Bind the Logger to the container with the execution ID.
-		$container->singleton( Logger::class, fn() => new Logger( $execution_id ) );
+		$container->singleton( Logger::class, static fn() => new Logger( $execution_id ) );
 
 		$logger = $container->get( Logger::class );
 
