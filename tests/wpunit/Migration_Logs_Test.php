@@ -6,9 +6,11 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Enums\Log_Type;
 use StellarWP\Migrations\Tables\Migration_Logs;
+use StellarWP\Migrations\Tests\Traits\With_Uopz;
 use StellarWP\Migrations\Utilities\Logger;
 
 class Migration_Logs_Test extends WPTestCase {
+	use With_Uopz;
 	/**
 	 * @test
 	 */
@@ -301,5 +303,197 @@ class Migration_Logs_Test extends WPTestCase {
 		$this->assertNotNull( $log );
 		$this->assertEquals( 'Message without data', $log['message'] );
 		$this->assertNull( $log['data'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_log_debug_messages_when_wp_debug_is_false(): void {
+		// Arrange.
+		$execution_id = 5001;
+
+		// Explicitly set WP_DEBUG to false.
+		$this->set_const_value( 'WP_DEBUG', false );
+
+		// Act.
+		$logger       = new Logger( $execution_id );
+		$debug_result = $logger->debug( 'Debug message' );
+		$info_result  = $logger->info( 'Info message' );
+
+		// Assert.
+		$this->assertFalse( $debug_result, 'Debug should not be logged when WP_DEBUG is false' );
+		$this->assertIsInt( $info_result, 'Info should be logged when WP_DEBUG is false' );
+
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
+		$this->assertCount( 1, $logs, 'Only info message should be logged' );
+		$this->assertEquals( 'info', $logs[0]['type'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_log_debug_messages_when_wp_debug_is_true(): void {
+		// Arrange.
+		$execution_id = 5002;
+
+		// Explicitly set WP_DEBUG to true.
+		$this->set_const_value( 'WP_DEBUG', true );
+
+		// Act.
+		$logger       = new Logger( $execution_id );
+		$debug_result = $logger->debug( 'Debug message' );
+		$info_result  = $logger->info( 'Info message' );
+
+		// Assert.
+		$this->assertIsInt( $debug_result, 'Debug should be logged when WP_DEBUG is true' );
+		$this->assertIsInt( $info_result, 'Info should be logged when WP_DEBUG is true' );
+
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
+		$this->assertCount( 2, $logs, 'Both debug and info messages should be logged' );
+
+		$log_types = array_column( $logs, 'type' );
+		$this->assertContains( 'debug', $log_types );
+		$this->assertContains( 'info', $log_types );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_respect_custom_min_log_level_from_filter(): void {
+		// Arrange.
+		$execution_id = 5005;
+
+		add_filter(
+			'stellarwp_migrations_minimum_log_level',
+			function () {
+				return Log_Type::WARNING();
+			}
+		);
+
+		$logger = new Logger( $execution_id );
+
+		// Act.
+		$debug_result   = $logger->debug( 'Debug message' );
+		$info_result    = $logger->info( 'Info message' );
+		$warning_result = $logger->warning( 'Warning message' );
+
+		// Assert.
+		$this->assertFalse( $debug_result, 'Debug should not be logged' );
+		$this->assertFalse( $info_result, 'Info should not be logged' );
+		$this->assertIsInt( $warning_result, 'Warning should be logged' );
+
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
+		$this->assertCount( 1, $logs, 'Only warning should be logged' );
+		$this->assertEquals( 'warning', $logs[0]['type'] );
+
+		// Clean up.
+		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_only_log_errors_when_min_level_is_error(): void {
+		// Arrange.
+		$execution_id = 5006;
+
+		add_filter(
+			'stellarwp_migrations_minimum_log_level',
+			function () {
+				return Log_Type::ERROR();
+			}
+		);
+
+		$logger = new Logger( $execution_id );
+
+		// Act.
+		$debug_result   = $logger->debug( 'Debug message' );
+		$info_result    = $logger->info( 'Info message' );
+		$warning_result = $logger->warning( 'Warning message' );
+		$error_result   = $logger->error( 'Error message' );
+
+		// Assert.
+		$this->assertFalse( $debug_result );
+		$this->assertFalse( $info_result );
+		$this->assertFalse( $warning_result );
+		$this->assertIsInt( $error_result );
+
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
+		$this->assertCount( 1, $logs );
+		$this->assertEquals( 'error', $logs[0]['type'] );
+
+		// Clean up.
+		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_log_all_levels_when_min_level_is_debug(): void {
+		// Arrange.
+		$execution_id = 5007;
+
+		add_filter(
+			'stellarwp_migrations_minimum_log_level',
+			function () {
+				return Log_Type::DEBUG();
+			}
+		);
+
+		$logger = new Logger( $execution_id );
+
+		// Act.
+		$debug_result   = $logger->debug( 'Debug message' );
+		$info_result    = $logger->info( 'Info message' );
+		$warning_result = $logger->warning( 'Warning message' );
+		$error_result   = $logger->error( 'Error message' );
+
+		// Assert.
+		$this->assertIsInt( $debug_result );
+		$this->assertIsInt( $info_result );
+		$this->assertIsInt( $warning_result );
+		$this->assertIsInt( $error_result );
+
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
+		$this->assertCount( 4, $logs );
+
+		$log_types = array_column( $logs, 'type' );
+		$this->assertContains( 'debug', $log_types );
+		$this->assertContains( 'info', $log_types );
+		$this->assertContains( 'warning', $log_types );
+		$this->assertContains( 'error', $log_types );
+
+		// Clean up.
+		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_set_min_log_level_once_per_logger_instance(): void {
+		// Arrange.
+		$execution_id = 5008;
+
+		$filter_call_count = 0;
+		add_filter(
+			'stellarwp_migrations_minimum_log_level',
+			function ( Log_Type $level ) use ( &$filter_call_count ) {
+				$filter_call_count++;
+				return Log_Type::INFO();
+			}
+		);
+
+		$logger = new Logger( $execution_id );
+
+		// Act.
+		$logger->info( 'First log' );
+		$logger->warning( 'Second log' );
+		$logger->error( 'Third log' );
+
+		// Assert.
+		$this->assertEquals( 1, $filter_call_count, 'Filter should only be called once per logger instance' );
+
+		// Clean up.
+		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
 	}
 }
