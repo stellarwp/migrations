@@ -3,6 +3,7 @@
 namespace Test_Plugin\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Enums\Operation;
 
 class Simple_Migration extends Migration_Abstract {
 	public function get_label(): string {
@@ -13,7 +14,11 @@ class Simple_Migration extends Migration_Abstract {
 		return 'This is a simple migration that runs a single batch.';
 	}
 
-	public function get_total_batches(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
+		return 1;
+	}
+
+	public function get_default_batch_size(): int {
 		return 1;
 	}
 
@@ -29,11 +34,11 @@ class Simple_Migration extends Migration_Abstract {
 		return false;
 	}
 
-	public function up( int $batch ): void {
+	public function up( int $batch, int $batch_size ): void {
 		// Do nothing.
 	}
 
-	public function down( int $batch ): void {
+	public function down( int $batch, int $batch_size ): void {
 		// Do nothing.
 	}
 }
