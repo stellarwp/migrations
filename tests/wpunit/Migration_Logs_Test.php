@@ -363,9 +363,10 @@ class Migration_Logs_Test extends WPTestCase {
 	public function it_should_respect_custom_min_log_level_from_filter(): void {
 		// Arrange.
 		$execution_id = 5005;
+		$prefix       = Config::get_hook_prefix();
 
 		add_filter(
-			'stellarwp_migrations_minimum_log_level',
+			"stellarwp_migrations_{$prefix}_minimum_log_level",
 			function () {
 				return Log_Type::WARNING();
 			}
@@ -388,7 +389,7 @@ class Migration_Logs_Test extends WPTestCase {
 		$this->assertEquals( 'warning', $logs[0]['type'] );
 
 		// Clean up.
-		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+		remove_all_filters( "stellarwp_migrations_{$prefix}_minimum_log_level" );
 	}
 
 	/**
@@ -397,9 +398,10 @@ class Migration_Logs_Test extends WPTestCase {
 	public function it_should_only_log_errors_when_min_level_is_error(): void {
 		// Arrange.
 		$execution_id = 5006;
+		$prefix       = Config::get_hook_prefix();
 
 		add_filter(
-			'stellarwp_migrations_minimum_log_level',
+			"stellarwp_migrations_{$prefix}_minimum_log_level",
 			function () {
 				return Log_Type::ERROR();
 			}
@@ -424,7 +426,7 @@ class Migration_Logs_Test extends WPTestCase {
 		$this->assertEquals( 'error', $logs[0]['type'] );
 
 		// Clean up.
-		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+		remove_all_filters( "stellarwp_migrations_{$prefix}_minimum_log_level" );
 	}
 
 	/**
@@ -433,9 +435,10 @@ class Migration_Logs_Test extends WPTestCase {
 	public function it_should_log_all_levels_when_min_level_is_debug(): void {
 		// Arrange.
 		$execution_id = 5007;
+		$prefix       = Config::get_hook_prefix();
 
 		add_filter(
-			'stellarwp_migrations_minimum_log_level',
+			"stellarwp_migrations_{$prefix}_minimum_log_level",
 			function () {
 				return Log_Type::DEBUG();
 			}
@@ -465,7 +468,7 @@ class Migration_Logs_Test extends WPTestCase {
 		$this->assertContains( 'error', $log_types );
 
 		// Clean up.
-		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+		remove_all_filters( "stellarwp_migrations_{$prefix}_minimum_log_level" );
 	}
 
 	/**
@@ -474,10 +477,11 @@ class Migration_Logs_Test extends WPTestCase {
 	public function it_should_set_min_log_level_once_per_logger_instance(): void {
 		// Arrange.
 		$execution_id = 5008;
+		$prefix       = Config::get_hook_prefix();
 
 		$filter_call_count = 0;
 		add_filter(
-			'stellarwp_migrations_minimum_log_level',
+			"stellarwp_migrations_{$prefix}_minimum_log_level",
 			function () use ( &$filter_call_count ) {
 				$filter_call_count++;
 				return Log_Type::INFO();
@@ -495,6 +499,6 @@ class Migration_Logs_Test extends WPTestCase {
 		$this->assertEquals( 1, $filter_call_count, 'Filter should only be called once per logger instance' );
 
 		// Clean up.
-		remove_all_filters( 'stellarwp_migrations_minimum_log_level' );
+		remove_all_filters( "stellarwp_migrations_{$prefix}_minimum_log_level" );
 	}
 }

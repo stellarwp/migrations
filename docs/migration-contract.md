@@ -422,12 +422,15 @@ The minimum log level is automatically determined based on the `WP_DEBUG` consta
 
 #### Filtering Log Levels
 
-You can customize the minimum log level using the `stellarwp_migrations_minimum_log_level` filter:
+You can customize the minimum log level using the `stellarwp_migrations_{prefix}_minimum_log_level` filter, where `{prefix}` is your configured hook prefix:
 
 ```php
+use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Enums\Log_Type;
 
-add_filter( 'stellarwp_migrations_minimum_log_level', function( Log_Type $minimum_log_level ) {
+$prefix = Config::get_hook_prefix();
+
+add_filter( "stellarwp_migrations_{$prefix}_minimum_log_level", function( Log_Type $minimum_log_level ) {
     // Only log warnings and errors.
     return Log_Type::WARNING();
 } );
@@ -439,6 +442,8 @@ The filter receives and should return a `Log_Type` enum instance. Available valu
 - `Log_Type::INFO()` - Informational messages
 - `Log_Type::WARNING()` - Warnings
 - `Log_Type::ERROR()` - Errors only (least verbose)
+
+**Note:** The filter name includes your configured hook prefix, allowing multiple instances of the library to run with independent log level configurations.
 
 #### Usage Example
 

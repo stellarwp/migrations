@@ -11,6 +11,7 @@ namespace StellarWP\Migrations\Utilities;
 
 use StellarWP\Migrations\Enums\Log_Type;
 use StellarWP\Migrations\Tables\Migration_Logs;
+use StellarWP\Migrations\Config;
 
 /**
  * Logger utility for migration executions.
@@ -169,6 +170,8 @@ class Logger {
 	 * @return Log_Type The minimum log level.
 	 */
 	protected function determine_minimum_log_level(): Log_Type {
+		$prefix = Config::get_hook_prefix();
+
 		// Determine the default based on WP_DEBUG.
 		$default_level = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? Log_Type::DEBUG() : Log_Type::INFO();
 
@@ -181,7 +184,7 @@ class Logger {
 		 *
 		 * @return Log_Type
 		 */
-		return apply_filters( 'stellarwp_migrations_minimum_log_level', $default_level );
+		return apply_filters( "stellarwp_migrations_{$prefix}_minimum_log_level", $default_level );
 	}
 
 	/**
