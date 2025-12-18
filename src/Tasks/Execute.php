@@ -93,13 +93,15 @@ class Execute extends Task_Abstract {
 		// Bind the Logger to the container with the execution ID.
 		$container->singleton( Logger::class, fn() => new Logger( $execution_id ) );
 
+		$logger = $container->get( Logger::class );
+
 		$method_to_check_if_done = "is_{$method}_done";
 
 		if ( $migration->$method_to_check_if_done() ) {
+			$this->handle_migration_completion( $method, $batch, $execution_id, $logger );
+
 			return;
 		}
-
-		$logger = $container->get( Logger::class );
 
 		$logger->info(
 			sprintf( '%s batch %d started.', $operation_type, $batch ),
@@ -302,37 +304,7 @@ class Execute extends Task_Abstract {
 
 		// Handle migration completion.
 
-		$completion_status = null;
-
-		// Rollback completion.
-		if ( 'down' === $method ) {
-			$logger->info(
-				'Migration rollback completed.',
-				[
-					'total_batches' => $batch,
-				]
-			);
-
-			$completion_status = Status::FAILED()->getValue();
-		} else {
-			// Successful migration completion.
-			$logger->info(
-				'Migration completed successfully.',
-				[
-					'total_batches' => $batch,
-				]
-			);
-
-			$completion_status = Status::COMPLETED()->getValue();
-		}
-
-		Migration_Executions::update_single(
-			[
-				'id'           => $execution_id,
-				'status'       => $completion_status,
-				'end_date_gmt' => current_time( 'mysql', true ),
-			]
-		);
+		$this->handle_migration_completion( $method, $batch, $execution_id, $logger );
 	}
 
 	/**
@@ -416,5 +388,49 @@ class Execute extends Task_Abstract {
 		if ( $args[4] < 1 ) {
 			throw new InvalidArgumentException( 'Execute task execution_id must be greater than 0.' );
 		}
+	}
+
+	/**
+	 * Handle migration completion.
+	 *
+	 * @param string $method       The method to run.
+	 * @param int    $batch        The batch number.
+	 * @param int    $execution_id The execution ID.
+	 * @param Logger $logger       The logger instance.
+	 *
+	 * @return void
+	 */
+	private function handle_migration_completion( string $method, int $batch, int $execution_id, Logger $logger ): void {
+		$completion_status = null;
+
+		// Rollback completion.
+		if ( 'down' === $method ) {
+			$logger->info(
+				'Migration rollback completed.',
+				[
+					'total_batches' => $batch,
+				]
+			);
+
+			$completion_status = Status::FAILED()->getValue();
+		} else {
+			// Successful migration completion.
+			$logger->info(
+				'Migration completed successfully.',
+				[
+					'total_batches' => $batch,
+				]
+			);
+
+			$completion_status = Status::COMPLETED()->getValue();
+		}
+
+		Migration_Executions::update_single(
+			[
+				'id'           => $execution_id,
+				'status'       => $completion_status,
+				'end_date_gmt' => current_time( 'mysql', true ),
+			]
+		);
 	}
 }
