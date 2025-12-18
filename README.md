@@ -89,7 +89,7 @@ Add custom logs to track migration progress and debug issues:
 
 ```php
 public function up( int $batch, int $batch_size ): void {
-    $logger = $this->get_logger();
+    $logger = Config::get_container()->get( Logger::class );
 
     $logger->info( 'Starting batch processing.', [ 'batch' => $batch ] );
 

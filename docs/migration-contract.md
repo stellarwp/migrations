@@ -382,7 +382,7 @@ The `Logger` utility class makes it easy to add logs for a migration execution:
 use StellarWP\Migrations\Utilities\Logger;
 
 // Create a logger for an execution.
-$logger = Logger::for_execution( $execution_id );
+$logger = new Logger( $execution_id );
 
 // Log messages at different levels.
 $logger->info( 'Processing batch 1' );

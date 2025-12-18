@@ -184,7 +184,7 @@ class Migration_Logs_Test extends WPTestCase {
 	 */
 	public function it_should_log_info_using_logger_utility(): void {
 		$execution_id = 2001;
-		$logger       = Logger::for_execution( $execution_id );
+		$logger       = new Logger( $execution_id );
 
 		// Arrange.
 
@@ -207,7 +207,7 @@ class Migration_Logs_Test extends WPTestCase {
 	 */
 	public function it_should_log_warning_using_logger_utility(): void {
 		$execution_id = 2002;
-		$logger       = Logger::for_execution( $execution_id );
+		$logger       = new Logger( $execution_id );
 
 		// Arrange.
 
@@ -228,7 +228,7 @@ class Migration_Logs_Test extends WPTestCase {
 	 */
 	public function it_should_log_error_using_logger_utility(): void {
 		$execution_id = 2003;
-		$logger       = Logger::for_execution( $execution_id );
+		$logger       = new Logger( $execution_id );
 
 		// Arrange.
 
@@ -251,7 +251,7 @@ class Migration_Logs_Test extends WPTestCase {
 	 */
 	public function it_should_log_debug_using_logger_utility(): void {
 		$execution_id = 2004;
-		$logger       = Logger::for_execution( $execution_id );
+		$logger       = new Logger( $execution_id );
 
 		// Arrange.
 
@@ -272,7 +272,7 @@ class Migration_Logs_Test extends WPTestCase {
 	 */
 	public function it_should_get_execution_id_from_logger(): void {
 		$execution_id = 3001;
-		$logger       = Logger::for_execution( $execution_id );
+		$logger       = new Logger( $execution_id );
 
 		// Arrange.
 
@@ -287,7 +287,7 @@ class Migration_Logs_Test extends WPTestCase {
 	 */
 	public function it_should_log_without_data(): void {
 		$execution_id = 4001;
-		$logger       = Logger::for_execution( $execution_id );
+		$logger       = new Logger( $execution_id );
 
 		// Arrange.
 

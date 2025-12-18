@@ -30,19 +30,6 @@ class Logger {
 	private int $execution_id;
 
 	/**
-	 * Creates a logger instance for the given execution ID.
-	 *
-	 * @since TBD
-	 *
-	 * @param int $execution_id The migration execution ID.
-	 *
-	 * @return self The logger instance.
-	 */
-	public static function for_execution( int $execution_id ): self {
-		return new self( $execution_id );
-	}
-
-	/**
 	 * Constructor.
 	 *
 	 * @since TBD

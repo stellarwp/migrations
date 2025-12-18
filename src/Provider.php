@@ -235,7 +235,7 @@ class Provider extends Provider_Abstract {
 
 			// Log the migration scheduling.
 
-			$logger = Logger::for_execution( $execution_id );
+			$logger = new Logger( $execution_id );
 			$logger->info(
 				sprintf( 'Migration "%s" scheduled for execution.', $migration_id ),
 				[
