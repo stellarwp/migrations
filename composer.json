@@ -35,7 +35,7 @@
   "require": {
     "php": ">=7.4",
     "myclabs/php-enum": "^1.8",
-    "stellarwp/shepherd": "^0.0.9"
+    "stellarwp/shepherd": "^0.1"
   },
   "require-dev": {
     "stellarwp/coding-standards": "^2.1",
@@ -53,6 +53,7 @@
     "lucatume/di52": "^4.0",
     "slope-it/clock-mock": "^0.4.0",
     "lucatume/codeception-snapshot-assertions": "^0.4.0",
+    "php-stubs/wp-cli-stubs": "^2.12",
     "dpanta94/phpstan-containers": "^0.1.0"
   },
   "scripts": {

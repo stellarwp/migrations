@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Abstracts;
 
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
+use RuntimeException;
 
 /**
  * Base class for migrations.
@@ -21,6 +23,78 @@ use StellarWP\Migrations\Contracts\Migration;
  * @package StellarWP\Migrations\Abstracts
  */
 abstract class Migration_Abstract implements Migration {
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_PENDING = 'pending';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_RUNNING = 'running';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_COMPLETED = 'completed';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_FAILED = 'failed';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_DOWN_PENDING = 'rollback-pending';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_DOWN_RUNNING = 'rollback-running';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_DOWN_COMPLETED = 'rollback-completed';
+
+	/**
+	 * The status of the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const STATUS_DOWN_FAILED = 'rollback-failed';
 
 	/**
 	 * Runs before each batch of the migration.
@@ -87,6 +161,20 @@ abstract class Migration_Abstract implements Migration {
 	}
 
 	/**
+	 * Get the total number of batches.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int            $batch_size The batch size.
+	 * @param Operation|null $operation  The operation to get the total batches for. On null, `Operation::UP()` is assumed.
+	 *
+	 * @return int The total number of batches.
+	 */
+	public function get_total_batches( int $batch_size, ?Operation $operation = null ): int {
+		return (int) ceil( $this->get_total_items( $operation ) / $batch_size );
+	}
+
+	/**
 	 * Get the migration tags.
 	 *
 	 * @since 0.0.1
@@ -123,5 +211,48 @@ abstract class Migration_Abstract implements Migration {
 	 */
 	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array {
 		return [];
+	}
+
+	/**
+	 * Convert the migration to an array.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array
+	 */
+	public function to_array(): array {
+		return [
+			'label'         => $this->get_label(),
+			'description'   => $this->get_description(),
+			'tags'          => $this->get_tags(),
+			'total_batches' => $this->get_total_batches( $this->get_default_batch_size() ),
+			'can_run'       => $this->can_run(),
+			'is_applicable' => $this->is_applicable(),
+			'status'        => $this->get_status(),
+		];
+	}
+
+	/**
+	 * Convert the migration to a JSON serializable array.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize(): array {
+		return $this->to_array();
+	}
+
+	/**
+	 * Get the migration status.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 *
+	 * @throws RuntimeException If the migration event type is invalid.
+	 */
+	public function get_status(): string {
+		return self::STATUS_PENDING;
 	}
 }
