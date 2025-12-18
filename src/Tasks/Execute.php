@@ -220,6 +220,7 @@ class Execute extends Task_Abstract {
 			);
 
 			if ( ! $is_rollback ) {
+				// Set the execution status to failed.
 				Migration_Executions::update_single(
 					[
 						'id'     => $execution_id,
@@ -301,6 +302,8 @@ class Execute extends Task_Abstract {
 
 		// Handle migration completion.
 
+		$completion_status = null;
+
 		// Rollback completion.
 		if ( 'down' === $method ) {
 			$logger->info(
@@ -309,6 +312,8 @@ class Execute extends Task_Abstract {
 					'total_batches' => $batch,
 				]
 			);
+
+			$completion_status = Status::FAILED()->getValue();
 		} else {
 			// Successful migration completion.
 			$logger->info(
@@ -318,15 +323,16 @@ class Execute extends Task_Abstract {
 				]
 			);
 
-			// Set the execution status to completed.
-			Migration_Executions::update_single(
-				[
-					'id'           => $execution_id,
-					'status'       => Status::COMPLETED()->getValue(),
-					'end_date_gmt' => current_time( 'mysql', true ),
-				]
-			);
+			$completion_status = Status::COMPLETED()->getValue();
 		}
+
+		Migration_Executions::update_single(
+			[
+				'id'           => $execution_id,
+				'status'       => $completion_status,
+				'end_date_gmt' => current_time( 'mysql', true ),
+			]
+		);
 	}
 
 	/**

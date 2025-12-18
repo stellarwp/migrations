@@ -294,13 +294,15 @@ class Migration_Executions_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_not_record_end_date_when_migration_fails(): void {
+	public function it_should_record_end_date_after_rollback_when_migration_fails(): void {
 		// Arrange.
 		Failing_Migration::reset();
 		Failing_Migration::$should_fail = true;
 
 		$registry = Config::get_container()->get( Registry::class );
 		$registry->register( 'tests_failing_migration', Failing_Migration::class );
+
+		$before = current_time( 'mysql', true );
 
 		// Act.
 		$prefix = Config::get_hook_prefix();
@@ -311,6 +313,8 @@ class Migration_Executions_Test extends WPTestCase {
 			// Expected exception from migration failure.
 		}
 
+		$after = current_time( 'mysql', true );
+
 		// Assert.
 		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_failing_migration' );
 
@@ -319,19 +323,54 @@ class Migration_Executions_Test extends WPTestCase {
 		$this->assertNotNull( $execution );
 		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
 
-		// End date should NOT be set on failure - only on successful completion or rollback completion.
+		// End date should be set after the automatic rollback completes.
 		$end_date = $execution['end_date_gmt'];
 		if ( $end_date instanceof \DateTime ) {
 			$end_date = $end_date->format( 'Y-m-d H:i:s' );
 		}
 
-		$this->assertNull( $end_date, 'End date should be NULL when migration fails' );
+		$this->assertNotNull( $end_date, 'End date should be set after rollback completes following a failure' );
+		$this->assertGreaterThanOrEqual( $before, $end_date );
+		$this->assertLessThanOrEqual( $after, $end_date );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_record_end_date_when_rollback_completes(): void {
+	public function it_should_record_end_date_when_migration_completes_successfully(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$before = current_time( 'mysql', true );
+
+		// Act.
+		$prefix = Config::get_hook_prefix();
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$after = current_time( 'mysql', true );
+
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+
+		$this->assertNotNull( $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+
+		// Verify end_date was set after successful migration completion.
+		$end_date = $execution['end_date_gmt'];
+		if ( $end_date instanceof \DateTime ) {
+			$end_date = $end_date->format( 'Y-m-d H:i:s' );
+		}
+
+		$this->assertNotNull( $end_date, 'End date should be set when migration completes successfully' );
+		$this->assertGreaterThanOrEqual( $before, $end_date );
+		$this->assertLessThanOrEqual( $after, $end_date );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_record_end_date_when_manual_rollback_completes(): void {
 		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
@@ -349,7 +388,8 @@ class Migration_Executions_Test extends WPTestCase {
 		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
 
 		// Verify end_date was set after successful up migration.
-		$this->assertNotNull( $execution['end_date_gmt'] );
+		$original_end_date = $execution['end_date_gmt'];
+		$this->assertNotNull( $original_end_date );
 
 		$before = current_time( 'mysql', true );
 
@@ -361,13 +401,20 @@ class Migration_Executions_Test extends WPTestCase {
 		$after = current_time( 'mysql', true );
 
 		// Assert.
-		// Note: The execution status remains as the original status after rollback.
-		// But we don't update end_date_gmt for rollbacks - rollbacks are cleanup operations.
+		// The execution status should be FAILED after rollback completes.
 		$execution_after = Migration_Executions::get_first_by( 'id', $execution['id'] );
 		$this->assertNotNull( $execution_after );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution_after['status'], 'Status should be FAILED after rollback' );
 
-		// The end_date should still be from the original completion.
-		$this->assertNotNull( $execution_after['end_date_gmt'] );
+		// The end_date should be updated after the rollback completes.
+		$new_end_date = $execution_after['end_date_gmt'];
+		if ( $new_end_date instanceof \DateTime ) {
+			$new_end_date = $new_end_date->format( 'Y-m-d H:i:s' );
+		}
+
+		$this->assertNotNull( $new_end_date );
+		$this->assertGreaterThanOrEqual( $before, $new_end_date );
+		$this->assertLessThanOrEqual( $after, $new_end_date );
 	}
 
 	/**
