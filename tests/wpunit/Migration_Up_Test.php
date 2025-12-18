@@ -7,7 +7,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 
 class Migration_Up_Test extends WPTestCase {
@@ -66,7 +66,7 @@ class Migration_Up_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_record_scheduled_event_in_migration_events(): void {
+	public function it_should_record_scheduled_execution_in_migration_executions(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_simple_migration', Simple_Migration::class );
@@ -74,17 +74,17 @@ class Migration_Up_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$event = Migration_Events::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
-		$this->assertNotNull( $event );
-		$this->assertEquals( 'tests_simple_migration', $event['migration_id'] );
-		$this->assertEquals( Migration_Events::TYPE_SCHEDULED, $event['type'] );
+		$this->assertNotNull( $execution );
+		$this->assertEquals( 'tests_simple_migration', $execution['migration_id'] );
+		$this->assertContains( $execution['status'], [ 'scheduled', 'running', 'completed' ] );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_record_completed_event_after_migration_finishes(): void {
+	public function it_should_record_completed_status_after_migration_finishes(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_simple_migration', Simple_Migration::class );
@@ -92,14 +92,11 @@ class Migration_Up_Test extends WPTestCase {
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		// Get all events for this migration.
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_simple_migration' );
+		// Check execution status is completed.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
-		$types = array_column( $events, 'type' );
-
-		$this->assertContains( Migration_Events::TYPE_SCHEDULED, $types );
-		$this->assertContains( Migration_Events::TYPE_BATCH_STARTED, $types );
-		$this->assertContains( Migration_Events::TYPE_COMPLETED, $types );
+		$this->assertNotNull( $execution );
+		$this->assertEquals( 'completed', $execution['status'] );
 	}
 
 	/**

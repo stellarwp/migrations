@@ -21,6 +21,7 @@ use StellarWP\Migrations\Contracts\Migration;
  * @package StellarWP\Migrations\Abstracts
  */
 abstract class Migration_Abstract implements Migration {
+
 	/**
 	 * Runs before each batch of the migration.
 	 *

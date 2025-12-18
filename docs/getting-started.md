@@ -185,6 +185,45 @@ public function after_down( int $batch, int $batch_size, bool $is_completed ): v
 }
 ```
 
+## Logging
+
+The library provides a Logger utility that is automatically bound to the container during migration execution. You can access it from within your migration to log custom messages:
+
+```php
+use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Config;
+use StellarWP\Migrations\Utilities\Logger;
+
+class My_Migration extends Migration_Abstract {
+    public function up( int $batch, int $batch_size ): void {
+        $logger = Config::get_container()->get( Logger::class );
+
+        // Log informational messages.
+        $logger->info( 'Processing batch', [ 'batch' => $batch ] );
+
+        // Perform migration work.
+        global $wpdb;
+        $updated = $wpdb->query( /* ... */ );
+
+        // Log success or warnings.
+        if ( $updated ) {
+            $logger->info( "Updated {$updated} records" );
+        } else {
+            $logger->warning( 'No records were updated' );
+        }
+    }
+}
+```
+
+Available log levels:
+
+- `$logger->info( $message, $data )` - Informational messages
+- `$logger->warning( $message, $data )` - Warning messages
+- `$logger->error( $message, $data )` - Error messages
+- `$logger->debug( $message, $data )` - Debug messages
+
+All logs are stored in the migration logs table and are associated with the current migration execution. The `$data` parameter is optional and accepts any serializable data structure.
+
 ## Failure Handling
 
 If a migration throws an exception during `up()`, the library automatically:
