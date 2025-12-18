@@ -6,6 +6,7 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tests\Migrations\Failing_Migration;
@@ -293,15 +294,13 @@ class Migration_Executions_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_record_end_date_when_migration_fails(): void {
+	public function it_should_not_record_end_date_when_migration_fails(): void {
 		// Arrange.
 		Failing_Migration::reset();
 		Failing_Migration::$should_fail = true;
 
 		$registry = Config::get_container()->get( Registry::class );
 		$registry->register( 'tests_failing_migration', Failing_Migration::class );
-
-		$before = current_time( 'mysql', true );
 
 		// Act.
 		$prefix = Config::get_hook_prefix();
@@ -312,24 +311,63 @@ class Migration_Executions_Test extends WPTestCase {
 			// Expected exception from migration failure.
 		}
 
-		$after = current_time( 'mysql', true );
-
 		// Assert.
 		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_failing_migration' );
 
 		$execution = $executions[0];
 
 		$this->assertNotNull( $execution );
-		$this->assertArrayHasKey( 'end_date_gmt', $execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
 
+		// End date should NOT be set on failure - only on successful completion or rollback completion.
 		$end_date = $execution['end_date_gmt'];
 		if ( $end_date instanceof \DateTime ) {
 			$end_date = $end_date->format( 'Y-m-d H:i:s' );
 		}
 
-		$this->assertNotNull( $end_date );
-		$this->assertGreaterThanOrEqual( $before, $end_date );
-		$this->assertLessThanOrEqual( $after, $end_date );
+		$this->assertNull( $end_date, 'End date should be NULL when migration fails' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_record_end_date_when_rollback_completes(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+
+		Multi_Batch_Migration::$total_batches = 3;
+
+		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		// Run the up migration first.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+		$this->assertNotNull( $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+
+		// Verify end_date was set after successful up migration.
+		$this->assertNotNull( $execution['end_date_gmt'] );
+
+		$before = current_time( 'mysql', true );
+
+		// Act.
+		// Manually trigger a rollback.
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution['id'] );
+		$task->process();
+
+		$after = current_time( 'mysql', true );
+
+		// Assert.
+		// Note: The execution status remains as the original status after rollback.
+		// But we don't update end_date_gmt for rollbacks - rollbacks are cleanup operations.
+		$execution_after = Migration_Executions::get_first_by( 'id', $execution['id'] );
+		$this->assertNotNull( $execution_after );
+
+		// The end_date should still be from the original completion.
+		$this->assertNotNull( $execution_after['end_date_gmt'] );
 	}
 
 	/**

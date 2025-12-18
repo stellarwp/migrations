@@ -4,9 +4,10 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tests\Migrations\Failing_Migration;
 use StellarWP\Migrations\Tests\Migrations\Failing_At_Batch_Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
@@ -27,33 +28,43 @@ class Migration_Failure_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_record_failed_event_on_failure(): void {
+	public function it_should_record_failed_log_on_failure(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_failing_migration', Failing_Migration::class );
 
 		$prefix = Config::get_hook_prefix();
 
+		// Act.
 		try {
 			do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 		} catch ( ShepherdTaskFailWithoutRetryException $e ) {
 			// Expected exception.
 		}
 
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_migration' );
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
+		$this->assertNotNull( $execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
 
-		$failed_events = array_filter(
-			$events,
-			fn( $event ) => $event['type'] === Migration_Events::TYPE_FAILED
+		// Verify error log was recorded.
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+
+		$error_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return $log['type'] === 'error';
+			}
 		);
 
-		$this->assertNotEmpty( $failed_events );
+		$this->assertNotEmpty( $error_logs, 'Should have error log entries' );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_store_error_message_in_failed_event(): void {
+	public function it_should_store_error_message_in_failed_log(): void {
 		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
@@ -71,22 +82,26 @@ class Migration_Failure_Test extends WPTestCase {
 		}
 
 		// Assert.
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_migration' );
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
+		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
 
-		$failed_events = array_filter(
-			$events,
-			fn( $event ) => $event['type'] === Migration_Events::TYPE_FAILED
+		$error_logs = array_filter(
+			$logs,
+			fn( $log ) => $log['type'] === 'error'
 		);
 
-		$this->assertNotEmpty( $failed_events, 'Failed event should exist' );
+		$this->assertNotEmpty( $error_logs, 'Should have error log entries' );
 
-		$failed_event = reset( $failed_events );
+		// Find the error log with our custom message.
+		$custom_error_log = null;
+		foreach ( $error_logs as $log ) {
+			if ( strpos( $log['message'], 'Custom test error message' ) !== false ) {
+				$custom_error_log = $log;
+				break;
+			}
+		}
 
-		$this->assertNotFalse( $failed_event, 'Failed event should not be false' );
-		$this->assertIsArray( $failed_event, 'Failed event should be an array' );
-		$this->assertArrayHasKey( 'data', $failed_event );
-		$this->assertArrayHasKey( 'message', $failed_event['data'] );
-		$this->assertStringContainsString( 'Custom test error message', $failed_event['data']['message'] );
+		$this->assertNotNull( $custom_error_log, 'Should find error log with custom message' );
 	}
 
 	/**
@@ -170,6 +185,7 @@ class Migration_Failure_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_schedule_down_after_up_failure(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		Failing_At_Batch_Migration::$fail_at_batch = 2;
@@ -179,25 +195,30 @@ class Migration_Failure_Test extends WPTestCase {
 
 		$prefix = Config::get_hook_prefix();
 
+		// Act.
 		try {
 			do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 		} catch ( ShepherdTaskFailWithoutRetryException $e ) {
 			// Expected exception.
 		}
 
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_failing_at_batch_migration' );
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_at_batch_migration' );
+		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
 
-		$scheduled_events = array_filter(
-			$events,
-			function ( $event ) {
-				if ( $event['type'] !== Migration_Events::TYPE_SCHEDULED ) {
-					return false;
-				}
-				return isset( $event['data']['args'][0] ) && $event['data']['args'][0] === 'down';
+		// Check for "Rollback scheduled" warning log.
+		$rollback_scheduled = array_filter(
+			$logs,
+			function ( $log ) {
+				return $log['type'] === 'warning'
+					&& strpos( $log['message'], 'Rollback scheduled' ) !== false;
 			}
 		);
 
-		$this->assertNotEmpty( $scheduled_events );
+		$this->assertNotEmpty( $rollback_scheduled, 'Should have "Rollback scheduled" warning log' );
+
+		// Verify rollback was actually executed.
+		$this->assertNotEmpty( Failing_At_Batch_Migration::$down_batches, 'Rollback should have been executed' );
 	}
 
 	/**

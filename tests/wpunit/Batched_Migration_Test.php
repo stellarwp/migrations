@@ -4,8 +4,9 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use function StellarWP\Shepherd\shepherd;
@@ -130,76 +131,98 @@ class Batched_Migration_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_record_batch_started_events_for_each_batch(): void {
+	public function it_should_record_batch_started_logs_for_each_batch(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
 		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
+		// Act.
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+		$this->assertNotNull( $execution );
 
-		$batch_started_events = array_values(
-			array_filter(
-				$events,
-				fn( $event ) => $event['type'] === Migration_Events::TYPE_BATCH_STARTED
-			)
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+
+		$started_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'batch' ) !== false
+					&& strpos( $log['message'], 'started' ) !== false;
+			}
 		);
 
-		$this->assertCount( 3, $batch_started_events );
+		$this->assertCount( 3, $started_logs, 'Should have 3 batch started log entries' );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_record_batch_completed_events_for_intermediate_batches(): void {
+	public function it_should_record_batch_completed_logs_for_intermediate_batches(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
 		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
+		// Act.
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+		$this->assertNotNull( $execution );
 
-		$batch_completed_events = array_values(
-			array_filter(
-				$events,
-				fn( $event ) => $event['type'] === Migration_Events::TYPE_BATCH_COMPLETED
-			)
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+
+		$completed_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'batch' ) !== false
+					&& strpos( $log['message'], 'completed' ) !== false;
+			}
 		);
 
-		$this->assertCount( 2, $batch_completed_events );
+		$this->assertCount( 3, $completed_logs, 'Should have 3 batch completed log entries' );
 	}
 
 	/**
 	 * @test
 	 */
-	public function it_should_record_single_completed_event_at_end(): void {
+	public function it_should_record_single_completed_log_at_end(): void {
+		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
 		$registry->register( 'tests_multi_batch_migration', Multi_Batch_Migration::class );
 
+		// Act.
 		$prefix = Config::get_hook_prefix();
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_multi_batch_migration' );
+		// Assert.
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+		$this->assertNotNull( $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
 
-		$completed_events = array_values(
-			array_filter(
-				$events,
-				fn( $event ) => $event['type'] === Migration_Events::TYPE_COMPLETED
-			)
+		// Verify there's a single "completed successfully" log entry at the end.
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+
+		$completed_successfully_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'completed successfully' ) !== false;
+			}
 		);
 
-		$this->assertCount( 1, $completed_events );
+		$this->assertCount( 1, $completed_successfully_logs, 'Should have exactly 1 "completed successfully" log entry' );
 	}
 
 	/**

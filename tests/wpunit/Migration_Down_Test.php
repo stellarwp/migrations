@@ -6,7 +6,7 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use function StellarWP\Shepherd\shepherd;
@@ -56,7 +56,7 @@ class Migration_Down_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_record_down_events(): void {
+	public function it_should_record_down_logs(): void {
 		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
@@ -72,16 +72,36 @@ class Migration_Down_Test extends WPTestCase {
 		shepherd()->dispatch( $task );
 
 		// Assert.
-		$events = Migration_Events::get_all_by( 'migration_id', 'tests_simple_migration' );
-		$types  = array_column( $events, 'type' );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
 
-		$this->assertContains( Migration_Events::TYPE_BATCH_STARTED, $types );
-		$this->assertContains( Migration_Events::TYPE_COMPLETED, $types );
+		$rollback_logs = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'Rollback' ) !== false;
+			}
+		);
 
-		// Should have at least 1 COMPLETED event from the up migration.
-		// Down migrations don't record COMPLETED events.
-		$completed_count = count( array_filter( $types, fn( $t ) => $t === Migration_Events::TYPE_COMPLETED ) );
-		$this->assertGreaterThanOrEqual( 1, $completed_count );
+		$this->assertNotEmpty( $rollback_logs, 'Should have rollback log entries' );
+
+		// Check for rollback started log.
+		$rollback_started = array_filter(
+			$rollback_logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'started' ) !== false;
+			}
+		);
+
+		$this->assertNotEmpty( $rollback_started, 'Should have rollback started log entry' );
+
+		// Check for rollback completed log.
+		$rollback_completed = array_filter(
+			$logs,
+			function ( $log ) {
+				return strpos( $log['message'], 'rollback completed' ) !== false;
+			}
+		);
+
+		$this->assertNotEmpty( $rollback_completed, 'Should have rollback completed log entry' );
 	}
 
 	/**
