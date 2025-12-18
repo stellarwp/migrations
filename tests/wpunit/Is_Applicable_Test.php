@@ -6,7 +6,6 @@ namespace StellarWP\Migrations;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
-use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 
 class Is_Applicable_Test extends WPTestCase {
