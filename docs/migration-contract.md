@@ -400,7 +400,7 @@ $logger->debug( 'Query result', [ 'count' => 50 ] );
 
 ### Log Level Filtering
 
-The logger implements a high-pass filter system to control which log messages are written to the database. This prevents excessive logging in production environments while allowing detailed logging during development.
+The logger implements a high-pass filter system to control which log messages are written to the database. This prevents excessive logging in production environments while allowing detailed logging during development or troubleshooting.
 
 #### Log Level Hierarchy
 
