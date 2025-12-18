@@ -478,7 +478,7 @@ class Migration_Logs_Test extends WPTestCase {
 		$filter_call_count = 0;
 		add_filter(
 			'stellarwp_migrations_minimum_log_level',
-			function ( Log_Type $level ) use ( &$filter_call_count ) {
+			function () use ( &$filter_call_count ) {
 				$filter_call_count++;
 				return Log_Type::INFO();
 			}
