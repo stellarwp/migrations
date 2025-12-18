@@ -22,6 +22,7 @@ use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\Tables\Migration_Events;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -232,7 +233,7 @@ class Provider extends Provider_Abstract {
 			$batch_size   = $migration->get_default_batch_size();
 
 			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
-			$args = [ 'up', $migration_id, 1, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( 1, $batch_size ) ];
+			$args = [ Operation::UP()->getValue(), $migration_id, 1, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( 1, $batch_size ) ];
 
 			Migration_Events::insert(
 				[

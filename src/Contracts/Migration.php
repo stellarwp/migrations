@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Contracts;
 
 use JsonSerializable;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * Interface for migrations.
@@ -42,9 +43,11 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @since 0.0.1
 	 *
+	 * @param Operation|null $operation The operation to get the total items for. On null, `Operation::UP()` is assumed.
+	 *
 	 * @return int
 	 */
-	public function get_total_items(): int;
+	public function get_total_items( ?Operation $operation = null ): int;
 
 	/**
 	 * Get the number of retries per batch.
@@ -197,6 +200,18 @@ interface Migration extends JsonSerializable {
 	 * @return array<mixed>
 	 */
 	public function get_up_extra_args_for_batch( int $batch, int $batch_size ): array;
+
+	/**
+	 * Get the total number of batches.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int            $batch_size The batch size.
+	 * @param Operation|null $operation  The operation to get the total batches for. On null, `Operation::UP()` is assumed.
+	 *
+	 * @return int
+	 */
+	public function get_total_batches( int $batch_size, ?Operation $operation ): int;
 
 	/**
 	 * Get extra arguments to be passed to the `down()` method for a specific batch.

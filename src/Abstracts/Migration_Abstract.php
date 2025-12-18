@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Abstracts;
 
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use RuntimeException;
 
 /**
@@ -159,6 +160,20 @@ abstract class Migration_Abstract implements Migration {
 	}
 
 	/**
+	 * Get the total number of batches.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int            $batch_size The batch size.
+	 * @param Operation|null $operation  The operation to get the total batches for. On null, `Operation::UP()` is assumed.
+	 *
+	 * @return int The total number of batches.
+	 */
+	public function get_total_batches( int $batch_size, ?Operation $operation = null ): int {
+		return (int) ceil( $this->get_total_items( $operation ) / $batch_size );
+	}
+
+	/**
 	 * Get the migration tags.
 	 *
 	 * @since 0.0.1
@@ -209,7 +224,7 @@ abstract class Migration_Abstract implements Migration {
 			'label'         => $this->get_label(),
 			'description'   => $this->get_description(),
 			'tags'          => $this->get_tags(),
-			'total_batches' => $this->get_total_batches(),
+			'total_batches' => $this->get_total_batches( $this->get_default_batch_size() ),
 			'can_run'       => $this->can_run(),
 			'is_applicable' => $this->is_applicable(),
 			'status'        => $this->get_status(),

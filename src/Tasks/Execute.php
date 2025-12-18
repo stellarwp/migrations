@@ -21,6 +21,7 @@ use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use Exception;
 use InvalidArgumentException;
 use StellarWP\Migrations\Tables\Migration_Events;
@@ -352,8 +353,15 @@ class Execute extends Task_Abstract {
 			throw new InvalidArgumentException( 'Execute task requires at least 5 arguments: method, migration_id, batch, batch_size, execution_id.' );
 		}
 
-		if ( ! in_array( $args[0], [ 'up', 'down' ], true ) ) {
-			throw new InvalidArgumentException( 'Execute task method must be either "up" or "down".' );
+		$all_operation_enums = array_map( static fn( Operation $operation ): string => $operation->getValue(), Operation::UP()->values() );
+
+		if ( ! in_array( $args[0], $all_operation_enums, true ) ) {
+			throw new InvalidArgumentException(
+				'Execute task method must be ' . implode(
+					' or ',
+					array_map( static fn( string $op ): string => "`{$op}`", $all_operation_enums )
+				) . '.'
+			);
 		}
 
 		if ( ! is_string( $args[1] ) ) {
