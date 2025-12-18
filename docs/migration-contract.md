@@ -271,15 +271,15 @@ public function down( int $batch, int $batch_size, ...$extra_args ): void {
 
 `StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
 
-| Method                               | Default Value |
-|--------------------------------------|---------------|
-| `before_up()`                        | No-op         |
-| `after_up()`                         | No-op         |
-| `before_down()`                      | No-op         |
-| `after_down()`                       | No-op         |
-| `can_run()`                          | `true`        |
+| Method                              | Default Value |
+| ----------------------------------- | ------------- |
+| `before_up()`                       | No-op         |
+| `after_up()`                        | No-op         |
+| `before_down()`                     | No-op         |
+| `after_down()`                      | No-op         |
+| `can_run()`                         | `true`        |
 | `get_number_of_retries_per_batch()` | `0`           |
-| `get_tags()`                         | `[]`          |
+| `get_tags()`                        | `[]`          |
 | `get_up_extra_args_for_batch()`     | `[]`          |
 | `get_down_extra_args_for_batch()`   | `[]`          |
 
@@ -359,14 +359,110 @@ $migration = $registry['my_plugin_migration'];
 - Migration values must be class-strings (fully qualified class names).
 - Migrations cannot be registered after the `stellarwp_migrations_{prefix}_schedule_migrations` action has fired.
 
-## Migration Events Table
+## Migration Logs
 
-The library tracks migration state in a database table with the following event types:
+The library provides comprehensive logging capabilities for tracking migration execution and debugging issues.
 
-| Type | Description |
-|------|-------------|
-| `scheduled` | Migration was queued for execution. |
-| `batch-started` | A batch began processing. |
-| `batch-completed` | A batch finished (more batches remain). |
-| `completed` | The migration fully completed. |
-| `failed` | A batch failed with an exception. |
+### Log Types
+
+The `Log_Type` enum provides the following log levels:
+
+| Type      | Description                                      |
+| --------- | ------------------------------------------------ |
+| `INFO`    | Informational messages about migration progress. |
+| `WARNING` | Warning messages for non-critical issues.        |
+| `ERROR`   | Error messages for failures and exceptions.      |
+| `DEBUG`   | Debug messages for troubleshooting.              |
+
+### Using the Logger
+
+The `Logger` utility class makes it easy to add logs for a migration execution:
+
+```php
+use StellarWP\Migrations\Utilities\Logger;
+
+// Create a logger for an execution.
+$logger = new Logger( $execution_id );
+
+// Log messages at different levels.
+$logger->info( 'Processing batch 1' );
+$logger->warning( 'Skipped invalid record', [ 'record_id' => 123 ] );
+$logger->error( 'Failed to update record', [ 'error' => $e->getMessage() ] );
+$logger->debug( 'Query result', [ 'count' => 50 ] );
+```
+
+### Logger Methods
+
+- `info( string $message, ?array $data = null )` - Log informational messages
+- `warning( string $message, ?array $data = null )` - Log warning messages
+- `error( string $message, ?array $data = null )` - Log error messages
+- `debug( string $message, ?array $data = null )` - Log debug messages
+
+### Log Level Filtering
+
+The logger implements a high-pass filter system to control which log messages are written to the database. This prevents excessive logging in production environments while allowing detailed logging during development.
+
+#### Log Level Hierarchy
+
+Log levels are ordered by priority (from most verbose to least verbose):
+
+1. `debug` - Detailed debugging information
+2. `info` - Informational messages about migration progress
+3. `warning` - Warning messages for non-critical issues
+4. `error` - Error messages for failures and exceptions
+
+When a minimum log level is set, only messages at that level or higher will be written to the database.
+
+#### Default Behavior
+
+The minimum log level is automatically determined based on the `WP_DEBUG` constant:
+
+- **`WP_DEBUG = true`**: Minimum level is `debug` (all messages are logged)
+- **`WP_DEBUG = false`**: Minimum level is `info` (debug messages are not logged)
+
+#### Filtering Log Levels
+
+You can customize the minimum log level using the `stellarwp_migrations_minimum_log_level` filter:
+
+```php
+use StellarWP\Migrations\Enums\Log_Type;
+
+add_filter( 'stellarwp_migrations_minimum_log_level', function( Log_Type $minimum_log_level ) {
+    // Only log warnings and errors.
+    return Log_Type::WARNING();
+} );
+```
+
+The filter receives and should return a `Log_Type` enum instance. Available values:
+
+- `Log_Type::DEBUG()` - Most verbose
+- `Log_Type::INFO()` - Informational messages
+- `Log_Type::WARNING()` - Warnings
+- `Log_Type::ERROR()` - Errors only (least verbose)
+
+#### Usage Example
+
+The logger provides a transparent API where you can call any log method without checking conditionals:
+
+```php
+use StellarWP\Migrations\Utilities\Logger;
+
+$logger = new Logger( $execution_id );
+
+// These will always be called, but only written to DB if they meet the minimum level.
+$logger->debug( 'Starting to process items.' );
+$logger->info( 'Processing 100 items.' );
+$logger->warning( 'Item 5 has invalid data.' );
+$logger->error( 'Failed to process item 10.' );
+```
+
+### Log Table Schema
+
+Each log entry contains:
+
+- `id` - Unique log entry ID
+- `migration_execution_id` - Reference to the migration execution
+- `type` - Log type (info, warning, error, debug)
+- `message` - Human-readable log message
+- `data` - Optional JSON data for additional context
+- `created_at` - Timestamp when the log was created
