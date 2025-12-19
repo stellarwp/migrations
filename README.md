@@ -14,7 +14,7 @@ A batched database migrations library for WordPress plugins powered by [Shepherd
 - **Automatic rollback** - Failed migrations trigger automatic rollback via `down()`.
 - **Activity logging** - All migration activity is logged to a database table.
 - **Extensible hooks** - Actions and filters for custom behavior at each stage.
-- **WP-CLI ready** - Optional CLI-only mode for controlled migrations.
+- **WP-CLI integration** - Full CLI support for running, rolling back, and monitoring migrations.
 
 ## Quick Start
 
@@ -109,10 +109,36 @@ public function up( int $batch, int $batch_size ): void {
 
 Available log levels: `info()`, `warning()`, `error()`, `debug()`
 
+## WP-CLI
+
+Manage migrations from the command line:
+
+```bash
+# List all registered migrations
+wp my-plugin migrations list
+
+# Run a specific migration
+wp my-plugin migrations run my_migration_id
+
+# Rollback a migration
+wp my-plugin migrations rollback my_migration_id
+
+# View execution history
+wp my-plugin migrations executions my_migration_id
+
+# View logs for an execution
+wp my-plugin migrations logs 123 --type=error
+```
+
+The command prefix (`my-plugin` above) is derived from your configured hook prefix.
+
+See [CLI Reference](./docs/cli.md) for full command documentation.
+
 ## Documentation
 
 - [Getting Started](./docs/getting-started.md) - Installation and basic usage.
 - [Migration Contract](./docs/migration-contract.md) - Full API reference.
+- [CLI Reference](./docs/cli.md) - WP-CLI commands and usage.
 - [Hooks Reference](./docs/hooks.md) - Available actions and filters.
 - [Tests](./docs/test.md) - Test setup instructions.
 
