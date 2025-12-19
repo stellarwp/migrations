@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Contracts;
 
+use JsonSerializable;
+use StellarWP\Migrations\Enums\Operation;
+
 /**
  * Interface for migrations.
  *
@@ -16,7 +19,7 @@ namespace StellarWP\Migrations\Contracts;
  *
  * @package StellarWP\Migrations\Contracts
  */
-interface Migration {
+interface Migration extends JsonSerializable {
 	/**
 	 * Get the migration label.
 	 *
@@ -40,9 +43,11 @@ interface Migration {
 	 *
 	 * @since 0.0.1
 	 *
+	 * @param Operation|null $operation The operation to get the total items for. On null, `Operation::UP()` is assumed.
+	 *
 	 * @return int
 	 */
-	public function get_total_items(): int;
+	public function get_total_items( ?Operation $operation = null ): int;
 
 	/**
 	 * Get the number of retries per batch.
@@ -197,6 +202,18 @@ interface Migration {
 	public function get_up_extra_args_for_batch( int $batch, int $batch_size ): array;
 
 	/**
+	 * Get the total number of batches.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int            $batch_size The batch size.
+	 * @param Operation|null $operation  The operation to get the total batches for. On null, `Operation::UP()` is assumed.
+	 *
+	 * @return int
+	 */
+	public function get_total_batches( int $batch_size, ?Operation $operation ): int;
+
+	/**
 	 * Get extra arguments to be passed to the `down()` method for a specific batch.
 	 *
 	 * @since 0.0.1
@@ -207,4 +224,32 @@ interface Migration {
 	 * @return array<mixed>
 	 */
 	public function get_down_extra_args_for_batch( int $batch, int $batch_size ): array;
+
+	/**
+	 * Convert the migration to an array.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @phpstan-return array{
+	 *     label: string,
+	 *     description: string,
+	 *     tags: array<string>,
+	 *     total_batches: int,
+	 *     can_run: bool,
+	 *     is_applicable: bool,
+	 *     status: string,
+	 * }
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function to_array(): array;
+
+	/**
+	 * Get the migration status.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 */
+	public function get_status(): string;
 }
