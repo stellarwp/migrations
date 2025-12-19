@@ -87,33 +87,11 @@ class Provider_Test extends WPTestCase {
 			function () use ( &$triggered ) {
 				$triggered = true;
 			},
-			true 
+			true
 		);
 
 		$registry->register( 'tests_simple_migration_2', Simple_Migration::class );
 		$this->assertTrue( $triggered );
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_skip_scheduling_when_cli_only_filter_returns_true(): void {
-		$registry = Config::get_container()->get( Registry::class );
-
-		$registry->register( 'tests_simple_migration', Simple_Migration::class );
-
-		$prefix = Config::get_hook_prefix();
-
-		add_filter( "stellarwp_migrations_{$prefix}_migrations_only_via_cli", '__return_true' );
-
-		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
-
-		remove_filter( "stellarwp_migrations_{$prefix}_migrations_only_via_cli", '__return_true' );
-
-		$this->assertFalse( Simple_Migration::$up_called );
-
-		$calls = tests_migrations_get_calls_data();
-		$this->assertEmpty( $calls );
 	}
 
 	/**
@@ -146,6 +124,185 @@ class Provider_Test extends WPTestCase {
 
 		$this->assertTrue( $pre_fired );
 		$this->assertTrue( $post_fired );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_skip_scheduling_when_global_automatic_schedule_filter_returns_false(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		add_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
+
+		// Act.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$this->assertFalse( Simple_Migration::$up_called, 'Migration should not be executed when global automatic_schedule filter returns false.' );
+
+		$calls = tests_migrations_get_calls_data();
+		$this->assertEmpty( $calls, 'No migration calls should be recorded when automatic scheduling is disabled globally.' );
+
+		// Clean up.
+		remove_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_skip_scheduling_when_plugin_specific_automatic_schedule_filter_returns_false(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		add_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_false' );
+
+		// Act.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$this->assertFalse( Simple_Migration::$up_called, 'Migration should not be executed when plugin-specific automatic_schedule filter returns false.' );
+
+		$calls = tests_migrations_get_calls_data();
+		$this->assertEmpty( $calls, 'No migration calls should be recorded when automatic scheduling is disabled for plugin.' );
+
+		// Clean up.
+		remove_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_false' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_schedule_when_both_automatic_schedule_filters_return_true(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		add_filter( 'stellarwp_migrations_automatic_schedule', '__return_true' );
+		add_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_true' );
+
+		// Act.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$this->assertTrue( Simple_Migration::$up_called, 'Migration should be executed when both automatic_schedule filters return true.' );
+
+		// Clean up.
+		remove_filter( 'stellarwp_migrations_automatic_schedule', '__return_true' );
+		remove_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_true' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_skip_scheduling_when_global_filter_is_false_even_if_plugin_filter_is_true(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		add_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
+		add_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_true' );
+
+		// Act.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$this->assertFalse( Simple_Migration::$up_called, 'Migration should not be executed when global filter returns false, regardless of plugin filter.' );
+
+		$calls = tests_migrations_get_calls_data();
+		$this->assertEmpty( $calls, 'No migration calls should be recorded when global filter disables scheduling.' );
+
+		// Clean up.
+		remove_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
+		remove_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_true' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_fire_pre_and_post_schedule_actions_when_global_automatic_schedule_is_false(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix     = Config::get_hook_prefix();
+		$pre_fired  = false;
+		$post_fired = false;
+
+		add_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
+
+		add_action(
+			"stellarwp_migrations_{$prefix}_pre_schedule_migrations",
+			function () use ( &$pre_fired ) {
+				$pre_fired = true;
+			}
+		);
+
+		add_action(
+			"stellarwp_migrations_{$prefix}_post_schedule_migrations",
+			function () use ( &$post_fired ) {
+				$post_fired = true;
+			}
+		);
+
+		// Act.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$this->assertFalse( $pre_fired, 'Pre-schedule action should not fire when global automatic scheduling is disabled.' );
+		$this->assertFalse( $post_fired, 'Post-schedule action should not fire when global automatic scheduling is disabled.' );
+
+		// Clean up.
+		remove_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_fire_pre_and_post_schedule_actions_when_plugin_automatic_schedule_is_false(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix     = Config::get_hook_prefix();
+		$pre_fired  = false;
+		$post_fired = false;
+
+		add_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_false' );
+
+		add_action(
+			"stellarwp_migrations_{$prefix}_pre_schedule_migrations",
+			function () use ( &$pre_fired ) {
+				$pre_fired = true;
+			}
+		);
+
+		add_action(
+			"stellarwp_migrations_{$prefix}_post_schedule_migrations",
+			function () use ( &$post_fired ) {
+				$post_fired = true;
+			}
+		);
+
+		// Act.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		// Assert.
+		$this->assertFalse( $pre_fired, 'Pre-schedule action should not fire when plugin-specific automatic scheduling is disabled.' );
+		$this->assertFalse( $post_fired, 'Post-schedule action should not fire when plugin-specific automatic scheduling is disabled.' );
+
+		// Clean up.
+		remove_filter( "stellarwp_migrations_{$prefix}_automatic_schedule", '__return_false' );
 	}
 
 	/**
