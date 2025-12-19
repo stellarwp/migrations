@@ -2,6 +2,9 @@ name: General Code Standards
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   spell-check:

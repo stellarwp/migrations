@@ -2,6 +2,12 @@
 
 A batched database migrations library for WordPress plugins powered by [Shepherd](https://github.com/stellarwp/shepherd).
 
+[![PHP Compatibility](https://github.com/stellarwp/migrations/actions/workflows/compatibility.yml/badge.svg)](https://github.com/stellarwp/migrations/actions/workflows/compatibility.yml)
+[![PHP Code Standards](https://github.com/stellarwp/migrations/actions/workflows/phpcs.yml/badge.svg)](https://github.com/stellarwp/migrations/actions/workflows/phpcs.yml)
+[![PHPStan](https://github.com/stellarwp/migrations/actions/workflows/phpstan.yml/badge.svg)](https://github.com/stellarwp/migrations/actions/workflows/phpstan.yml)
+[![General Code Standards](https://github.com/stellarwp/migrations/actions/workflows/standards.yml/badge.svg)](https://github.com/stellarwp/migrations/actions/workflows/standards.yml)
+[![PHP Tests](https://github.com/stellarwp/migrations/actions/workflows/tests-php.yml/badge.svg)](https://github.com/stellarwp/migrations/actions/workflows/tests-php.yml)
+
 ## Features
 
 - **Batched execution** - Process large datasets incrementally without timeouts.

@@ -3,6 +3,9 @@ name: PHP Tests
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   php-tests:
