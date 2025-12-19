@@ -1,10 +1,11 @@
+# cspell:ignore shivammathur reqs
 name: PHPStan
 
 on:
   pull_request:
 
 jobs:
-  phpstsan:
+  phpstan:
     name: phpstan
 
     runs-on: ubuntu-latest
