@@ -20,6 +20,8 @@
     "vendor"
   ],
   "words": [
+    "WPCLI",
+    "codecept",
     "abspath",
     "bunx",
     "chromedriver",

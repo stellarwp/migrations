@@ -20,7 +20,9 @@ use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
+use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -106,6 +108,8 @@ class Provider extends Provider_Abstract {
 	 */
 	public function on_migrations_schema_up(): void {
 		$prefix = Config::get_hook_prefix();
+
+		$this->container->get( CLI_Provider::class )->register();
 
 		// During WP-CLI execution, we don't need to schedule migrations, we'll run them directly.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -233,7 +237,7 @@ class Provider extends Provider_Abstract {
 			$batch_size   = $migration->get_default_batch_size();
 
 			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
-			$args = [ 'up', $migration_id, $batch_number, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( $batch_number, $batch_size ) ];
+			$args = [ Operation::UP()->getValue(), $migration_id, $batch_number, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( $batch_number, $batch_size ) ];
 
 			// Log the migration scheduling.
 
