@@ -1,5 +1,5 @@
 {
-  "name": "stellarwp-migrations",
+  "name": "@stellarwp/migrations",
   "description": "StellarWP Migrations library",
   "private": true,
   "scripts": {
