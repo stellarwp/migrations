@@ -119,12 +119,12 @@ class Migration_Logs extends Table_Abstract {
 	 */
 	public static function transform_from_array( array $result_array ) {
 		return [
-			'id' => $result_array['id'],
+			'id'                     => $result_array['id'],
 			'migration_execution_id' => $result_array['migration_execution_id'],
-			'type' => Log_Type::from( $result_array['type'] ),
-			'message' => $result_array['message'],
-			'data' => $result_array['data'],
-			'created_at' => $result_array['created_at'],
+			'type'                   => Log_Type::from( $result_array['type'] ),
+			'message'                => $result_array['message'],
+			'data'                   => $result_array['data'],
+			'created_at'             => $result_array['created_at'],
 		];
 	}
 }

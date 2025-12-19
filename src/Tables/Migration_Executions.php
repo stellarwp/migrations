@@ -125,14 +125,14 @@ class Migration_Executions extends Table_Abstract {
 	 */
 	public static function transform_from_array( array $result_array ) {
 		return [
-			'id' => $result_array['id'],
-			'migration_id' => $result_array['migration_id'],
-			'start_date_gmt' => $result_array['start_date_gmt'],
-			'end_date_gmt' => $result_array['end_date_gmt'],
-			'status' => Status::from( $result_array['status'] ),
-			'items_total' => $result_array['items_total'],
+			'id'              => $result_array['id'],
+			'migration_id'    => $result_array['migration_id'],
+			'start_date_gmt'  => $result_array['start_date_gmt'],
+			'end_date_gmt'    => $result_array['end_date_gmt'],
+			'status'          => Status::from( $result_array['status'] ),
+			'items_total'     => $result_array['items_total'],
 			'items_processed' => $result_array['items_processed'],
-			'created_at' => $result_array['created_at'],
+			'created_at'      => $result_array['created_at'],
 		];
 	}
 }
