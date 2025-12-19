@@ -169,7 +169,6 @@ class Provider extends Provider_Abstract {
 	public function schedule_migrations(): void {
 		$prefix = Config::get_hook_prefix();
 
-		// Check if migrations should be automatically scheduled.
 
 		/**
 		 * Filters whether migrations should be automatically scheduled for this prefix.
