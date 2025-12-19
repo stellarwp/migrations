@@ -230,7 +230,17 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array
+	 * @phpstan-return array{
+	 *     label: string,
+	 *     description: string,
+	 *     tags: array<string>,
+	 *     total_batches: int,
+	 *     can_run: bool,
+	 *     is_applicable: bool,
+	 *     status: string,
+	 * }
+	 *
+	 * @return array<string, mixed>
 	 */
 	public function to_array(): array;
 

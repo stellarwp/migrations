@@ -35,4 +35,22 @@ class Operation extends Enum {
 	 * @since TBD
 	 */
 	private const DOWN = 'down';
+
+	/**
+	 * Returns the human-readable label for the log type.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The label.
+	 */
+	public function get_label(): string {
+		switch ( $this->getValue() ) {
+			case self::UP:
+				return _x( 'Up', 'Migration operation', 'stellarwp-migrations' );
+			case self::DOWN:
+				return _x( 'Down', 'Migration operation', 'stellarwp-migrations' );
+			default:
+				return _x( 'Unknown', 'Migration operation', 'stellarwp-migrations' );
+		}
+	}
 }
