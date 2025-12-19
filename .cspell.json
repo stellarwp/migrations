@@ -1,0 +1,36 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    ".git",
+    "*.map",
+    "*.min.css",
+    "*.min.js",
+    "bun.lockb",
+    "composer.json",
+    "composer.lock",
+    "LICENSE",
+    "node_modules",
+    "phpstan-cache",
+    "phpstan.neon.dist",
+    "tests/_support/_generated",
+    "vendor"
+  ],
+  "words": [
+    "abspath",
+    "bunx",
+    "codeception",
+    "kadence",
+    "learndash",
+    "lucatume",
+    "phpbrowser",
+    "slic",
+    "squiz",
+    "stellarwp",
+    "uids",
+    "usermeta",
+    "wpdb",
+    "wpunit"
+  ],
+  "dictionaries": ["bash", "git", "html", "npm", "php"]
+}

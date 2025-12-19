@@ -1,6 +1,8 @@
-name: "PHPCS"
+name: PHP Code Standards
+
 on:
   pull_request:
+
 jobs:
   phpcs:
     runs-on: ubuntu-latest

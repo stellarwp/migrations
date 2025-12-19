@@ -1,6 +1,8 @@
-name: "Tests"
+name: Tests
+
 on:
   pull_request:
+
 jobs:
   test:
     strategy:

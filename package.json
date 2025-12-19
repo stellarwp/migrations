@@ -1,0 +1,11 @@
+{
+  "name": "stellarwp-migrations",
+  "description": "StellarWP Migrations library",
+  "private": true,
+  "scripts": {
+    "check:spelling": "bunx cspell lint -c .cspell.json --no-progress --no-must-find-files --dot '**'"
+  },
+  "devDependencies": {
+    "cspell": "^8"
+  }
+}

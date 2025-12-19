@@ -1,6 +1,8 @@
 name: PHP Compatibility
+
 on:
   pull_request:
+
 jobs:
   php-compatibility:
     name: PHP ${{ matrix.php-version }}
