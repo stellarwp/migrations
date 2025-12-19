@@ -83,18 +83,20 @@ class Commands {
 	 * @return void
 	 */
 	public function list( array $args, array $assoc_args ): void {
-		/** @var string $tags */
-		$tags = Utils\get_flag_value( $assoc_args, 'tags', '' );
+		/** @var string $tags_string */
+		$tags_string = Utils\get_flag_value( $assoc_args, 'tags', '' );
 		/** @var string $format */
 		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
 
-		$tags = explode( ',', $tags );
+		$tags = array_filter( explode( ',', $tags_string ) );
 
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
 
 		if ( ! empty( $tags ) ) {
-			$registry->filter( fn( ?Migration $migration ): bool => $migration && in_array( $tags, $migration->get_tags(), true ) );
+			$registry = $registry->filter(
+				fn( ?Migration $migration ): bool => $migration && ! empty( array_intersect( $tags, $migration->get_tags() ) )
+			);
 		}
 
 		$items = $registry->all();
@@ -157,13 +159,7 @@ class Commands {
 	 *     # Run a migration for a specific batch size in parallel
 	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel
 	 *
-	 *     # Run a migration for a specific batch size in parallel for a specific batch
-	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
-	 *
-	 *     # Run a migration for a specific batch size in parallel for a specific batch
-	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
-	 *
-	 *     # Run a migration for a specific batch size in parallel for a specific batch
+	 *     # Run a migration with all options combined
 	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
 	 *
 	 * @subcommand run
@@ -217,13 +213,7 @@ class Commands {
 	 *     # Rollback a migration for a specific batch size in parallel
 	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel
 	 *
-	 *     # Rollback a migration for a specific batch size in parallel for a specific batch
-	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
-	 *
-	 *     # Rollback a migration for a specific batch size in parallel for a specific batch
-	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
-	 *
-	 *     # Rollback a migration for a specific batch size in parallel for a specific batch
+	 *     # Rollback a migration with all options combined
 	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
 	 *
 	 * @subcommand rollback
@@ -355,10 +345,27 @@ class Commands {
 		/** @var string $search */
 		$search = Utils\get_flag_value( $assoc_args, 'search', '' );
 
+		// Validate order direction.
+		if ( ! in_array( $order, [ 'ASC', 'DESC' ], true ) ) {
+			WP_CLI::error( 'Invalid order direction. Use ASC or DESC.' );
+		}
+
+		// Validate order-by column.
+		$allowed_order_by = [ 'id', 'type', 'created_at' ];
+		if ( ! in_array( $order_by, $allowed_order_by, true ) ) {
+			WP_CLI::error( sprintf( 'Invalid order-by column. Allowed: %s', implode( ', ', $allowed_order_by ) ) );
+		}
+
 		$arguments = [
-			'offset'  => $offset,
-			'orderby' => $order_by,
-			'order'   => $order,
+			'offset'                 => $offset,
+			'orderby'                => $order_by,
+			'order'                  => $order,
+			'query_operator'         => 'AND',
+			'migration_execution_id' => [
+				'column'   => 'migration_execution_id',
+				'value'    => $execution_id,
+				'operator' => '=',
+			],
 		];
 
 		if ( $search ) {
@@ -370,10 +377,12 @@ class Commands {
 		}
 
 		if ( $types ) {
-			$types                       = explode( ',', $types );
-			$arguments['query_operator'] = 'OR';
+			$types             = explode( ',', $types );
+			$arguments['type'] = [
+				'query_operator' => 'OR',
+			];
 			foreach ( $types as $type ) {
-				$arguments[] = [
+				$arguments['type'][] = [
 					'column'   => 'type',
 					'value'    => $type,
 					'operator' => '=',
@@ -382,10 +391,12 @@ class Commands {
 		}
 
 		if ( $not_types ) {
-			$not_types                   = explode( ',', $not_types );
-			$arguments['query_operator'] = 'AND';
+			$not_types             = explode( ',', $not_types );
+			$arguments['not_type'] = [
+				'query_operator' => 'AND',
+			];
 			foreach ( $not_types as $type ) {
-				$arguments[] = [
+				$arguments['not_type'][] = [
 					'column'   => 'type',
 					'value'    => $type,
 					'operator' => '!=',
@@ -428,6 +439,8 @@ class Commands {
 	 *
 	 *     # List executions in JSON format
 	 *     $ wp migrations executions my_migration --format=json
+	 *
+	 * @since 0.0.1
 	 *
 	 * @subcommand executions
 	 *
@@ -486,6 +499,10 @@ class Commands {
 
 		$from_batch = max( 1, $from_batch );
 		$to_batch   = min( $to_batch, $total_batches );
+
+		if ( $from_batch > $to_batch ) {
+			WP_CLI::error( 'from-batch cannot be greater than to-batch.' );
+		}
 
 		$in_parallel = isset( $assoc_args['in-parallel'] );
 
