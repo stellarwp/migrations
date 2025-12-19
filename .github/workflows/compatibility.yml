@@ -1,6 +1,12 @@
+# cspell:ignore shivammathur reqs
 name: PHP Compatibility
+
 on:
   pull_request:
+  push:
+    branches:
+      - main
+
 jobs:
   php-compatibility:
     name: PHP ${{ matrix.php-version }}

@@ -1,6 +1,12 @@
-name: "PHPCS"
+# cspell:ignore reqs
+name: PHP Code Standards
+
 on:
   pull_request:
+  push:
+    branches:
+      - main
+
 jobs:
   phpcs:
     runs-on: ubuntu-latest
@@ -18,11 +24,13 @@ jobs:
           args: --ignore-platform-reqs
 
       - name: Fix and Push phpcbf issues
+        if: ${{ github.event_name == 'pull_request' }}
         continue-on-error: true
         run: |
           vendor/bin/phpcbf ./
 
       - name: Commit & Push changes
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions-js/push@master
         continue-on-error: true
         with:

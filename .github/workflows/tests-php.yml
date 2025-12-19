@@ -1,8 +1,14 @@
-name: "Tests"
+# cspell:ignore shivammathur
+name: PHP Tests
+
 on:
   pull_request:
+  push:
+    branches:
+      - main
+
 jobs:
-  test:
+  php-tests:
     strategy:
       matrix:
         suite:
