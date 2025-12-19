@@ -173,15 +173,17 @@ class Provider extends Provider_Abstract {
 	public function schedule_migrations(): void {
 		$prefix = Config::get_hook_prefix();
 
+
 		/**
-		 * Filters whether migrations should be executed only via CLI.
+		 * Filters whether migrations should be automatically scheduled for this prefix.
 		 *
-		 * @since 0.0.1
+		 * @since TBD
 		 *
-		 * @param bool $migrations_only_via_cli Whether migrations should be executed only via CLI. Default is false.
+		 * @param bool $automatic_schedule Whether the migration should be automatically scheduled. Default is true.
+		 *
+		 * @return bool Whether the migration should be automatically scheduled.
 		 */
-		if ( apply_filters( "stellarwp_migrations_{$prefix}_migrations_only_via_cli", false ) ) {
-			// Via CLI we don't need to schedule migrations, we'll run them directly.
+		if ( ! apply_filters( "stellarwp_migrations_{$prefix}_automatic_schedule", true ) ) {
 			return;
 		}
 
