@@ -177,7 +177,7 @@ class Provider extends Provider_Abstract {
 		 *
 		 * @param bool $automatic_schedule Whether the migration should be automatically scheduled. Default is true.
 		 *
-		 * @return bool
+		 * @return bool Whether the migration should be automatically scheduled.
 		 */
 		if ( ! apply_filters( "stellarwp_migrations_{$prefix}_automatic_schedule", true ) ) {
 			return;
