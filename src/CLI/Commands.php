@@ -19,7 +19,10 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Contracts\Task;
 use StellarWP\Migrations\Enums\Operation;
-use StellarWP\Migrations\Tables\Migration_Events;
+use StellarWP\Migrations\Tables\Migration_Logs;
+use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Utilities\Cast;
+use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
@@ -74,13 +77,15 @@ class Commands {
 	 *
 	 * @subcommand list
 	 *
-	 * @param array $args       Positional arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<mixed>               $args       Positional arguments.
+	 * @param array<string, bool|string> $assoc_args Associative arguments.
 	 *
 	 * @return void
 	 */
 	public function list( array $args, array $assoc_args ): void {
+		/** @var string $tags */
 		$tags   = Utils\get_flag_value( $assoc_args, 'tags', '' );
+		/** @var string $format */
 		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
 
 		$tags = explode( ',', $tags );
@@ -117,7 +122,7 @@ class Commands {
 	 *
 	 * ## OPTIONS
 	 *
-	 * <migration_ids>...
+	 * <migration_id>
 	 * : The migration ID to run.
 	 *
 	 * [--from-batch=<batch>]
@@ -163,8 +168,8 @@ class Commands {
 	 *
 	 * @subcommand run
 	 *
-	 * @param array $args       Positional arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<mixed>               $args       Positional arguments.
+	 * @param array<string, bool|string> $assoc_args Associative arguments.
 	 *
 	 * @return void
 	 */
@@ -177,7 +182,7 @@ class Commands {
 	 *
 	 * ## OPTIONS
 	 *
-	 * <migration_ids>...
+	 * <migration_id>
 	 * : The migration ID to rollback.
 	 *
 	 * [--from-batch=<batch>]
@@ -223,8 +228,8 @@ class Commands {
 	 *
 	 * @subcommand rollback
 	 *
-	 * @param array $args       Positional arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<mixed>               $args       Positional arguments.
+	 * @param array<string, bool|string> $assoc_args Associative arguments.
 	 *
 	 * @return void
 	 */
@@ -237,14 +242,29 @@ class Commands {
 	 *
 	 * ## OPTIONS
 	 *
-	 * <migration_id>
-	 * : The migration ID to list logs for.
+	 * <execution_id>
+	 * : The execution ID to list logs for.
 	 *
 	 * [--type=<type>]
-	 * : Filter logs by event type (e.g., scheduled, batch-started, batch-completed, completed, failed).
+	 * : Filter logs by log type (e.g., info, warning, error, debug). Accepts multiple types separated by commas.
+	 *
+	 * [--not-type=<not-type>]
+	 * : Filter logs by log type that is not the specified type (e.g., info, warning, error, debug). Accepts multiple types separated by commas.
+	 *
+	 * [--search=<search>]
+	 * : Filter logs by search term.
 	 *
 	 * [--limit=<limit>]
-	 * : Limit the number of results returned.
+	 * : Limit the number of results returned. Default is 100.
+	 *
+	 * [--offset=<offset>]
+	 * : Offset the results by the specified number of records. Default is 0.
+	 *
+	 * [--order=<order>]
+	 * : Order the results by ASC or DESC. Default is DESC.
+	 *
+	 * [--order-by=<order-by>]
+	 * : Order the results by the specified column. Default is created_at.
 	 *
 	 * [--format=<format>]
 	 * : Output format. Options: table, json, csv, yaml. Default: table.
@@ -259,85 +279,185 @@ class Commands {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     # List logs for a specific migration
-	 *     $ wp migrations logs my_migration
+	 *     # List logs for a specific execution
+	 *     $ wp migrations logs 123
 	 *
 	 *     # List logs in JSON format
-	 *     $ wp migrations logs my_migration --format=json
+	 *     $ wp migrations logs 123 --format=json
 	 *
 	 *     # List only failed logs
-	 *     $ wp migrations logs my_migration --type=failed
+	 *     $ wp migrations logs 123 --type=error
 	 *
 	 *     # List the last 10 logs
-	 *     $ wp migrations logs my_migration --limit=10
+	 *     $ wp migrations logs 123 --limit=10
+	 *
+	 *     # List logs for a specific migration
+	 *     $ wp migrations logs 123 --search="failed to update record"
+	 *
+	 *     # List logs for a specific type
+	 *     $ wp migrations logs 123 --type=error
+	 *
+	 *     # List logs for a specific search term and not type
+	 *     $ wp migrations logs 123 --not-type=info --search="failed to update record"
+	 *
+	 *     # List logs for a specific search term and not multiple types
+	 *     $ wp migrations logs 123 --not-type=info,debug --search="failed to update record"
+	 *
 	 *
 	 * @since 0.0.1
 	 *
 	 * @subcommand logs
 	 *
-	 * @param array $args       Positional arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<mixed>               $args       Positional arguments.
+	 * @param array<string, bool|string> $assoc_args Associative arguments.
 	 *
 	 * @return void
 	 */
 	public function logs( array $args, array $assoc_args ): void {
+		$execution_id = $args[0] ?? null;
+
+		if ( ! $execution_id ) {
+			WP_CLI::error( 'Execution ID is required.' );
+		}
+
+		/** @var int $execution_id */
+		$execution = Migration_Executions::get_by_id( $execution_id );
+
+		if ( ! $execution || ! is_array( $execution ) ) {
+			WP_CLI::error( "Execution with ID '{$execution_id}' not found." );
+		}
+
+		$migration_id = ! empty( $execution['migration_id'] ) ? $execution['migration_id'] : false;
+
+		if ( ! $migration_id ) {
+			WP_CLI::error( "Execution with ID '{$execution_id}' not found." );
+		}
+
+		$container = Config::get_container();
+		$registry  = $container->get( Registry::class );
+		/** @var string $migration_id */
+		$migration = $registry->get( $migration_id );
+
+		if ( ! $migration ) {
+			WP_CLI::error( "The migration associated with execution '{$execution_id}' is no longer available." );
+		}
+
+		/** @var string $format */
+		$format     = Utils\get_flag_value( $assoc_args, 'format', 'table' );
+		/** @var string $types */
+		$types      = Utils\get_flag_value( $assoc_args, 'type', '' );
+		/** @var string $not_types */
+		$not_types  = Utils\get_flag_value( $assoc_args, 'not-type', '' );
+		$limit      = Cast::to_int( Utils\get_flag_value( $assoc_args, 'limit', 100 ) );
+		$offset     = Cast::to_int( Utils\get_flag_value( $assoc_args, 'offset', 0 ) );
+		$order      = strtoupper( Cast::to_string( Utils\get_flag_value( $assoc_args, 'order', 'DESC' ) ) );
+		/** @var string $order_by */
+		$order_by   = Utils\get_flag_value( $assoc_args, 'order-by', 'created_at' );
+		/** @var string $search */
+		$search     = Utils\get_flag_value( $assoc_args, 'search', '' );
+
+		$arguments = [
+			'offset'  => $offset,
+			'orderby' => $order_by,
+			'order'   => $order,
+		];
+
+		if ( $search ) {
+			$arguments['term'] = $search;
+		}
+
+		if ( $types && $not_types ) {
+			WP_CLI::error( 'Cannot filter by type and not-type at the same time. Use one or the other.' );
+		}
+
+		if ( $types ) {
+			$types = explode( ',', $types );
+			$arguments['query_operator'] = 'OR';
+			foreach ( $types as $type ) {
+				$arguments[] = [
+					'column'   => 'type',
+					'value'    => $type,
+					'operator' => '=',
+				];
+			}
+		}
+
+		if ( $not_types ) {
+			$not_types = explode( ',', $not_types );
+			$arguments['query_operator'] = 'AND';
+			foreach ( $not_types as $type ) {
+				$arguments[] = [
+					'column'   => 'type',
+					'value'    => $type,
+					'operator' => '!=',
+				];
+			}
+		}
+
+		$logs = Migration_Logs::paginate(
+			$arguments,
+			$limit
+		);
+
+		if ( empty( $logs ) ) {
+			WP_CLI::log( "No logs found for execution '{$execution_id}' of migration '{$migration_id}'." );
+			return;
+		}
+
+		Utils\format_items(
+			$format,
+			$logs,
+			[ 'id', 'type', 'message', 'data', 'created_at' ]
+		);
+	}
+
+	/**
+	 * List executions.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <migration_id>
+	 * : The migration ID to list executions for.
+	 *
+	 * [--format=<format>]
+	 * : Output format. Options: table, json, csv, yaml. Default: table.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # List executions for a specific migration
+	 *     $ wp migrations executions my_migration
+	 *
+	 *     # List executions in JSON format
+	 *     $ wp migrations executions my_migration --format=json
+	 *
+	 * @subcommand executions
+	 *
+	 * @param array<mixed>               $args       Positional arguments.
+	 * @param array<string, bool|string> $assoc_args Associative arguments.
+	 *
+	 * @return void
+	 */
+	public function executions( array $args, array $assoc_args ): void {
 		$migration_id = $args[0] ?? null;
 
 		if ( ! $migration_id ) {
 			WP_CLI::error( 'Migration ID is required.' );
 		}
 
-		$container = Config::get_container();
-		$registry  = $container->get( Registry::class );
-		$migration = $registry->get( $migration_id );
+		/** @var string $format */
+		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
 
-		if ( ! $migration ) {
-			WP_CLI::error( "Migration with ID '{$migration_id}' not found." );
-		}
+		$executions = Migration_Executions::get_all_by( 'migration_id', $migration_id );
 
-		$format     = Utils\get_flag_value( $assoc_args, 'format', 'table' );
-		$type       = Utils\get_flag_value( $assoc_args, 'type', '' );
-		$limit      = Utils\get_flag_value( $assoc_args, 'limit', 0 );
-		$table_name = Migration_Events::table_name();
-
-		$query      = 'SELECT id, migration_id, type, data, created_at FROM %i WHERE migration_id = %s';
-		$query_args = [ $table_name, $migration_id ];
-
-		if ( $type ) {
-			$query       .= ' AND type = %s';
-			$query_args[] = $type;
-		}
-
-		$query .= ' ORDER BY created_at ASC';
-
-		if ( $limit > 0 ) {
-			$query       .= ' LIMIT %d';
-			$query_args[] = (int) $limit;
-		}
-
-		$results = DB::get_results(
-			DB::prepare( $query, ...$query_args ),
-			ARRAY_A
-		);
-
-		if ( empty( $results ) ) {
-			WP_CLI::log( "No logs found for migration '{$migration_id}'." );
-			return;
-		}
-
-		Utils\format_items(
-			$format,
-			$results,
-			[ 'id', 'migration_id', 'type', 'data', 'created_at' ]
-		);
+		Utils\format_items( $format, $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ] );
 	}
 
 	/**
 	 * Run a migration operation.
 	 *
-	 * @param Operation $operation  The operation to run.
-	 * @param array     $args       The arguments.
-	 * @param array     $assoc_args The associative arguments.
+	 * @param Operation                  $operation  The operation to run.
+	 * @param array<mixed>               $args       The arguments.
+	 * @param array<string, bool|string> $assoc_args The associative arguments.
 	 *
 	 * @return void
 	 */
@@ -351,17 +471,19 @@ class Commands {
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
 
+		/** @var string $migration_id */
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
 			WP_CLI::error( "Migration with ID {$migration_id} not found." );
 		}
 
-		$batch_size    = Utils\get_flag_value( $assoc_args, 'batch-size', $migration->get_default_batch_size() );
+		/** @var Migration $migration */
+		$batch_size    = Cast::to_int( Utils\get_flag_value( $assoc_args, 'batch-size', $migration->get_default_batch_size() ) );
 		$total_batches = $migration->get_total_batches( $batch_size, $operation );
 
-		$from_batch = Utils\get_flag_value( $assoc_args, 'from-batch', 1 );
-		$to_batch   = Utils\get_flag_value( $assoc_args, 'to-batch', $total_batches );
+		$from_batch = Cast::to_int( Utils\get_flag_value( $assoc_args, 'from-batch', 1 ) );
+		$to_batch   = Cast::to_int( Utils\get_flag_value( $assoc_args, 'to-batch', $total_batches ) );
 
 		$from_batch = max( 1, $from_batch );
 		$to_batch   = min( $to_batch, $total_batches );
@@ -372,23 +494,47 @@ class Commands {
 			WP_CLI::error( 'Running migrations in parallel is not supported yet.' );
 		}
 
+		$insert_status = Migration_Executions::insert(
+			[
+				'migration_id'    => $migration_id,
+				'status'          => Status::SCHEDULED()->getValue(),
+				'items_total'     => $migration->get_total_items(),
+				'items_processed' => 0,
+			]
+		);
+
+		if ( ! $insert_status ) {
+			WP_CLI::error(
+				sprintf(
+					// translators: %1$s is the migration ID.
+					__( 'Failed to insert migration execution for migration "%1$s"', 'stellarwp-migrations' ),
+					$migration_id
+				)
+			);
+		}
+
+		$execution_id = DB::last_insert_id();
+
 		$tasks = [];
 
 		for ( $i = $from_batch; $i <= $to_batch; $i++ ) {
-			$task    = new Execute( $operation->getValue(), $migration_id, $i, $batch_size, ...$migration->{'get_' . $operation->getValue() . '_extra_args_for_batch'}( $i, $batch_size ) );
+			$task    = new Execute( $operation->getValue(), $migration_id, $i, $batch_size, $execution_id, ...$migration->{'get_' . $operation->getValue() . '_extra_args_for_batch'}( $i, $batch_size ) );
 			$tasks[] = $task;
 		}
 
 		$batches = count( $tasks );
 
+		/** @var \cli\progress\Bar $progress_bar */
 		$progress_bar = make_progress_bar(
 			"Running `{$batches}` batches for migration `{$migration_id}`. From batch `{$from_batch}` to batch `{$to_batch}` with a batch size of `{$batch_size}`.",
 			$batches
 		);
 
 		$callables = [
-			'before' => function ( Task $task ) use ( $progress_bar ): void {
-				WP_CLI::log( "Running batch `{$task->get_args()[2]}` for migration `{$task->get_args()[1]}`." );
+			'before' => function ( Task $task ): void {
+				$migration_id = Cast::to_string( $task->get_args()[1] );
+				$batch = Cast::to_int( $task->get_args()[2] );
+				WP_CLI::log( "Running batch `{$batch}` for migration `{$migration_id}`." );
 			},
 			'after'  => function () use ( $progress_bar ): void {
 				$progress_bar->tick();
