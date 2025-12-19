@@ -161,29 +161,24 @@ add_action(
 
 ## Filters
 
-### `stellarwp_migrations_{prefix}_migrations_only_via_cli`
+### `stellarwp_migrations_{prefix}_automatic_schedule`
 
-Controls whether migrations should only run via WP-CLI. Return `true` to prevent automatic scheduling.
+Controls whether migrations should be automatically scheduled. Return `false` to prevent automatic scheduling while still allowing migrations to be triggered via WP-CLI or programmatically.
 
 ```php
-add_filter(
-    "stellarwp_migrations_{prefix}_migrations_only_via_cli",
-    '__return_true'
-);
+add_filter( 'stellarwp_migrations_{prefix}_automatic_schedule', '__return_false' );
 ```
 
-When this filter returns `true`:
-
-- Migrations will not be automatically scheduled on `shutdown`.
-- Migrations must be triggered manually via WP-CLI or custom code.
+This filter allows you to control automatic scheduling on a per-prefix basis.
 
 ## Hook Execution Order
 
 During a successful migration:
 
 1. `stellarwp_migrations_{prefix}_schedule_migrations`
-2. `stellarwp_migrations_{prefix}_pre_schedule_migrations`
-3. For each migration:
+1. **Filter:** `stellarwp_migrations_{prefix}_automatic_schedule` - If returns `false`, stop here.
+1. `stellarwp_migrations_{prefix}_pre_schedule_migrations`
+1. For each migration:
    - `Migration::before_up()`
    - `stellarwp_migrations_{prefix}_before_up_batch_processed`
    - `stellarwp_migrations_{prefix}_before_batch_processed`
@@ -192,7 +187,7 @@ During a successful migration:
    - `stellarwp_migrations_{prefix}_post_batch_processed`
    - `Migration::after_up()`
    - (Repeat for additional batches until `is_up_done()` returns `true`)
-4. `stellarwp_migrations_{prefix}_post_schedule_migrations`
+1. `stellarwp_migrations_{prefix}_post_schedule_migrations`
 
 During a successful rollback:
 
@@ -209,5 +204,5 @@ During a successful rollback:
 During a failure:
 
 1. `stellarwp_migrations_{prefix}_{method}_batch_failed`
-2. `stellarwp_migrations_{prefix}_batch_failed`
-3. (If `up` failed) Rollback is automatically dispatched.
+1. `stellarwp_migrations_{prefix}_batch_failed`
+1. (If `up` failed) Rollback is automatically dispatched.
