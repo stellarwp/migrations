@@ -84,7 +84,7 @@ class Commands {
 	 */
 	public function list( array $args, array $assoc_args ): void {
 		/** @var string $tags */
-		$tags   = Utils\get_flag_value( $assoc_args, 'tags', '' );
+		$tags = Utils\get_flag_value( $assoc_args, 'tags', '' );
 		/** @var string $format */
 		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
 
@@ -303,7 +303,6 @@ class Commands {
 	 *     # List logs for a specific search term and not multiple types
 	 *     $ wp migrations logs 123 --not-type=info,debug --search="failed to update record"
 	 *
-	 *
 	 * @since 0.0.1
 	 *
 	 * @subcommand logs
@@ -343,18 +342,18 @@ class Commands {
 		}
 
 		/** @var string $format */
-		$format     = Utils\get_flag_value( $assoc_args, 'format', 'table' );
+		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
 		/** @var string $types */
-		$types      = Utils\get_flag_value( $assoc_args, 'type', '' );
+		$types = Utils\get_flag_value( $assoc_args, 'type', '' );
 		/** @var string $not_types */
-		$not_types  = Utils\get_flag_value( $assoc_args, 'not-type', '' );
-		$limit      = Cast::to_int( Utils\get_flag_value( $assoc_args, 'limit', 100 ) );
-		$offset     = Cast::to_int( Utils\get_flag_value( $assoc_args, 'offset', 0 ) );
-		$order      = strtoupper( Cast::to_string( Utils\get_flag_value( $assoc_args, 'order', 'DESC' ) ) );
+		$not_types = Utils\get_flag_value( $assoc_args, 'not-type', '' );
+		$limit     = Cast::to_int( Utils\get_flag_value( $assoc_args, 'limit', 100 ) );
+		$offset    = Cast::to_int( Utils\get_flag_value( $assoc_args, 'offset', 0 ) );
+		$order     = strtoupper( Cast::to_string( Utils\get_flag_value( $assoc_args, 'order', 'DESC' ) ) );
 		/** @var string $order_by */
-		$order_by   = Utils\get_flag_value( $assoc_args, 'order-by', 'created_at' );
+		$order_by = Utils\get_flag_value( $assoc_args, 'order-by', 'created_at' );
 		/** @var string $search */
-		$search     = Utils\get_flag_value( $assoc_args, 'search', '' );
+		$search = Utils\get_flag_value( $assoc_args, 'search', '' );
 
 		$arguments = [
 			'offset'  => $offset,
@@ -371,7 +370,7 @@ class Commands {
 		}
 
 		if ( $types ) {
-			$types = explode( ',', $types );
+			$types                       = explode( ',', $types );
 			$arguments['query_operator'] = 'OR';
 			foreach ( $types as $type ) {
 				$arguments[] = [
@@ -383,7 +382,7 @@ class Commands {
 		}
 
 		if ( $not_types ) {
-			$not_types = explode( ',', $not_types );
+			$not_types                   = explode( ',', $not_types );
 			$arguments['query_operator'] = 'AND';
 			foreach ( $not_types as $type ) {
 				$arguments[] = [
@@ -533,7 +532,7 @@ class Commands {
 		$callables = [
 			'before' => function ( Task $task ): void {
 				$migration_id = Cast::to_string( $task->get_args()[1] );
-				$batch = Cast::to_int( $task->get_args()[2] );
+				$batch        = Cast::to_int( $task->get_args()[2] );
 				WP_CLI::log( "Running batch `{$batch}` for migration `{$migration_id}`." );
 			},
 			'after'  => function () use ( $progress_bar ): void {
