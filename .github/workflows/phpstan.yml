@@ -1,8 +1,14 @@
-name: Static Analysis
+# cspell:ignore shivammathur reqs
+name: PHPStan
+
 on:
   pull_request:
+  push:
+    branches:
+      - main
+
 jobs:
-  phpstsan:
+  phpstan:
     name: phpstan
 
     runs-on: ubuntu-latest

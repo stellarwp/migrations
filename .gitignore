@@ -2,6 +2,9 @@ composer.lock
 vendor/
 tests/_support/_generated
 
+node_modules/
+bun.lockb
+
 # Dev tools
 .buildpath
 *.iml
