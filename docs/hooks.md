@@ -161,45 +161,22 @@ add_action(
 
 ## Filters
 
-### `stellarwp_migrations_automatic_schedule`
-
-Controls whether migrations should be automatically scheduled globally across all migration prefixes. Return `false` to prevent automatic scheduling while still allowing migrations to be triggered via WP-CLI or programmatically.
-
-```php
-add_filter( 'stellarwp_migrations_automatic_schedule', '__return_false' );
-```
-
-This filter applies to **all** migrations regardless of their prefix.
-
 ### `stellarwp_migrations_{prefix}_automatic_schedule`
 
-Controls whether migrations should be automatically scheduled for a specific prefix. Return `false` to prevent automatic scheduling for migrations from a specific prefix.
+Controls whether migrations should be automatically scheduled. Return `false` to prevent automatic scheduling while still allowing migrations to be triggered via WP-CLI or programmatically.
 
 ```php
-add_filter(
-    'stellarwp_migrations_{prefix}_automatic_schedule',
-    '__return_false'
-);
+add_filter( 'stellarwp_migrations_{prefix}_automatic_schedule', '__return_false' );
 ```
 
-This filter allows you to control scheduling on a per-prefix basis.
-
-**Filter Execution Order:**
-
-Both filters are evaluated in sequence:
-
-1. `stellarwp_migrations_automatic_schedule` (global)
-2. `stellarwp_migrations_{prefix}_automatic_schedule` (plugin-specific)
-
-If either filter returns `false`, automatic scheduling is disabled.
+This filter allows you to control automatic scheduling on a per-prefix basis.
 
 ## Hook Execution Order
 
 During a successful migration:
 
 1. `stellarwp_migrations_{prefix}_schedule_migrations`
-1. **Filter:** `stellarwp_migrations_automatic_schedule` (global) - If returns `false`, stop here.
-1. **Filter:** `stellarwp_migrations_{prefix}_automatic_schedule` (plugin-specific) - If returns `false`, stop here.
+1. **Filter:** `stellarwp_migrations_{prefix}_automatic_schedule` - If returns `false`, stop here.
 1. `stellarwp_migrations_{prefix}_pre_schedule_migrations`
 1. For each migration:
    - `Migration::before_up()`

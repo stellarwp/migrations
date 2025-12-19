@@ -172,20 +172,7 @@ class Provider extends Provider_Abstract {
 		// Check if migrations should be automatically scheduled.
 
 		/**
-		 * Filters whether migrations should be automatically scheduled globally.
-		 *
-		 * @since TBD
-		 *
-		 * @param bool $automatic_schedule Whether migrations should be automatically scheduled. Default is true.
-		 *
-		 * @return bool
-		 */
-		if ( ! apply_filters( 'stellarwp_migrations_automatic_schedule', true ) ) {
-			return;
-		}
-
-		/**
-		 * Filters whether migrations should be automatically scheduled for a specific plugin.
+		 * Filters whether migrations should be automatically scheduled for this prefix.
 		 *
 		 * @since TBD
 		 *
