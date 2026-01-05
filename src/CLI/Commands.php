@@ -26,6 +26,7 @@ use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
+
 /**
  * Manage database migrations.
  *
