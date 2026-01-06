@@ -7,6 +7,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Enums\Operation;
 
 class Is_Applicable_Test extends WPTestCase {
 	/**
@@ -132,7 +133,7 @@ class Is_Applicable_Test extends WPTestCase {
 			private static bool $applicable = true;
 			public static bool $up_called   = false;
 
-			public function get_total_items(): int {
+			public function get_total_items( ?Operation $operation = null ): int {
 				return 1;
 			}
 

@@ -9,6 +9,7 @@ use StellarWP\Migrations\Abstracts\Migration_Abstract;
 use StellarWP\DB\DB;
 use StellarWP\DB\QueryBuilder\JoinQueryBuilder;
 use StellarWP\DB\QueryBuilder\QueryBuilder;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * Student Meta Migration class.
@@ -34,7 +35,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	 *
 	 * @return int Total number of items.
 	 */
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return $this->get_distinct_user_count();
 	}
 

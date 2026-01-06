@@ -5,6 +5,7 @@ namespace StellarWP\Migrations\Tests\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
 use RuntimeException;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * A migration that throws an exception on up().
@@ -56,7 +57,7 @@ class Failing_Migration extends Migration_Abstract {
 		self::$should_fail_down = false;
 	}
 
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return 1;
 	}
 
