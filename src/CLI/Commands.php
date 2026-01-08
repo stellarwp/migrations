@@ -52,6 +52,8 @@ class Commands {
 	/**
 	 * List registered migrations.
 	 *
+	 * @since 0.0.1
+	 *
 	 * ## OPTIONS
 	 *
 	 * [--tags=<tags>]
@@ -123,6 +125,8 @@ class Commands {
 	/**
 	 * Run a migration.
 	 *
+	 * @since 0.0.1
+	 *
 	 * ## OPTIONS
 	 *
 	 * <migration_id>
@@ -177,6 +181,8 @@ class Commands {
 	/**
 	 * Rollback a migration.
 	 *
+	 * @since 0.0.1
+	 *
 	 * ## OPTIONS
 	 *
 	 * <migration_id>
@@ -230,6 +236,8 @@ class Commands {
 
 	/**
 	 * List logs for a specific migration.
+	 *
+	 * @since 0.0.1
 	 *
 	 * ## OPTIONS
 	 *
@@ -293,8 +301,6 @@ class Commands {
 	 *
 	 *     # List logs for a specific search term and not multiple types
 	 *     $ wp migrations logs 123 --not-type=info,debug --search="failed to update record"
-	 *
-	 * @since 0.0.1
 	 *
 	 * @subcommand logs
 	 *
@@ -425,6 +431,8 @@ class Commands {
 	/**
 	 * List executions.
 	 *
+	 * @since 0.0.1
+	 *
 	 * ## OPTIONS
 	 *
 	 * <migration_id>
@@ -440,8 +448,6 @@ class Commands {
 	 *
 	 *     # List executions in JSON format
 	 *     $ wp migrations executions my_migration --format=json
-	 *
-	 * @since 0.0.1
 	 *
 	 * @subcommand executions
 	 *
@@ -467,6 +473,8 @@ class Commands {
 
 	/**
 	 * Run a migration operation.
+	 *
+	 * @since 0.0.1
 	 *
 	 * @param Operation                  $operation  The operation to run.
 	 * @param array<mixed>               $args       The arguments.

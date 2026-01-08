@@ -27,18 +27,18 @@ class Simple_Migration extends Migration_Abstract {
 	}
 
 	public function is_up_done(): bool {
-		return false;
+		return (bool) get_transient( 'test_migration_up_done' );
 	}
 
 	public function is_down_done(): bool {
-		return false;
+		return ! $this->is_up_done();
 	}
 
 	public function up( int $batch, int $batch_size ): void {
-		// Do nothing.
+		set_transient( 'test_migration_up_done', true, 10 * MINUTE_IN_SECONDS );
 	}
 
 	public function down( int $batch, int $batch_size ): void {
-		// Do nothing.
+		delete_transient( 'test_migration_up_done' );
 	}
 }
