@@ -17,7 +17,10 @@
   "repositories": [
     {
         "type": "path",
-        "url": "../../../"
+        "url": "../../plugins/migrations",
+        "options": {
+            "symlink": true
+        }
     }
   ],
   "authors": [
