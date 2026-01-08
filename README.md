@@ -59,26 +59,32 @@ class Rename_Meta_Key extends Migration_Abstract {
         );
     }
 
-    public function up( int $batch ): void {
+    public function get_default_batch_size(): int {
+        return 100;
+    }
+
+    public function up( int $batch, int $batch_size ): void {
         global $wpdb;
         $wpdb->query(
             $wpdb->prepare(
-                'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100',
+                'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d',
                 $wpdb->postmeta,
                 'new_key',
-                'old_key'
+                'old_key',
+                $batch_size
             )
         );
     }
 
-    public function down( int $batch ): void {
+    public function down( int $batch, int $batch_size ): void {
         global $wpdb;
         $wpdb->query(
             $wpdb->prepare(
-                'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT 100',
+                'UPDATE %i SET meta_key = %s WHERE meta_key = %s LIMIT %d',
                 $wpdb->postmeta,
                 'old_key',
-                'new_key'
+                'new_key',
+                $batch_size
             )
         );
     }

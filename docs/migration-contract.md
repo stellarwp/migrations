@@ -28,23 +28,57 @@ public function get_description(): string {
 }
 ```
 
-#### `get_total_items(): int`
+#### `get_total_items( ?Operation $operation = null ): int`
 
 Returns the total number of items to process for the migration. Used for progress tracking.
 
+The optional `$operation` parameter allows returning different counts for `up` vs `down` operations. When `null` is passed, `Operation::UP()` is assumed.
+
 ```php
-public function get_total_items(): int {
+use StellarWP\Migrations\Enums\Operation;
+
+public function get_total_items( ?Operation $operation = null ): int {
     global $wpdb;
 
-    $count = (int) $wpdb->get_var(
+    // Use Operation::UP() as default if null.
+    $operation = $operation ?? Operation::UP();
+
+    // Return different counts based on operation.
+    if ( $operation->equals( Operation::DOWN() ) ) {
+        // Count items that need to be rolled back.
+        return (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+                $wpdb->postmeta,
+                'new_key'
+            )
+        );
+    }
+
+    // Default: count items for migration (up).
+    return (int) $wpdb->get_var(
         $wpdb->prepare(
             "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
             $wpdb->postmeta,
             'old_key'
         )
     );
+}
+```
 
-    return $count;
+For simple migrations where the count is the same for both operations, you can ignore the parameter:
+
+```php
+public function get_total_items( ?Operation $operation = null ): int {
+    global $wpdb;
+
+    return (int) $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+            $wpdb->postmeta,
+            'old_key'
+        )
+    );
 }
 ```
 
@@ -265,6 +299,51 @@ public function down( int $batch, int $batch_size, ...$extra_args ): void {
         // Revert item.
     }
 }
+```
+
+#### `get_total_batches( int $batch_size, ?Operation $operation = null ): int`
+
+Returns the total number of batches for the migration. This is calculated from `get_total_items()` divided by the batch size, rounded up.
+
+The optional `$operation` parameter is passed through to `get_total_items()` to support different batch counts for `up` vs `down` operations.
+
+```php
+use StellarWP\Migrations\Enums\Operation;
+
+// The default implementation in Migration_Abstract:
+public function get_total_batches( int $batch_size, ?Operation $operation = null ): int {
+    return (int) ceil( $this->get_total_items( $operation ) / $batch_size );
+}
+```
+
+You typically don't need to override this method unless you have custom batching logic.
+
+## Operation Enum
+
+The `Operation` enum (`StellarWP\Migrations\Enums\Operation`) represents the migration direction:
+
+| Value | Description |
+| ----- | ----------- |
+| `Operation::UP()` | Migration operation (forward) |
+| `Operation::DOWN()` | Rollback operation (reverse) |
+
+Usage:
+
+```php
+use StellarWP\Migrations\Enums\Operation;
+
+$operation = Operation::UP();
+
+// Check the operation type.
+if ( $operation->equals( Operation::DOWN() ) ) {
+    // Handle rollback case.
+}
+
+// Get the string value ('up' or 'down').
+$value = $operation->getValue(); // 'up'
+
+// Get human-readable label.
+$label = $operation->get_label(); // 'Up'
 ```
 
 ## Abstract Class: `Migration_Abstract`

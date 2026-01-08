@@ -308,6 +308,18 @@ With this filter active, migrations will only run when explicitly triggered via 
 
 ---
 
+## Planned Features
+
+The following features are defined in the CLI interface but not yet implemented:
+
+### Parallel Execution (`--in-parallel`)
+
+The `run` and `rollback` commands include an `--in-parallel` option that is not yet functional. When implemented, this will allow multiple batches to be processed concurrently for improved performance.
+
+Currently, all batches are processed sequentially.
+
+---
+
 ## Next Steps
 
 - [Getting Started](./getting-started.md) - Basic usage guide
