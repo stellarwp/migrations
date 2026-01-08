@@ -69,7 +69,7 @@ class ListCest {
 		Assert::assertStringContainsString( 'id,label,description,tags,total_batches,can_run,is_applicable,status', $output );
 		Assert::assertStringContainsString( 'tests_simple_migration', $output );
 
-		$I->assertMatchesJsonSnapshot( $output );
+		$I->assertMatchesCsvSnapshot( $output );
 	}
 
 	/**
@@ -88,7 +88,7 @@ class ListCest {
 		Assert::assertStringContainsString( 'label:', $output );
 		Assert::assertStringContainsString( 'tests_simple_migration', $output );
 
-		$I->assertMatchesJsonSnapshot( $output );
+		$I->assertMatchesYamlSnapshot( $output );
 	}
 
 	/**
@@ -127,7 +127,7 @@ class ListCest {
 
 		Assert::assertStringContainsString( 'No migrations found', $output );
 
-		$I->assertMatchesJsonSnapshot( $output );
+		$I->assertMatchesStringSnapshot( $output );
 	}
 
 	/**
