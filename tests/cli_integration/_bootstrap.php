@@ -14,18 +14,13 @@ Dispatcher::addListener(
 		codecept_debug( 'Installing test plugin on SUITE BEFORE' );
 
 		$source      = codecept_root_dir( 'tests/_data/test-plugin' );
-		$destination = codecept_root_dir( '../../mu-plugins/test-plugin' );
-
-		// Remove any existing test-plugin to ensure clean state.
-		shell_exec( 'rm -rf ' . $destination );
+		$destination = codecept_root_dir( '../../mu-plugins' );
 
 		// Copy test plugin to mu-plugins.
 		$result = shell_exec( 'cp -R ' . $source . ' ' . $destination );
 		codecept_debug( $result );
 
-		// Remove vendor directory to ensure fresh composer install with correct paths.
-		shell_exec( 'rm -rf ' . $destination . '/vendor' );
-		shell_exec( 'rm -f ' . $destination . '/composer.lock' );
+		$destination .= '/test-plugin';
 
 		// Run composer install to get fresh dependencies with correct paths.
 		$result = shell_exec( 'composer install --working-dir=' . $destination . ' 2>&1' );
