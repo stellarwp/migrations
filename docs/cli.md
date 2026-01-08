@@ -308,6 +308,33 @@ With this filter active, migrations will only run when explicitly triggered via 
 
 ---
 
+## Output Formatting
+
+All CLI commands support multiple output formats via the `--format` option: `table` (default), `json`, `csv`, and `yaml`.
+
+The CLI automatically normalizes data for display:
+
+- **Enum values** (e.g., `Status`, `Log_Type`) are converted to their string values
+- **DateTime objects** are formatted as ISO 8601 (ATOM) strings
+- **Arrays** are joined with commas for table display
+
+This ensures consistent, readable output across all formats.
+
+**Example:**
+
+```bash
+# Table output (default) - human readable
+wp my-plugin migrations list
+
+# JSON output - for scripting and automation
+wp my-plugin migrations list --format=json
+
+# CSV output - for spreadsheet import
+wp my-plugin migrations executions my_migration --format=csv
+```
+
+---
+
 ## Planned Features
 
 The following features are defined in the CLI interface but not yet implemented:

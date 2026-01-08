@@ -318,46 +318,34 @@ public function get_total_batches( int $batch_size, ?Operation $operation = null
 
 You typically don't need to override this method unless you have custom batching logic.
 
-#### `get_status(): string`
+#### `get_status(): Status`
 
-Returns the current status of the migration. Used by the CLI and for reporting.
+Returns the current status of the migration based on its most recent execution. Used by the CLI and for reporting.
+
+The default implementation in `Migration_Abstract` queries the `Migration_Executions` table to find the latest execution for this migration and returns its status. If no executions exist, it returns `Status::PENDING()`.
 
 ```php
-public function get_status(): string {
-    if ( $this->is_up_done() ) {
-        return 'completed';
-    }
+use StellarWP\Migrations\Enums\Status;
 
-    return 'pending';
+public function get_status(): Status {
+    // The default implementation queries the last execution.
+    // Returns Status::PENDING() if no executions exist.
 }
 ```
 
-The default implementation in `Migration_Abstract` returns `'pending'`. Override this method if you need custom status logic.
+**Available Status Values:**
 
-**Status Constants:**
+| Status | Description |
+| ------ | ----------- |
+| `Status::PENDING()` | Migration has not started |
+| `Status::SCHEDULED()` | Migration has been scheduled |
+| `Status::RUNNING()` | Migration is currently running |
+| `Status::COMPLETED()` | Migration finished successfully |
+| `Status::FAILED()` | Migration failed |
+| `Status::PAUSED()` | Migration is paused |
+| `Status::CANCELED()` | Migration was canceled |
 
-The `Migration_Abstract` class defines the following status constants:
-
-| Constant | Value | Description |
-| -------- | ----- | ----------- |
-| `STATUS_PENDING` | `'pending'` | Migration has not started |
-| `STATUS_RUNNING` | `'running'` | Migration is in progress |
-| `STATUS_COMPLETED` | `'completed'` | Migration finished successfully |
-| `STATUS_FAILED` | `'failed'` | Migration failed |
-| `STATUS_DOWN_PENDING` | `'rollback-pending'` | Rollback has not started |
-| `STATUS_DOWN_RUNNING` | `'rollback-running'` | Rollback is in progress |
-| `STATUS_DOWN_COMPLETED` | `'rollback-completed'` | Rollback finished successfully |
-| `STATUS_DOWN_FAILED` | `'rollback-failed'` | Rollback failed |
-
-These constants can be used for status comparisons:
-
-```php
-use StellarWP\Migrations\Abstracts\Migration_Abstract;
-
-if ( $status === Migration_Abstract::STATUS_COMPLETED ) {
-    // Migration is done.
-}
-```
+**Note:** The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history.
 
 #### `to_array(): array`
 
@@ -409,7 +397,30 @@ $label = $operation->get_label(); // 'Up'
 
 ## Abstract Class: `Migration_Abstract`
 
-`StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
+`StellarWP\Migrations\Abstracts\Migration_Abstract` provides a base class that implements the `Migration` interface with sensible defaults.
+
+### Constructor
+
+The abstract class requires a migration ID to be passed to the constructor:
+
+```php
+public function __construct( string $migration_id )
+```
+
+This ID is used internally to query execution history and determine the current status. When using the `Registry`, the migration ID is automatically passed to the constructor when retrieving migrations.
+
+### `get_id(): string`
+
+Returns the migration ID that was passed to the constructor:
+
+```php
+$migration = $registry->get( 'my_plugin_migration' );
+echo $migration->get_id(); // 'my_plugin_migration'
+```
+
+### Default Implementations
+
+`Migration_Abstract` provides default implementations for the following methods:
 
 | Method                              | Default Value                          |
 | ----------------------------------- | -------------------------------------- |
@@ -423,8 +434,9 @@ $label = $operation->get_label(); // 'Up'
 | `get_up_extra_args_for_batch()`     | `[]`                                   |
 | `get_down_extra_args_for_batch()`   | `[]`                                   |
 | `get_total_batches()`               | Calculated from items/batch_size       |
-| `get_status()`                      | `'pending'` or `'completed'`           |
+| `get_status()`                      | Queries last execution or `PENDING`    |
 | `to_array()`                        | Array of migration properties          |
+| `get_id()`                          | Returns the migration ID               |
 
 Extend this class to avoid implementing these methods when not needed.
 
@@ -432,6 +444,21 @@ Extend this class to avoid implementing these methods when not needed.
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
 
 class My_Migration extends Migration_Abstract {
+    // The constructor receives the migration ID from the Registry.
+    // You can add your own constructor if needed, but must call parent::__construct().
+    public function __construct( string $migration_id ) {
+        parent::__construct( $migration_id );
+        // Your initialization code here.
+    }
+
+    public function get_label(): string {
+        return 'My Migration';
+    }
+
+    public function get_description(): string {
+        return 'Performs data transformation.';
+    }
+
     public function is_applicable(): bool {
         return true;
     }
@@ -442,6 +469,10 @@ class My_Migration extends Migration_Abstract {
 
     public function is_down_done(): bool {
         // Implementation.
+    }
+
+    public function get_total_items( ?Operation $operation = null ): int {
+        return 1000;
     }
 
     public function get_default_batch_size(): int {
@@ -457,6 +488,8 @@ class My_Migration extends Migration_Abstract {
     }
 }
 ```
+
+**Note:** When extending `Migration_Abstract`, the constructor must accept the `$migration_id` parameter and pass it to the parent constructor. The Registry handles this automatically when retrieving migrations.
 
 ## Registry
 
@@ -487,10 +520,11 @@ $registry = new Registry( [
 
 ### Retrieving Migrations
 
-The registry returns a new instance of the migration class each time:
+The registry returns a new instance of the migration class each time, automatically passing the migration ID to the constructor:
 
 ```php
 $migration = $registry->get( 'my_plugin_migration' );
+// Equivalent to: new My_Migration( 'my_plugin_migration' )
 
 // Or via array access.
 $migration = $registry['my_plugin_migration'];

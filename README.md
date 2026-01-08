@@ -23,6 +23,7 @@ use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Provider;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Enums\Operation;
 
 // Configure the library.
 Config::set_container( $container );
@@ -33,6 +34,14 @@ $container->get( Provider::class )->register();
 
 // Create a migration.
 class Rename_Meta_Key extends Migration_Abstract {
+    public function get_label(): string {
+        return 'Rename Meta Key';
+    }
+
+    public function get_description(): string {
+        return 'Renames old_key to new_key in post meta.';
+    }
+
     public function is_applicable(): bool {
         return true;
     }
@@ -55,6 +64,18 @@ class Rename_Meta_Key extends Migration_Abstract {
                 'SELECT COUNT(*) FROM %i WHERE meta_key = %s',
                 $wpdb->postmeta,
                 'new_key'
+            )
+        );
+    }
+
+    public function get_total_items( ?Operation $operation = null ): int {
+        global $wpdb;
+        $key = ( $operation ?? Operation::UP() )->equals( Operation::DOWN() ) ? 'new_key' : 'old_key';
+        return (int) $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT COUNT(*) FROM %i WHERE meta_key = %s',
+                $wpdb->postmeta,
+                $key
             )
         );
     }
