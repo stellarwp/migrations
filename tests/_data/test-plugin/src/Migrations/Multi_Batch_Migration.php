@@ -126,7 +126,7 @@ class Multi_Batch_Migration extends Migration_Abstract {
 	 * @return void
 	 */
 	public function up( int $batch, int $batch_size ): void {
-		$current = $this->get_processed_count();
+		$current   = $this->get_processed_count();
 		$new_count = min( $current + $batch_size, self::TOTAL_ITEMS );
 		$this->set_processed_count( $new_count );
 	}
@@ -140,7 +140,7 @@ class Multi_Batch_Migration extends Migration_Abstract {
 	 * @return void
 	 */
 	public function down( int $batch, int $batch_size ): void {
-		$current = $this->get_processed_count();
+		$current   = $this->get_processed_count();
 		$new_count = max( $current - $batch_size, 0 );
 		$this->set_processed_count( $new_count );
 	}

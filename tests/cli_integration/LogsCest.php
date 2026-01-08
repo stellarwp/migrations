@@ -28,28 +28,34 @@ class LogsCest {
 	 */
 	public function _before( Cli_integrationTester $I ): void {
 		// Reset migration state.
-		$I->cli( [
-			'option',
-			'delete',
-			'test_plugin_multi_batch_processed',
-		] );
+		$I->cli(
+			[
+				'option',
+				'delete',
+				'test_plugin_multi_batch_processed',
+			] 
+		);
 
 		// Run a migration to generate an execution with logs.
-		$I->cli( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'run',
-			'tests_multi_batch_migration',
-		] );
+		$I->cli(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_multi_batch_migration',
+			] 
+		);
 
 		// Get the execution ID.
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'executions',
-			'tests_multi_batch_migration',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_multi_batch_migration',
+				'--format=json',
+			] 
+		);
 
 		$executions = json_decode( $output, true );
 		if ( ! empty( $executions ) ) {
@@ -66,13 +72,15 @@ class LogsCest {
 			$I->markTestSkipped( 'No execution ID available.' );
 		}
 
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'logs',
-			(string) $this->execution_id,
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'logs',
+				(string) $this->execution_id,
+				'--format=json',
+			] 
+		);
 
 		$logs = json_decode( $output, true );
 
@@ -89,13 +97,15 @@ class LogsCest {
 			$I->markTestSkipped( 'No execution ID available.' );
 		}
 
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'logs',
-			(string) $this->execution_id,
-			'--format=table',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'logs',
+				(string) $this->execution_id,
+				'--format=table',
+			] 
+		);
 
 		// Output should contain table headers or "No logs found" message.
 		$has_table_headers = str_contains( $output, 'id' ) && str_contains( $output, 'type' );
@@ -109,12 +119,14 @@ class LogsCest {
 	 */
 	public function it_should_error_when_execution_not_found( Cli_integrationTester $I ): void {
 		try {
-			$I->cli( [
-				tests_migrations_cli_integration_get_prefix(),
-				'migrations',
-				'logs',
-				'999999',
-			] );
+			$I->cli(
+				[
+					tests_migrations_cli_integration_get_prefix(),
+					'migrations',
+					'logs',
+					'999999',
+				] 
+			);
 			Assert::fail( 'Expected command to fail' );
 		} catch ( ModuleException $e ) {
 			// Command failed as expected.
@@ -131,14 +143,16 @@ class LogsCest {
 		}
 
 		// This tests that the limit option is accepted without error.
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'logs',
-			(string) $this->execution_id,
-			'--limit=5',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'logs',
+				(string) $this->execution_id,
+				'--limit=5',
+				'--format=json',
+			] 
+		);
 
 		$logs = json_decode( $output, true );
 		// May be null if no logs, that's acceptable.
@@ -154,15 +168,17 @@ class LogsCest {
 		}
 
 		// This tests that the offset option is accepted without error.
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'logs',
-			(string) $this->execution_id,
-			'--offset=0',
-			'--limit=10',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'logs',
+				(string) $this->execution_id,
+				'--offset=0',
+				'--limit=10',
+				'--format=json',
+			] 
+		);
 
 		$logs = json_decode( $output, true );
 		// May be null if no logs, that's acceptable.
@@ -178,15 +194,17 @@ class LogsCest {
 		}
 
 		// Test ASC order.
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'logs',
-			(string) $this->execution_id,
-			'--order=ASC',
-			'--order-by=created_at',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'logs',
+				(string) $this->execution_id,
+				'--order=ASC',
+				'--order-by=created_at',
+				'--format=json',
+			] 
+		);
 
 		$logs = json_decode( $output, true );
 		// May be null if no logs, that's acceptable.
@@ -202,13 +220,15 @@ class LogsCest {
 		}
 
 		try {
-			$I->cli( [
-				tests_migrations_cli_integration_get_prefix(),
-				'migrations',
-				'logs',
-				(string) $this->execution_id,
-				'--order=INVALID',
-			] );
+			$I->cli(
+				[
+					tests_migrations_cli_integration_get_prefix(),
+					'migrations',
+					'logs',
+					(string) $this->execution_id,
+					'--order=INVALID',
+				] 
+			);
 			Assert::fail( 'Expected command to fail' );
 		} catch ( ModuleException $e ) {
 			// Command failed as expected.
@@ -225,13 +245,15 @@ class LogsCest {
 		}
 
 		try {
-			$I->cli( [
-				tests_migrations_cli_integration_get_prefix(),
-				'migrations',
-				'logs',
-				(string) $this->execution_id,
-				'--order-by=invalid_column',
-			] );
+			$I->cli(
+				[
+					tests_migrations_cli_integration_get_prefix(),
+					'migrations',
+					'logs',
+					(string) $this->execution_id,
+					'--order-by=invalid_column',
+				] 
+			);
 			Assert::fail( 'Expected command to fail' );
 		} catch ( ModuleException $e ) {
 			// Command failed as expected.
@@ -248,14 +270,16 @@ class LogsCest {
 		}
 
 		try {
-			$I->cli( [
-				tests_migrations_cli_integration_get_prefix(),
-				'migrations',
-				'logs',
-				(string) $this->execution_id,
-				'--type=info',
-				'--not-type=error',
-			] );
+			$I->cli(
+				[
+					tests_migrations_cli_integration_get_prefix(),
+					'migrations',
+					'logs',
+					(string) $this->execution_id,
+					'--type=info',
+					'--not-type=error',
+				] 
+			);
 			Assert::fail( 'Expected command to fail' );
 		} catch ( ModuleException $e ) {
 			// Command failed as expected.
