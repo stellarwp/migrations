@@ -318,6 +318,67 @@ public function get_total_batches( int $batch_size, ?Operation $operation = null
 
 You typically don't need to override this method unless you have custom batching logic.
 
+#### `get_status(): string`
+
+Returns the current status of the migration. Used by the CLI and for reporting.
+
+```php
+public function get_status(): string {
+    if ( $this->is_up_done() ) {
+        return 'completed';
+    }
+
+    return 'pending';
+}
+```
+
+The default implementation in `Migration_Abstract` returns `'pending'`. Override this method if you need custom status logic.
+
+**Status Constants:**
+
+The `Migration_Abstract` class defines the following status constants:
+
+| Constant | Value | Description |
+| -------- | ----- | ----------- |
+| `STATUS_PENDING` | `'pending'` | Migration has not started |
+| `STATUS_RUNNING` | `'running'` | Migration is in progress |
+| `STATUS_COMPLETED` | `'completed'` | Migration finished successfully |
+| `STATUS_FAILED` | `'failed'` | Migration failed |
+| `STATUS_DOWN_PENDING` | `'rollback-pending'` | Rollback has not started |
+| `STATUS_DOWN_RUNNING` | `'rollback-running'` | Rollback is in progress |
+| `STATUS_DOWN_COMPLETED` | `'rollback-completed'` | Rollback finished successfully |
+| `STATUS_DOWN_FAILED` | `'rollback-failed'` | Rollback failed |
+
+These constants can be used for status comparisons:
+
+```php
+use StellarWP\Migrations\Abstracts\Migration_Abstract;
+
+if ( $status === Migration_Abstract::STATUS_COMPLETED ) {
+    // Migration is done.
+}
+```
+
+#### `to_array(): array`
+
+Converts the migration to an array representation. This is used by the CLI commands and implements `JsonSerializable`.
+
+```php
+public function to_array(): array {
+    return [
+        'label'         => $this->get_label(),
+        'description'   => $this->get_description(),
+        'tags'          => $this->get_tags(),
+        'total_batches' => $this->get_total_batches( $this->get_default_batch_size() ),
+        'can_run'       => $this->can_run(),
+        'is_applicable' => $this->is_applicable(),
+        'status'        => $this->get_status(),
+    ];
+}
+```
+
+The `Migration` interface extends `JsonSerializable`, so migrations can be directly serialized to JSON via `json_encode()`.
+
 ## Operation Enum
 
 The `Operation` enum (`StellarWP\Migrations\Enums\Operation`) represents the migration direction:
@@ -350,17 +411,20 @@ $label = $operation->get_label(); // 'Up'
 
 `StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
 
-| Method                              | Default Value |
-| ----------------------------------- | ------------- |
-| `before_up()`                       | No-op         |
-| `after_up()`                        | No-op         |
-| `before_down()`                     | No-op         |
-| `after_down()`                      | No-op         |
-| `can_run()`                         | `true`        |
-| `get_number_of_retries_per_batch()` | `0`           |
-| `get_tags()`                        | `[]`          |
-| `get_up_extra_args_for_batch()`     | `[]`          |
-| `get_down_extra_args_for_batch()`   | `[]`          |
+| Method                              | Default Value                          |
+| ----------------------------------- | -------------------------------------- |
+| `before_up()`                       | No-op                                  |
+| `after_up()`                        | No-op                                  |
+| `before_down()`                     | No-op                                  |
+| `after_down()`                      | No-op                                  |
+| `can_run()`                         | `true`                                 |
+| `get_number_of_retries_per_batch()` | `0`                                    |
+| `get_tags()`                        | `[]`                                   |
+| `get_up_extra_args_for_batch()`     | `[]`                                   |
+| `get_down_extra_args_for_batch()`   | `[]`                                   |
+| `get_total_batches()`               | Calculated from items/batch_size       |
+| `get_status()`                      | `'pending'` or `'completed'`           |
+| `to_array()`                        | Array of migration properties          |
 
 Extend this class to avoid implementing these methods when not needed.
 
@@ -430,6 +494,35 @@ $migration = $registry->get( 'my_plugin_migration' );
 
 // Or via array access.
 $migration = $registry['my_plugin_migration'];
+```
+
+### Filtering Migrations
+
+The registry supports filtering migrations with a callback:
+
+```php
+// Get only migrations with a specific tag.
+$data_migrations = $registry->filter( function( Migration $migration ) {
+    return in_array( 'data', $migration->get_tags(), true );
+} );
+
+// Get only applicable migrations.
+$applicable = $registry->filter( fn( Migration $m ) => $m->is_applicable() );
+```
+
+The `filter()` method returns a new `Registry` instance containing only the matching migrations.
+
+### Getting All Migrations
+
+To retrieve all migrations as an array:
+
+```php
+$all_migrations = $registry->all();
+
+foreach ( $all_migrations as $migration_id => $migration ) {
+    // $migration is a Migration instance.
+    echo $migration->get_label();
+}
 ```
 
 ### Constraints
