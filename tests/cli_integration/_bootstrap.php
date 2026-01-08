@@ -12,14 +12,26 @@ Dispatcher::addListener(
 	Events::SUITE_BEFORE,
 	function ( SuiteEvent $suiteEvent ) {
 		codecept_debug( 'Installing test plugin on SUITE BEFORE' );
-		$result = shell_exec( 'cp -R ' . codecept_root_dir( 'tests/_data/test-plugin' ) . ' ' . codecept_root_dir( '../../mu-plugins/' ) );
 
+		$source      = codecept_root_dir( 'tests/_data/test-plugin' );
+		$destination = codecept_root_dir( '../../mu-plugins/test-plugin' );
+
+		// Remove any existing test-plugin to ensure clean state.
+		shell_exec( 'rm -rf ' . $destination );
+
+		// Copy test plugin to mu-plugins.
+		$result = shell_exec( 'cp -R ' . $source . ' ' . $destination );
 		codecept_debug( $result );
 
-		$result = shell_exec( 'composer install --working-dir=' . codecept_root_dir( '../../mu-plugins/test-plugin/' ) );
+		// Remove vendor directory to ensure fresh composer install with correct paths.
+		shell_exec( 'rm -rf ' . $destination . '/vendor' );
+		shell_exec( 'rm -f ' . $destination . '/composer.lock' );
 
+		// Run composer install to get fresh dependencies with correct paths.
+		$result = shell_exec( 'composer install --working-dir=' . $destination . ' 2>&1' );
 		codecept_debug( $result );
 
+		// Create include file for mu-plugin loading.
 		$php = "<?php require_once __DIR__ . '/test-plugin/test-plugin.php';";
 
 		$result = shell_exec(
