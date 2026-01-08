@@ -20,18 +20,22 @@ class ExecutionsCest {
 	 */
 	public function _before( Cli_integrationTester $I ): void {
 		// Reset any migration state.
-		$I->cli( [
-			'option',
-			'delete',
-			'test_plugin_multi_batch_processed',
-		] );
+		$I->cli(
+			[
+				'option',
+				'delete',
+				'test_plugin_multi_batch_processed',
+			] 
+		);
 
 		// Clean up executions for test migrations to ensure consistent test state.
-		$I->cli( [
-			'db',
-			'query',
-			"DELETE FROM wp_stellarwp_bar_migration_executions WHERE migration_id LIKE 'tests_%'",
-		] );
+		$I->cli(
+			[
+				'db',
+				'query',
+				"DELETE FROM wp_stellarwp_bar_migration_executions WHERE migration_id LIKE 'tests_%'",
+			] 
+		);
 	}
 
 	/**
@@ -39,20 +43,24 @@ class ExecutionsCest {
 	 */
 	public function it_should_list_executions_as_json( Cli_integrationTester $I ): void {
 		// Run a migration to create an execution.
-		$I->cli( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'run',
-			'tests_simple_migration',
-		] );
+		$I->cli(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_simple_migration',
+			] 
+		);
 
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'executions',
-			'tests_simple_migration',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=json',
+			] 
+		);
 
 		$executions = json_decode( $output, true );
 		Assert::assertIsArray( $executions );
@@ -76,20 +84,24 @@ class ExecutionsCest {
 	 */
 	public function it_should_list_executions_as_table( Cli_integrationTester $I ): void {
 		// Run a migration to create an execution.
-		$I->cli( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'run',
-			'tests_simple_migration',
-		] );
+		$I->cli(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_simple_migration',
+			] 
+		);
 
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'executions',
-			'tests_simple_migration',
-			'--format=table',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=table',
+			] 
+		);
 
 		// Table format should contain headers.
 		Assert::assertStringContainsString( 'id', $output );
@@ -106,27 +118,33 @@ class ExecutionsCest {
 	 */
 	public function it_should_show_multiple_executions( Cli_integrationTester $I ): void {
 		// Run the migration multiple times.
-		$I->cli( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'run',
-			'tests_simple_migration',
-		] );
+		$I->cli(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_simple_migration',
+			] 
+		);
 
-		$I->cli( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'run',
-			'tests_simple_migration',
-		] );
+		$I->cli(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_simple_migration',
+			] 
+		);
 
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'executions',
-			'tests_simple_migration',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=json',
+			] 
+		);
 
 		$executions = json_decode( $output, true );
 		Assert::assertGreaterThanOrEqual( 2, count( $executions ) );
@@ -140,20 +158,24 @@ class ExecutionsCest {
 	 */
 	public function it_should_track_items_total_and_processed( Cli_integrationTester $I ): void {
 		// Run multi-batch migration.
-		$I->cli( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'run',
-			'tests_multi_batch_migration',
-		] );
+		$I->cli(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_multi_batch_migration',
+			] 
+		);
 
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'executions',
-			'tests_multi_batch_migration',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_multi_batch_migration',
+				'--format=json',
+			] 
+		);
 
 		$executions = json_decode( $output, true );
 		Assert::assertNotEmpty( $executions );
@@ -173,13 +195,15 @@ class ExecutionsCest {
 		// Don't run any migration, just check executions.
 		// Note: This may show executions from other tests, so we use a migration
 		// that's less likely to have been run (not_applicable).
-		$output = $I->cliToString( [
-			tests_migrations_cli_integration_get_prefix(),
-			'migrations',
-			'executions',
-			'tests_not_applicable_migration',
-			'--format=json',
-		] );
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_not_applicable_migration',
+				'--format=json',
+			] 
+		);
 
 		// Should return empty array or no results.
 		$executions = json_decode( $output, true );
