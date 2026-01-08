@@ -1,5 +1,5 @@
 id,label,description,tags,total_batches,can_run,is_applicable,status
 tests_simple_migration,"Simple Migration","This is a simple migration that runs a single batch.",[],1,1,1,pending
 tests_multi_batch_migration,"Multi-Batch Migration","A migration that processes 15 items in batches of 5.","[""data"",""batch""]",3,1,1,pending
-tests_not_applicable_migration,"Not Applicable Migration","A migration that should never run because it is not applicable.","[""legacy"",""deprecated""]",1,1,,pending
+tests_not_applicable_migration,"Not Applicable Migration","A migration that should never run because it is not applicable.","[""legacy"",""deprecated""]",1,1,0,pending
 tests_failing_migration,"Failing Migration","A migration that intentionally fails for testing error handling.","[""test"",""error""]",1,1,1,pending
