@@ -1,0 +1,28 @@
+[
+    {
+        "id": "tests_multi_batch_migration",
+        "label": "Multi-Batch Migration",
+        "description": "A migration that processes 15 items in batches of 5.",
+        "tags": [
+            "data",
+            "batch"
+        ],
+        "total_batches": 3,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
+    },
+    {
+        "id": "tests_failing_migration",
+        "label": "Failing Migration",
+        "description": "A migration that intentionally fails for testing error handling.",
+        "tags": [
+            "test",
+            "error"
+        ],
+        "total_batches": 1,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
+    }
+]

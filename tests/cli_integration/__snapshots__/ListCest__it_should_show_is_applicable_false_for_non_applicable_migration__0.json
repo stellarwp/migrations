@@ -1,0 +1,15 @@
+[
+    {
+        "id": "tests_not_applicable_migration",
+        "label": "Not Applicable Migration",
+        "description": "A migration that should never run because it is not applicable.",
+        "tags": [
+            "legacy",
+            "deprecated"
+        ],
+        "total_batches": 1,
+        "can_run": true,
+        "is_applicable": false,
+        "status": "pending"
+    }
+]

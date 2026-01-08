@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations\Tests\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * A migration that uses extra arguments to be passed to the `up()` and `down()` methods.
@@ -31,7 +32,7 @@ class Extra_Args_Migration extends Migration_Abstract {
 		self::$down_batch_count = 0;
 	}
 
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return 4;
 	}
 

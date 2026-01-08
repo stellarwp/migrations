@@ -28,7 +28,7 @@ class Batched_Migration_Test extends WPTestCase {
 	 */
 	public function it_should_execute_multiple_batches_until_done(): void {
 		$registry  = Config::get_container()->get( Registry::class );
-		$migration = new Multi_Batch_Migration();
+		$migration = new Multi_Batch_Migration( 'tests_multi_batch_migration' );
 
 		Multi_Batch_Migration::$total_batches = 3;
 
