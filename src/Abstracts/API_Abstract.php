@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\CLI;
 
-use MyCLabs\Enum\Enum;
 use WP_CLI;
 use WP_CLI\Utils;
 use StellarWP\Migrations\Config;
@@ -27,60 +26,19 @@ use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
-use DateTimeInterface;
 
 /**
  * Manage database migrations.
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\CLI
- *
- * ## EXAMPLES
- *
- *     # Run all pending migrations
- *     $ wp migrations run
- *
- *     # Run migrations for a specific plugin
- *     $ wp migrations run --plugin=tec
- *
- *     # Rollback last batch of migrations
- *     $ wp migrations rollback --plugin=tec
- *
- *     # Show migration status
- *     $ wp migrations status
+ * @package StellarWP\Migrations\Abstracts
  */
-class Commands {
+abstract class API_Abstract {
 	/**
 	 * List registered migrations.
 	 *
 	 * @since 0.0.1
-	 *
-	 * ## OPTIONS
-	 *
-	 * [--tags=<tags>]
-	 * : The tags to list migrations for. If not specified, lists for all registered migrations.
-	 *
-	 * [--format=<format>]
-	 * : Output format. Options: table, json, csv, yaml. Default: table.
-	 * ---
-	 * default: table
-	 * options:
-	 *   - table
-	 *   - json
-	 *   - csv
-	 *   - yaml
-	 * ---
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     # List all registered migrations
-	 *     $ wp migrations list
-	 *
-	 *     # List migrations for a specific plugin
-	 *     $ wp migrations list --tags=tec,ld
-	 *
-	 * @subcommand list
 	 *
 	 * @param array<mixed>               $args       Positional arguments.
 	 * @param array<string, bool|string> $assoc_args Associative arguments.
@@ -117,55 +75,17 @@ class Commands {
 			$migrations_as_arrays[] = array_merge( [ 'id' => $migration_id ], $migration->to_array() );
 		}
 
-		$this->display_items_in_format( $migrations_as_arrays, [ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'status' ], $format );
+		Utils\format_items(
+			$format,
+			$migrations_as_arrays,
+			[ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'status' ]
+		);
 	}
 
 	/**
 	 * Run a migration.
 	 *
 	 * @since 0.0.1
-	 *
-	 * ## OPTIONS
-	 *
-	 * <migration_id>
-	 * : The migration ID to run.
-	 *
-	 * [--from-batch=<batch>]
-	 * : The batch number to start from. If not specified, starts from the first batch.
-	 *
-	 * [--to-batch=<batch>]
-	 * : The batch number to end at. If not specified, ends at the last batch.
-	 *
-	 * [--batch-size=<batch-size>]
-	 * : The number of batches to run at once. If not specified, runs one batch at a time.
-	 *
-	 * [--in-parallel]
-	 * : Whether to run the batches in parallel. If not specified, runs the batches sequentially.
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     # Run a migration
-	 *     $ wp migrations run my_migration
-	 *
-	 *     # Run a migration for a specific batch
-	 *     $ wp migrations run my_migration --from-batch=1 --to-batch=10
-	 *
-	 *     # Run a migration in parallel
-	 *     $ wp migrations run my_migration --in-parallel
-	 *
-	 *     # Run a migration for a specific batch in parallel
-	 *     $ wp migrations run my_migration --from-batch=1 --to-batch=10 --in-parallel
-	 *
-	 *     # Run a migration for a specific batch size
-	 *     $ wp migrations run my_migration --batch-size=10
-	 *
-	 *     # Run a migration for a specific batch size in parallel
-	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel
-	 *
-	 *     # Run a migration with all options combined
-	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
-	 *
-	 * @subcommand run
 	 *
 	 * @param array<mixed>               $args       Positional arguments.
 	 * @param array<string, bool|string> $assoc_args Associative arguments.
@@ -181,48 +101,6 @@ class Commands {
 	 *
 	 * @since 0.0.1
 	 *
-	 * ## OPTIONS
-	 *
-	 * <migration_id>
-	 * : The migration ID to rollback.
-	 *
-	 * [--from-batch=<batch>]
-	 * : The batch number to start from. If not specified, starts from the first batch.
-	 *
-	 * [--to-batch=<batch>]
-	 * : The batch number to end at. If not specified, ends at the last batch.
-	 *
-	 * [--batch-size=<batch-size>]
-	 * : The number of batches to run at once. If not specified, runs one batch at a time.
-	 *
-	 * [--in-parallel]
-	 * : Whether to run the batches in parallel. If not specified, runs the batches sequentially.
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     # Rollback a migration
-	 *     $ wp migrations rollback my_migration
-	 *
-	 *     # Rollback a migration for a specific batch
-	 *     $ wp migrations rollback my_migration --from-batch=1 --to-batch=10
-	 *
-	 *     # Rollback a migration in parallel
-	 *     $ wp migrations rollback my_migration --in-parallel
-	 *
-	 *     # Rollback a migration for a specific batch in parallel
-	 *     $ wp migrations rollback my_migration --from-batch=1 --to-batch=10 --in-parallel
-	 *
-	 *     # Rollback a migration for a specific batch size
-	 *     $ wp migrations rollback my_migration --batch-size=10
-	 *
-	 *     # Rollback a migration for a specific batch size in parallel
-	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel
-	 *
-	 *     # Rollback a migration with all options combined
-	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
-	 *
-	 * @subcommand rollback
-	 *
 	 * @param array<mixed>               $args       Positional arguments.
 	 * @param array<string, bool|string> $assoc_args Associative arguments.
 	 *
@@ -236,71 +114,6 @@ class Commands {
 	 * List logs for a specific migration.
 	 *
 	 * @since 0.0.1
-	 *
-	 * ## OPTIONS
-	 *
-	 * <execution_id>
-	 * : The execution ID to list logs for.
-	 *
-	 * [--type=<type>]
-	 * : Filter logs by log type (e.g., info, warning, error, debug). Accepts multiple types separated by commas.
-	 *
-	 * [--not-type=<not-type>]
-	 * : Filter logs by log type that is not the specified type (e.g., info, warning, error, debug). Accepts multiple types separated by commas.
-	 *
-	 * [--search=<search>]
-	 * : Filter logs by search term.
-	 *
-	 * [--limit=<limit>]
-	 * : Limit the number of results returned. Default is 100.
-	 *
-	 * [--offset=<offset>]
-	 * : Offset the results by the specified number of records. Default is 0.
-	 *
-	 * [--order=<order>]
-	 * : Order the results by ASC or DESC. Default is DESC.
-	 *
-	 * [--order-by=<order-by>]
-	 * : Order the results by the specified column. Default is created_at.
-	 *
-	 * [--format=<format>]
-	 * : Output format. Options: table, json, csv, yaml. Default: table.
-	 * ---
-	 * default: table
-	 * options:
-	 *   - table
-	 *   - json
-	 *   - csv
-	 *   - yaml
-	 * ---
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     # List logs for a specific execution
-	 *     $ wp migrations logs 123
-	 *
-	 *     # List logs in JSON format
-	 *     $ wp migrations logs 123 --format=json
-	 *
-	 *     # List only failed logs
-	 *     $ wp migrations logs 123 --type=error
-	 *
-	 *     # List the last 10 logs
-	 *     $ wp migrations logs 123 --limit=10
-	 *
-	 *     # List logs for a specific migration
-	 *     $ wp migrations logs 123 --search="failed to update record"
-	 *
-	 *     # List logs for a specific type
-	 *     $ wp migrations logs 123 --type=error
-	 *
-	 *     # List logs for a specific search term and not type
-	 *     $ wp migrations logs 123 --not-type=info --search="failed to update record"
-	 *
-	 *     # List logs for a specific search term and not multiple types
-	 *     $ wp migrations logs 123 --not-type=info,debug --search="failed to update record"
-	 *
-	 * @subcommand logs
 	 *
 	 * @param array<mixed>               $args       Positional arguments.
 	 * @param array<string, bool|string> $assoc_args Associative arguments.
@@ -419,31 +232,17 @@ class Commands {
 			return;
 		}
 
-		$this->display_items_in_format( $logs, [ 'id', 'type', 'message', 'data', 'created_at' ], $format );
+		Utils\format_items(
+			$format,
+			$logs,
+			[ 'id', 'type', 'message', 'data', 'created_at' ]
+		);
 	}
 
 	/**
 	 * List executions.
 	 *
 	 * @since 0.0.1
-	 *
-	 * ## OPTIONS
-	 *
-	 * <migration_id>
-	 * : The migration ID to list executions for.
-	 *
-	 * [--format=<format>]
-	 * : Output format. Options: table, json, csv, yaml. Default: table.
-	 *
-	 * ## EXAMPLES
-	 *
-	 *     # List executions for a specific migration
-	 *     $ wp migrations executions my_migration
-	 *
-	 *     # List executions in JSON format
-	 *     $ wp migrations executions my_migration --format=json
-	 *
-	 * @subcommand executions
 	 *
 	 * @param array<mixed>               $args       Positional arguments.
 	 * @param array<string, bool|string> $assoc_args Associative arguments.
@@ -462,7 +261,7 @@ class Commands {
 
 		$executions = Migration_Executions::get_all_by( 'migration_id', $migration_id );
 
-		$this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
+		Utils\format_items( $format, $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ] );
 	}
 
 	/**
@@ -564,55 +363,5 @@ class Commands {
 		];
 
 		shepherd()->run( $tasks, $callables );
-	}
-
-	private function display_items_in_format( array $items, array $columns, string $format = 'table' ): void {
-		$items = $this->normalize_items( $items, $format );
-
-		Utils\format_items( $format, $items, $columns );
-	}
-
-	/**
-	 * Normalize items to be displayed in the CLI.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @param array<mixed> $items The items to normalize.
-	 * @param string $format The format to normalize the items to.
-	 *
-	 * @return array<mixed> The normalized items.
-	 */
-	private function normalize_items( array $items, string $format ): array {
-		foreach ( $items as $offset => $item ) {
-			foreach ( $item as $column => $value ) {
-				if ( is_array( $value ) ) {
-					$items[ $offset ][ $column ] = implode( ', ', $this->normalize_items( $value, $format ) );
-					continue;
-				}
-
-				if ( $value instanceof Enum ) {
-					$items[ $offset ][ $column ] = $value->getValue();
-					continue;
-				}
-
-				if ( is_bool( $value ) ) {
-					if ( 'table' === $format ) {
-						$items[ $offset ][ $column ] = (bool) $value ? 'true' : 'false';
-					} elseif ( 'csv' === $format ) {
-						$items[ $offset ][ $column ] = (int) $value;
-					} else {
-						$items[ $offset ][ $column ] = $value;
-					}
-					continue;
-				}
-
-				if ( $value instanceof DateTimeInterface ) {
-					$items[ $offset ][ $column ] = $value->format( DateTimeInterface::ATOM );
-					continue;
-				}
-			}
-		}
-
-		return $items;
 	}
 }

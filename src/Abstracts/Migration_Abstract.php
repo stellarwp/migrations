@@ -13,6 +13,8 @@ namespace StellarWP\Migrations\Abstracts;
 
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
+use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Enums\Status;
 use RuntimeException;
 
 /**
@@ -25,76 +27,38 @@ use RuntimeException;
 abstract class Migration_Abstract implements Migration {
 
 	/**
-	 * The status of the migration.
+	 * The migration ID.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
-	public const STATUS_PENDING = 'pending';
+	private string $migration_id;
+
 
 	/**
-	 * The status of the migration.
+	 * Constructor.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @var string
+	 * @param string $migration_id The migration ID.
+	 *
+	 * @return void
 	 */
-	public const STATUS_RUNNING = 'running';
+	public function __construct( string $migration_id ) {
+		$this->migration_id = $migration_id;
+	}
 
 	/**
-	 * The status of the migration.
+	 * Get the migration ID.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @var string
+	 * @return string The migration ID.
 	 */
-	public const STATUS_COMPLETED = 'completed';
-
-	/**
-	 * The status of the migration.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	public const STATUS_FAILED = 'failed';
-
-	/**
-	 * The status of the migration.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	public const STATUS_DOWN_PENDING = 'rollback-pending';
-
-	/**
-	 * The status of the migration.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	public const STATUS_DOWN_RUNNING = 'rollback-running';
-
-	/**
-	 * The status of the migration.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	public const STATUS_DOWN_COMPLETED = 'rollback-completed';
-
-	/**
-	 * The status of the migration.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string
-	 */
-	public const STATUS_DOWN_FAILED = 'rollback-failed';
+	public function get_id(): string {
+		return $this->migration_id;
+	}
 
 	/**
 	 * Runs before each batch of the migration.
@@ -268,11 +232,29 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return string
+	 * @return Status
 	 *
 	 * @throws RuntimeException If the migration event type is invalid.
 	 */
-	public function get_status(): string {
-		return self::STATUS_PENDING;
+	public function get_status(): Status {
+		$latest_execution = Migration_Executions::paginate(
+			[
+				'order'   => 'DESC',
+				'orderby' => 'created_at',
+				'migration_id' => [
+					'column' => 'migration_id',
+					'value' => $this->get_id(),
+					'operator' => '=',
+				],
+			],
+			1,
+			1
+		);
+
+		if ( empty( $latest_execution[0]['status'] ) ) {
+			return Status::PENDING();
+		}
+
+		return $latest_execution[0]['status'];
 	}
 }

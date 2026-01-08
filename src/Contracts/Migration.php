@@ -11,6 +11,7 @@ namespace StellarWP\Migrations\Contracts;
 
 use JsonSerializable;
 use StellarWP\Migrations\Enums\Operation;
+use StellarWP\Migrations\Enums\Status;
 
 /**
  * Interface for migrations.
@@ -20,6 +21,15 @@ use StellarWP\Migrations\Enums\Operation;
  * @package StellarWP\Migrations\Contracts
  */
 interface Migration extends JsonSerializable {
+	/**
+	 * Get the migration ID.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string The migration ID.
+	 */
+	public function get_id(): string;
+
 	/**
 	 * Get the migration label.
 	 *
@@ -249,7 +259,7 @@ interface Migration extends JsonSerializable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return string
+	 * @return Status
 	 */
-	public function get_status(): string;
+	public function get_status(): Status;
 }

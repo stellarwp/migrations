@@ -93,7 +93,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	public function current(): ?Migration {
 		$migration_class = current( $this->migrations );
 
-		return $migration_class === false ? null : new $migration_class();
+		return $migration_class === false ? null : new $migration_class( key( $this->migrations ) );
 	}
 
 	/**
@@ -130,7 +130,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 */
 	public function offsetGet( $offset ): ?Migration {
 		$migration_class = $this->migrations[ $offset ] ?? null;
-		return $migration_class ? new $migration_class() : null;
+		return $migration_class ? new $migration_class( $offset ) : null;
 	}
 
 	/**
@@ -247,7 +247,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	private function build_migrations(): array {
 		$migrations = [];
 		foreach ( $this->migrations as $migration_id => $migration_class ) {
-			$migrations[ $migration_id ] = new $migration_class();
+			$migrations[ $migration_id ] = new $migration_class( $migration_id );
 		}
 		return $migrations;
 	}
