@@ -352,7 +352,7 @@ class Migration_Logs_Test extends WPTestCase {
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
 		$this->assertCount( 2, $logs, 'Both debug and info messages should be logged' );
 
-		$log_types = array_column( $logs, 'type' );
+		$log_types = array_map( fn( $log ) => $log['type']->getValue(), $logs );
 		$this->assertContains( 'debug', $log_types );
 		$this->assertContains( 'info', $log_types );
 	}
@@ -461,7 +461,7 @@ class Migration_Logs_Test extends WPTestCase {
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
 		$this->assertCount( 4, $logs );
 
-		$log_types = array_column( $logs, 'type' );
+		$log_types = array_map( fn( $log ) => $log['type']->getValue(), $logs );
 		$this->assertContains( 'debug', $log_types );
 		$this->assertContains( 'info', $log_types );
 		$this->assertContains( 'warning', $log_types );

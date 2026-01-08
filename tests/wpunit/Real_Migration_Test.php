@@ -222,7 +222,7 @@ class Real_Migration_Test extends WPTestCase {
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 'completed', $execution['status'] );
+		$this->assertEquals( 'completed', $execution['status']->getValue() );
 
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
 		$this->assertNotEmpty( $logs, 'Should have log entries' );
@@ -248,7 +248,7 @@ class Real_Migration_Test extends WPTestCase {
 		// Verify log types are valid.
 		foreach ( $logs as $log ) {
 			$this->assertContains(
-				$log['type'],
+				$log['type']->getValue(),
 				[ 'info', 'warning', 'error', 'debug' ],
 				'Log type should be valid'
 			);
