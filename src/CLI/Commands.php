@@ -578,7 +578,7 @@ class Commands {
 	 * @since 0.0.1
 	 *
 	 * @param array<mixed> $items The items to normalize.
-	 * @param string $format The format to normalize the items to.
+	 * @param string       $format The format to normalize the items to.
 	 *
 	 * @return array<mixed> The normalized items.
 	 */
@@ -586,7 +586,7 @@ class Commands {
 		foreach ( $items as $offset => $item ) {
 			foreach ( $item as $column => $value ) {
 				if ( is_array( $value ) ) {
-					$normalized = $this->normalize_items( $value, $format );
+					$normalized                  = $this->normalize_items( $value, $format );
 					$items[ $offset ][ $column ] = 'table' === $format ? implode( ', ', $normalized ) : $normalized;
 					continue;
 				}

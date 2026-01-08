@@ -239,11 +239,11 @@ abstract class Migration_Abstract implements Migration {
 	public function get_status(): Status {
 		$latest_execution = Migration_Executions::paginate(
 			[
-				'order'   => 'DESC',
-				'orderby' => 'created_at',
+				'order'        => 'DESC',
+				'orderby'      => 'created_at',
 				'migration_id' => [
-					'column' => 'migration_id',
-					'value' => $this->get_id(),
+					'column'   => 'migration_id',
+					'value'    => $this->get_id(),
 					'operator' => '=',
 				],
 			],
