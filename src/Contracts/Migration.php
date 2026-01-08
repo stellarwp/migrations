@@ -247,7 +247,7 @@ interface Migration extends JsonSerializable {
 	 *     total_batches: int,
 	 *     can_run: bool,
 	 *     is_applicable: bool,
-	 *     status: string,
+	 *     status: Status,
 	 * }
 	 *
 	 * @return array<string, mixed>

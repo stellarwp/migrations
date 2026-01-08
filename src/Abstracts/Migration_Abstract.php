@@ -15,7 +15,6 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Enums\Status;
-use RuntimeException;
 
 /**
  * Base class for migrations.
@@ -135,6 +134,10 @@ abstract class Migration_Abstract implements Migration {
 	 * @return int The total number of batches.
 	 */
 	public function get_total_batches( int $batch_size, ?Operation $operation = null ): int {
+		if ( $batch_size <= 0 ) {
+			return 0;
+		}
+
 		return (int) ceil( $this->get_total_items( $operation ) / $batch_size );
 	}
 
@@ -189,7 +192,7 @@ abstract class Migration_Abstract implements Migration {
 	 *     total_batches: int,
 	 *     can_run: bool,
 	 *     is_applicable: bool,
-	 *     status: string,
+	 *     status: Status,
 	 * }
 	 *
 	 * @return array<string, mixed>
@@ -218,7 +221,7 @@ abstract class Migration_Abstract implements Migration {
 	 *     total_batches: int,
 	 *     can_run: bool,
 	 *     is_applicable: bool,
-	 *     status: string,
+	 *     status: Status,
 	 * }
 	 *
 	 * @return array<string, mixed>
@@ -230,13 +233,15 @@ abstract class Migration_Abstract implements Migration {
 	/**
 	 * Get the migration status.
 	 *
+	 * Queries the database for the latest execution of this migration
+	 * and returns its status. If no executions exist, returns PENDING.
+	 *
 	 * @since 0.0.1
 	 *
-	 * @return Status
-	 *
-	 * @throws RuntimeException If the migration event type is invalid.
+	 * @return Status The current status of the migration.
 	 */
 	public function get_status(): Status {
+		/** @var array<int, array{status?: Status}> $latest_execution */
 		$latest_execution = Migration_Executions::paginate(
 			[
 				'order'        => 'DESC',
@@ -251,7 +256,7 @@ abstract class Migration_Abstract implements Migration {
 			1
 		);
 
-		if ( empty( $latest_execution[0]['status'] ) ) {
+		if ( empty( $latest_execution[0]['status'] ) || ! $latest_execution[0]['status'] instanceof Status ) {
 			return Status::PENDING();
 		}
 

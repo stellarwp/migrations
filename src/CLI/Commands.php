@@ -25,9 +25,9 @@ use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
+use DateTimeInterface;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
-use DateTimeInterface;
 
 /**
  * Manage database migrations.
@@ -409,6 +409,7 @@ class Commands {
 			}
 		}
 
+		/** @var array<int|string, array<string, mixed>> $logs */
 		$logs = Migration_Logs::paginate(
 			$arguments,
 			$limit
@@ -566,6 +567,17 @@ class Commands {
 		shepherd()->run( $tasks, $callables );
 	}
 
+	/**
+	 * Display items in the specified format.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<int|string, array<string, mixed>> $items   The items to display.
+	 * @param array<string>                           $columns The columns to display.
+	 * @param string                                  $format  The format to display the items in.
+	 *
+	 * @return void
+	 */
 	private function display_items_in_format( array $items, array $columns, string $format = 'table' ): void {
 		$items = $this->normalize_items( $items, $format );
 
@@ -577,16 +589,20 @@ class Commands {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<mixed> $items The items to normalize.
-	 * @param string       $format The format to normalize the items to.
+	 * @param array<int|string, array<string, mixed>> $items  The items to normalize.
+	 * @param string                                  $format The format to normalize the items to.
 	 *
-	 * @return array<mixed> The normalized items.
+	 * @return array<int|string, array<string, mixed>> The normalized items.
 	 */
 	private function normalize_items( array $items, string $format ): array {
 		foreach ( $items as $offset => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+
 			foreach ( $item as $column => $value ) {
 				if ( is_array( $value ) ) {
-					$normalized                  = $this->normalize_items( $value, $format );
+					$normalized                  = $this->normalize_array_value( $value, $format );
 					$items[ $offset ][ $column ] = 'table' === $format ? implode( ', ', $normalized ) : $normalized;
 					continue;
 				}
@@ -598,7 +614,7 @@ class Commands {
 
 				if ( is_bool( $value ) ) {
 					if ( 'table' === $format ) {
-						$items[ $offset ][ $column ] = (bool) $value ? 'true' : 'false';
+						$items[ $offset ][ $column ] = $value ? 'true' : 'false';
 					} elseif ( 'csv' === $format ) {
 						$items[ $offset ][ $column ] = (int) $value;
 					} else {
@@ -615,5 +631,43 @@ class Commands {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Normalize an array value for CLI display.
+	 *
+	 * Handles nested arrays by converting objects (Enums, DateTimes) to their string representations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<mixed> $value  The array value to normalize.
+	 * @param string       $format The format to normalize to.
+	 *
+	 * @return array<mixed> The normalized array.
+	 */
+	private function normalize_array_value( array $value, string $format ): array {
+		$normalized = [];
+
+		foreach ( $value as $key => $item ) {
+			if ( is_array( $item ) ) {
+				$normalized[ $key ] = $this->normalize_array_value( $item, $format );
+			} elseif ( $item instanceof Enum ) {
+				$normalized[ $key ] = $item->getValue();
+			} elseif ( $item instanceof DateTimeInterface ) {
+				$normalized[ $key ] = $item->format( DateTimeInterface::ATOM );
+			} elseif ( is_bool( $item ) ) {
+				if ( 'table' === $format ) {
+					$normalized[ $key ] = $item ? 'true' : 'false';
+				} elseif ( 'csv' === $format ) {
+					$normalized[ $key ] = (int) $item;
+				} else {
+					$normalized[ $key ] = $item;
+				}
+			} else {
+				$normalized[ $key ] = $item;
+			}
+		}
+
+		return $normalized;
 	}
 }
