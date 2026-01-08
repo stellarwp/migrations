@@ -586,7 +586,8 @@ class Commands {
 		foreach ( $items as $offset => $item ) {
 			foreach ( $item as $column => $value ) {
 				if ( is_array( $value ) ) {
-					$items[ $offset ][ $column ] = implode( ', ', $this->normalize_items( $value, $format ) );
+					$normalized = $this->normalize_items( $value, $format );
+					$items[ $offset ][ $column ] = 'table' === $format ? implode( ', ', $normalized ) : $normalized;
 					continue;
 				}
 
