@@ -17,14 +17,17 @@ Dispatcher::addListener(
 		$destination = codecept_root_dir( '../../mu-plugins' );
 
 		// Copy test plugin to mu-plugins.
-		$result = shell_exec( 'cp -R ' . $source . ' ' . $destination );
-		codecept_debug( $result );
+		$result = shell_exec( 'mkdir -p ' . $destination . '/test-plugin && cp -R ' . $source . ' ' . $destination );
+		codecept_debug( 'Copied test plugin to mu-plugins: ' . $result );
 
 		$destination .= '/test-plugin';
 
+		$result = shell_exec( 'ls -la ' . $destination );
+		codecept_debug( 'ls -la ' . $destination . ': ' . $result );
+
 		// Run composer install to get fresh dependencies with correct paths.
 		$result = shell_exec( 'composer install --working-dir=' . $destination . ' 2>&1' );
-		codecept_debug( $result );
+		codecept_debug( 'Composer install: ' . $result );
 
 		// Create include file for mu-plugin loading.
 		$php = "<?php require_once __DIR__ . '/test-plugin/test-plugin.php';";
@@ -33,7 +36,7 @@ Dispatcher::addListener(
 			'echo "' . $php . '" > ' . codecept_root_dir( '../../mu-plugins/include-test-plugin.php' )
 		);
 
-		codecept_debug( $result );
+		codecept_debug( 'Created include file: ' . $result );
 	}
 );
 
