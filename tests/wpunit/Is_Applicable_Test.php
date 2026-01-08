@@ -129,7 +129,7 @@ class Is_Applicable_Test extends WPTestCase {
 	public function it_should_create_dynamic_applicable_migration(): void {
 		$registry = Config::get_container()->get( Registry::class );
 
-		$migration = new class() extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
+		$migration = new class( 'tests_dynamic_applicable' ) extends \StellarWP\Migrations\Abstracts\Migration_Abstract {
 			private static bool $applicable = true;
 			public static bool $up_called   = false;
 
