@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations\Tests\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Enums\Operation;
 use StellarWP\DB\DB;
 
 /**
@@ -29,7 +30,7 @@ class Switch_Post_Meta_Key extends Migration_Abstract {
 	 */
 	private static array $created_meta_values = [];
 
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return count( self::$created_post_ids );
 	}
 

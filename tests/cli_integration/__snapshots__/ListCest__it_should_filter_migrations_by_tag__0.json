@@ -1,0 +1,15 @@
+[
+    {
+        "id": "tests_multi_batch_migration",
+        "label": "Multi-Batch Migration",
+        "description": "A migration that processes 15 items in batches of 5.",
+        "tags": [
+            "data",
+            "batch"
+        ],
+        "total_batches": 3,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
+    }
+]

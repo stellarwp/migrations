@@ -1,0 +1,51 @@
+[
+    {
+        "id": "tests_simple_migration",
+        "label": "Simple Migration",
+        "description": "This is a simple migration that runs a single batch.",
+        "tags": [],
+        "total_batches": 1,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
+    },
+    {
+        "id": "tests_multi_batch_migration",
+        "label": "Multi-Batch Migration",
+        "description": "A migration that processes 15 items in batches of 5.",
+        "tags": [
+            "data",
+            "batch"
+        ],
+        "total_batches": 3,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
+    },
+    {
+        "id": "tests_not_applicable_migration",
+        "label": "Not Applicable Migration",
+        "description": "A migration that should never run because it is not applicable.",
+        "tags": [
+            "legacy",
+            "deprecated"
+        ],
+        "total_batches": 1,
+        "can_run": true,
+        "is_applicable": false,
+        "status": "pending"
+    },
+    {
+        "id": "tests_failing_migration",
+        "label": "Failing Migration",
+        "description": "A migration that intentionally fails for testing error handling.",
+        "tags": [
+            "test",
+            "error"
+        ],
+        "total_batches": 1,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
+    }
+]

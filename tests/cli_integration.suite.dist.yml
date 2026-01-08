@@ -1,0 +1,29 @@
+# Codeception Test Suite Configuration
+
+# suite for WordPress functional tests.
+# Emulate web requests and make application process them.
+actor: Cli_integrationTester
+bootstrap: _bootstrap.php
+extensions:
+    enabled:
+        - lucatume\WPBrowser\Extension\EventDispatcherBridge
+modules:
+    enabled:
+        - \Helper\Cli_integration
+        - WPLoader
+        - WPCLI
+    config:
+        WPLoader:
+            wpRootFolder: "%WP_ROOT_FOLDER%"
+            dbName: "%WP_TEST_DB_NAME%"
+            dbHost: "%WP_TEST_DB_HOST%"
+            dbUser: "%WP_TEST_DB_USER%"
+            dbPassword: "%WP_TEST_DB_PASSWORD%"
+            tablePrefix: "%WP_TABLE_PREFIX%"
+            domain: "%WP_DOMAIN%"
+            title: stellarwp/migrations CLI integration tests
+            configFile: tests/config.php
+            theme: kadence
+        WPCLI:
+            throw: true
+            path: %WP_ROOT_FOLDER%

@@ -1,6 +1,6 @@
 <?php
 /**
- * Shepherd's container for tests.
+ * Migrations's container for tests.
  *
  * @since 0.0.1
  *
