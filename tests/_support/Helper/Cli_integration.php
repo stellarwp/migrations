@@ -64,6 +64,42 @@ class Cli_integration extends Module {
 	}
 
 	/**
+	 * Assert that a CSV string matches a stored snapshot.
+	 *
+	 * If the snapshot file doesn't exist, it will be created with the current content.
+	 * On subsequent runs, the current content will be compared to the stored snapshot.
+	 *
+	 * @param string      $current       The current CSV string to compare.
+	 * @param string|null $snapshot_name Optional custom snapshot name. If not provided,
+	 *                                   it will be auto-generated from the test name.
+	 *
+	 * @return void
+	 *
+	 * @throws RuntimeException If the test context is not available.
+	 */
+	public function assertMatchesCsvSnapshot( string $current, ?string $snapshot_name = null ): void {
+		$this->assert_matches_snapshot( $current, $snapshot_name, 'csv' );
+	}
+
+	/**
+	 * Assert that a YAML string matches a stored snapshot.
+	 *
+	 * If the snapshot file doesn't exist, it will be created with the current content.
+	 * On subsequent runs, the current content will be compared to the stored snapshot.
+	 *
+	 * @param string      $current       The current YAML string to compare.
+	 * @param string|null $snapshot_name Optional custom snapshot name. If not provided,
+	 *                                   it will be auto-generated from the test name.
+	 *
+	 * @return void
+	 *
+	 * @throws RuntimeException If the test context is not available.
+	 */
+	public function assertMatchesYamlSnapshot( string $current, ?string $snapshot_name = null ): void {
+		$this->assert_matches_snapshot( $current, $snapshot_name, 'yml' );
+	}
+
+	/**
 	 * Assert that a JSON string matches a stored snapshot.
 	 *
 	 * The JSON will be pretty-printed before comparison for better diffs.
