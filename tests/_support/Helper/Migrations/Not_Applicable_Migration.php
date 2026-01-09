@@ -48,6 +48,17 @@ class Not_Applicable_Migration extends Migration_Abstract {
 		return 'This migration is not applicable.';
 	}
 
+	/**
+	 * Get migration tags.
+	 *
+	 * @since TBD
+	 *
+	 * @return array<string>
+	 */
+	public function get_tags(): array {
+		return [ 'legacy' ];
+	}
+
 	public function is_applicable(): bool {
 		return false;
 	}
