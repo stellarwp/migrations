@@ -107,15 +107,29 @@ class Migration_Logs extends Table_Abstract {
 	/**
 	 * Transforms a result array into a Migration_Log array.
 	 *
-	 * @since TBD
-	 *
-	 * @phpstan-param array{ id: int, migration_execution_id: int, type: string, message: string, data: array<string, mixed>, created_at: DateTimeInterface } $result_array
-	 *
-	 * @phpstan-return array{ id: int, migration_execution_id: int, type: Log_Type, message: string, data: array<string, mixed>, created_at: DateTimeInterface }
+	 * @since 0.0.1
 	 *
 	 * @param array<string, mixed> $result_array The result array.
 	 *
+	 * @phpstan-param array{
+	 *     id: int,
+	 *     migration_execution_id: int,
+	 *     type: string,
+	 *     message: string,
+	 *     data: array<string, mixed>,
+	 *     created_at: DateTimeInterface
+	 * } $result_array
+	 *
 	 * @return array<string, mixed> The Migration_Log array.
+	 *
+	 * @phpstan-return array{
+	 *     id: int,
+	 *     migration_execution_id: int,
+	 *     type: Log_Type,
+	 *     message: string,
+	 *     data: array<string, mixed>,
+	 *     created_at: DateTimeInterface
+	 * }
 	 */
 	public static function transform_from_array( array $result_array ) {
 		return [

@@ -20,11 +20,10 @@
     "vendor"
   ],
   "words": [
-    "WPCLI",
-    "codecept",
     "abspath",
     "bunx",
     "chromedriver",
+    "codecept",
     "codeception",
     "kadence",
     "learndash",
@@ -37,6 +36,7 @@
     "stellarwp",
     "uids",
     "usermeta",
+    "wpcli",
     "wpdb",
     "wpunit"
   ],

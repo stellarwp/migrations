@@ -66,7 +66,7 @@ wp my-plugin migrations list --format=json
 Runs a specific migration.
 
 ```bash
-wp {prefix} migrations run <migration_id> [--from-batch=<batch>] [--to-batch=<batch>] [--batch-size=<size>]
+wp {prefix} migrations run <migration_id> [--from-batch=<batch>] [--to-batch=<batch>] [--batch-size=<size>] [--dry-run]
 ```
 
 **Arguments:**
@@ -81,7 +81,8 @@ wp {prefix} migrations run <migration_id> [--from-batch=<batch>] [--to-batch=<ba
 |--------|-------------|---------|
 | `--from-batch=<batch>` | Batch number to start from | `1` |
 | `--to-batch=<batch>` | Batch number to end at | (last batch) |
-| `--batch-size=<size>` | Number of items per batch | (migration default) |
+| `--batch-size=<size>` | Number of items per batch (must be at least 1) | (migration default) |
+| `--dry-run` | Preview what would be run without executing | (disabled) |
 
 **Examples:**
 
@@ -94,6 +95,9 @@ wp my-plugin migrations run rename_meta_key --from-batch=5 --to-batch=10
 
 # Run with custom batch size
 wp my-plugin migrations run rename_meta_key --batch-size=50
+
+# Preview what would be run (dry run)
+wp my-plugin migrations run rename_meta_key --dry-run
 ```
 
 **Behavior:**
@@ -109,7 +113,7 @@ wp my-plugin migrations run rename_meta_key --batch-size=50
 Rolls back a specific migration.
 
 ```bash
-wp {prefix} migrations rollback <migration_id> [--from-batch=<batch>] [--to-batch=<batch>] [--batch-size=<size>]
+wp {prefix} migrations rollback <migration_id> [--from-batch=<batch>] [--to-batch=<batch>] [--batch-size=<size>] [--dry-run]
 ```
 
 **Arguments:**
@@ -124,7 +128,8 @@ wp {prefix} migrations rollback <migration_id> [--from-batch=<batch>] [--to-batc
 |--------|-------------|---------|
 | `--from-batch=<batch>` | Batch number to start from | `1` |
 | `--to-batch=<batch>` | Batch number to end at | (last batch) |
-| `--batch-size=<size>` | Number of items per batch | (migration default) |
+| `--batch-size=<size>` | Number of items per batch (must be at least 1) | (migration default) |
+| `--dry-run` | Preview what would be rolled back without executing | (disabled) |
 
 **Examples:**
 
@@ -134,6 +139,9 @@ wp my-plugin migrations rollback rename_meta_key
 
 # Rollback specific batches
 wp my-plugin migrations rollback rename_meta_key --from-batch=1 --to-batch=5
+
+# Preview what would be rolled back (dry run)
+wp my-plugin migrations rollback rename_meta_key --dry-run
 ```
 
 ---
@@ -332,18 +340,6 @@ wp my-plugin migrations list --format=json
 # CSV output - for spreadsheet import
 wp my-plugin migrations executions my_migration --format=csv
 ```
-
----
-
-## Planned Features
-
-The following features are defined in the CLI interface but not yet implemented:
-
-### Parallel Execution (`--in-parallel`)
-
-The `run` and `rollback` commands include an `--in-parallel` option that is not yet functional. When implemented, this will allow multiple batches to be processed concurrently for improved performance.
-
-Currently, all batches are processed sequentially.
 
 ---
 
