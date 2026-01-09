@@ -66,7 +66,9 @@ class Execute extends Task_Abstract {
 			Cast::to_int( $args[4] ), // Execution ID.
 		];
 
-		unset( $args[0], $args[1], $args[2], $args[3], $args[4] ); // Remove default arguments.
+		// Remove default arguments.
+		unset( $args[0], $args[1], $args[2], $args[3], $args[4] );
+
 		$extra_args = $args;
 
 		$is_rollback    = 'down' === $method;
