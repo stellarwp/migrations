@@ -320,9 +320,9 @@ abstract class API_Abstract {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<mixed> $items The items to display.
+	 * @param array<mixed>  $items The items to display.
 	 * @param array<string> $columns The columns to display.
-	 * @param string $format The format to display the items in.
+	 * @param string        $format The format to display the items in.
 	 *
 	 * @return void|WP_REST_Response
 	 */

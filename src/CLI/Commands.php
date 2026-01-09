@@ -429,7 +429,7 @@ class Commands extends API_Abstract {
 			$extra_args_method = 'get_' . $operation->getValue() . '_extra_args_for_batch';
 			$extra_args        = $migration->{$extra_args_method}( $i, $batch_size );
 
-			$task = new Execute(
+			$task    = new Execute(
 				$operation->getValue(),
 				$migration_id,
 				$i,
@@ -487,9 +487,9 @@ class Commands extends API_Abstract {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<mixed>               $args       The arguments.
-	 * @param string                     $param_key The parameter key.
-	 * @param mixed|null                 $default   The default value.
+	 * @param array<mixed> $args       The arguments.
+	 * @param string       $param_key The parameter key.
+	 * @param mixed|null   $default   The default value.
 	 *
 	 * @return mixed The parameter value.
 	 */

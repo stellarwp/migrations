@@ -59,12 +59,30 @@ class Logs_Test extends REST_Test_Case {
 
 		// Create some test logs.
 		$log_types = [
-			[ 'type' => Log_Type::INFO()->getValue(), 'message' => 'Migration started' ],
-			[ 'type' => Log_Type::INFO()->getValue(), 'message' => 'Processing batch 1' ],
-			[ 'type' => Log_Type::WARNING()->getValue(), 'message' => 'Skipped invalid record' ],
-			[ 'type' => Log_Type::ERROR()->getValue(), 'message' => 'Failed to process item 5' ],
-			[ 'type' => Log_Type::INFO()->getValue(), 'message' => 'Migration completed' ],
-			[ 'type' => Log_Type::DEBUG()->getValue(), 'message' => 'Debug information' ],
+			[
+				'type'    => Log_Type::INFO()->getValue(),
+				'message' => 'Migration started',
+			],
+			[
+				'type'    => Log_Type::INFO()->getValue(),
+				'message' => 'Processing batch 1',
+			],
+			[
+				'type'    => Log_Type::WARNING()->getValue(),
+				'message' => 'Skipped invalid record',
+			],
+			[
+				'type'    => Log_Type::ERROR()->getValue(),
+				'message' => 'Failed to process item 5',
+			],
+			[
+				'type'    => Log_Type::INFO()->getValue(),
+				'message' => 'Migration completed',
+			],
+			[
+				'type'    => Log_Type::DEBUG()->getValue(),
+				'message' => 'Debug information',
+			],
 		];
 
 		foreach ( $log_types as $index => $log ) {
