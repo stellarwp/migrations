@@ -544,7 +544,7 @@ class Commands {
 			$extra_args_method = 'get_' . $operation->getValue() . '_extra_args_for_batch';
 			$extra_args        = $migration->{$extra_args_method}( $i, $batch_size );
 
-			$task = new Execute(
+			$task    = new Execute(
 				$operation->getValue(),
 				$migration_id,
 				$i,

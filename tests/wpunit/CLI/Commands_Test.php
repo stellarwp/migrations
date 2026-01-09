@@ -42,7 +42,7 @@ if ( ! function_exists( 'WP_CLI\Utils\make_progress_bar' ) ) {
 	 * @return object A mock progress bar.
 	 */
 	function make_progress_bar( string $message, int $count ): object {
-		return new class {
+		return new class() {
 			public function tick(): void {}
 			public function finish(): void {}
 		};
