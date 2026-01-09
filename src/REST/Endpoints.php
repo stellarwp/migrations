@@ -97,10 +97,7 @@ class Endpoints extends API_Abstract {
 		/** @var string $tags_string */
 		$tags_string = $request->get_param( 'tags' ) ?? '';
 
-		/** @var string $format */
-		$format = $request->get_param( 'format' ) ?? 'table';
-
-		$result = $this->real_list( $tags_string, $format );
+		$result = $this->real_list( $tags_string, 'json' );
 
 		// Handle empty result from base class (returns void when no items).
 		if ( ! $result instanceof WP_REST_Response ) {
@@ -160,8 +157,6 @@ class Endpoints extends API_Abstract {
 
 		$execution_id = Cast::to_int( $execution_id );
 
-		/** @var string $format */
-		$format = $request->get_param( 'format' ) ?? 'table';
 		/** @var string $types */
 		$types = $request->get_param( 'type' ) ?? '';
 		/** @var string $not_types */
@@ -175,7 +170,7 @@ class Endpoints extends API_Abstract {
 		/** @var string $search */
 		$search = $request->get_param( 'search' ) ?? '';
 
-		$result = $this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+		$result = $this->real_logs( $execution_id, 'json', $types, $not_types, $limit, $offset, $order, $order_by, $search );
 
 		// Handle empty result or error from base class.
 		if ( ! $result instanceof WP_REST_Response ) {
@@ -213,10 +208,7 @@ class Endpoints extends API_Abstract {
 			return $this->error( "Migration with ID {$migration_id} not found." );
 		}
 
-		/** @var string $format */
-		$format = $request->get_param( 'format' ) ?? 'table';
-
-		$result = $this->real_executions( $migration_id, $format );
+		$result = $this->real_executions( $migration_id, 'json' );
 
 		// Handle empty result from base class.
 		if ( ! $result instanceof WP_REST_Response ) {
@@ -319,7 +311,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @return WP_REST_Response
 	 */
-	protected function display_items_in_format( array $items, array $columns, string $format = 'table' ): WP_REST_Response {
+	protected function display_items_in_format( array $items, array $columns, string $format = 'json' ): WP_REST_Response {
 		// Format is only JSON for REST endpoints.
 		$items = $this->normalize_items( $items, 'json' );
 
