@@ -364,7 +364,8 @@ class Commands extends API_Abstract {
 		$migration_id = $args[0] ?? null;
 
 		if ( ! $migration_id ) {
-			WP_CLI::error( 'Migration ID is required.' );
+			$this->error( 'Migration ID is required.' );
+			return;
 		}
 
 		$container = Config::get_container();
@@ -374,7 +375,8 @@ class Commands extends API_Abstract {
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
-			WP_CLI::error( "Migration with ID {$migration_id} not found." );
+			$this->error( "Migration with ID {$migration_id} not found." );
+			return;
 		}
 
 		/** @var Migration $migration */

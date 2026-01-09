@@ -98,7 +98,14 @@ class Endpoints extends API_Abstract {
 		/** @var string $format */
 		$format = $request->get_param( 'format' ) ?? 'table';
 
-		return $this->real_list( $tags_string, $format );
+		$result = $this->real_list( $tags_string, $format );
+
+		// Handle empty result from base class (returns void when no items).
+		if ( ! $result instanceof WP_REST_Response ) {
+			return new WP_REST_Response( [], 200 );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -158,7 +165,14 @@ class Endpoints extends API_Abstract {
 		/** @var string $search */
 		$search = $request->get_param( 'search' ) ?? '';
 
-		return $this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+		$result = $this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+
+		// Handle empty result or error from base class.
+		if ( ! $result instanceof WP_REST_Response ) {
+			return new WP_REST_Response( [], 200 );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -177,10 +191,27 @@ class Endpoints extends API_Abstract {
 			return $this->error( __( 'Migration ID is required.', 'stellarwp-migrations' ) );
 		}
 
+		// Validate migration exists.
+		$container = Config::get_container();
+		$registry  = $container->get( Registry::class );
+		/** @var string $migration_id */
+		$migration = $registry->get( $migration_id );
+
+		if ( ! $migration ) {
+			return $this->error( "Migration with ID {$migration_id} not found." );
+		}
+
 		/** @var string $format */
 		$format = $request->get_param( 'format' ) ?? 'table';
 
-		return $this->real_executions( $migration_id, $format );
+		$result = $this->real_executions( $migration_id, $format );
+
+		// Handle empty result from base class.
+		if ( ! $result instanceof WP_REST_Response ) {
+			return new WP_REST_Response( [], 200 );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -307,6 +338,7 @@ class Endpoints extends API_Abstract {
 	protected function error( string $message ): WP_REST_Response {
 		return new WP_REST_Response(
 			[
+				'code'    => 'migrations_error',
 				'success' => false,
 				'message' => $message,
 			],
