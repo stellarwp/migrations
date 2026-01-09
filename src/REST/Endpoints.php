@@ -154,9 +154,11 @@ class Endpoints extends API_Abstract {
 	public function logs( WP_REST_Request $request ) {
 		$execution_id = $request->get_param( 'execution_id' ) ?? null;
 
-		if ( ! $execution_id ) {
+		if ( ! ( $execution_id && is_numeric( $execution_id ) ) ) {
 			return $this->error( __( 'Execution ID is required.', 'stellarwp-migrations' ) );
 		}
+
+		$execution_id = Cast::to_int( $execution_id );
 
 		/** @var string $format */
 		$format = $request->get_param( 'format' ) ?? 'table';
@@ -173,7 +175,7 @@ class Endpoints extends API_Abstract {
 		/** @var string $search */
 		$search = $request->get_param( 'search' ) ?? '';
 
-		$result = $this->real_logs( Cast::to_int( $execution_id ), $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+		$result = $this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
 
 		// Handle empty result or error from base class.
 		if ( ! $result instanceof WP_REST_Response ) {

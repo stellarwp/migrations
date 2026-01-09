@@ -273,10 +273,12 @@ class Commands extends API_Abstract {
 	public function logs( array $args, array $assoc_args ): void {
 		$execution_id = $args[0] ?? null;
 
-		if ( ! ( $execution_id && is_int( $execution_id ) ) ) {
+		if ( ! ( $execution_id && is_numeric( $execution_id ) ) ) {
 			$this->error( 'Execution ID is required.' );
 			return;
 		}
+
+		$execution_id = Cast::to_int( $execution_id );
 
 		/** @var string $format */
 		$format = $this->get_param( $assoc_args, 'format', 'table' );
