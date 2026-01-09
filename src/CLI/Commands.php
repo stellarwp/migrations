@@ -139,6 +139,9 @@ class Commands {
 	 * [--batch-size=<batch-size>]
 	 * : The number of items to process per batch. If not specified, uses the migration's default batch size.
 	 *
+	 * [--dry-run]
+	 * : Show what would be run without actually running the migration.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Run a migration
@@ -149,6 +152,9 @@ class Commands {
 	 *
 	 *     # Run a migration with a custom batch size
 	 *     $ wp migrations run my_migration --batch-size=10
+	 *
+	 *     # Preview what would be run (dry run)
+	 *     $ wp migrations run my_migration --dry-run
 	 *
 	 *     # Run a migration with all options combined
 	 *     $ wp migrations run my_migration --batch-size=10 --from-batch=1 --to-batch=10
@@ -183,6 +189,9 @@ class Commands {
 	 * [--batch-size=<batch-size>]
 	 * : The number of items to process per batch. If not specified, uses the migration's default batch size.
 	 *
+	 * [--dry-run]
+	 * : Show what would be rolled back without actually running the rollback.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Rollback a migration
@@ -193,6 +202,9 @@ class Commands {
 	 *
 	 *     # Rollback a migration with a custom batch size
 	 *     $ wp migrations rollback my_migration --batch-size=10
+	 *
+	 *     # Preview what would be rolled back (dry run)
+	 *     $ wp migrations rollback my_migration --dry-run
 	 *
 	 *     # Rollback a migration with all options combined
 	 *     $ wp migrations rollback my_migration --batch-size=10 --from-batch=1 --to-batch=10
@@ -487,6 +499,22 @@ class Commands {
 
 		if ( $from_batch > $to_batch ) {
 			WP_CLI::error( 'from-batch cannot be greater than to-batch.' );
+		}
+
+		$dry_run = isset( $assoc_args['dry-run'] );
+
+		if ( $dry_run ) {
+			$total_batches_to_run = $to_batch - $from_batch + 1;
+			$operation_label      = $operation->get_label();
+
+			WP_CLI::log( "Dry run: Would {$operation_label} migration '{$migration_id}'." );
+			WP_CLI::log( "  - Total items: {$migration->get_total_items()}" );
+			WP_CLI::log( "  - Batch size: {$batch_size}" );
+			WP_CLI::log( "  - From batch: {$from_batch}" );
+			WP_CLI::log( "  - To batch: {$to_batch}" );
+			WP_CLI::log( "  - Total batches to run: {$total_batches_to_run}" );
+
+			return;
 		}
 
 		$insert_status = Migration_Executions::insert(
