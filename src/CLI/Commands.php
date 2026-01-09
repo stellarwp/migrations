@@ -137,33 +137,21 @@ class Commands {
 	 * : The batch number to end at. If not specified, ends at the last batch.
 	 *
 	 * [--batch-size=<batch-size>]
-	 * : The number of batches to run at once. If not specified, runs one batch at a time.
-	 *
-	 * [--in-parallel]
-	 * : Whether to run the batches in parallel. If not specified, runs the batches sequentially.
+	 * : The number of items to process per batch. If not specified, uses the migration's default batch size.
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Run a migration
 	 *     $ wp migrations run my_migration
 	 *
-	 *     # Run a migration for a specific batch
+	 *     # Run a migration for a specific batch range
 	 *     $ wp migrations run my_migration --from-batch=1 --to-batch=10
 	 *
-	 *     # Run a migration in parallel
-	 *     $ wp migrations run my_migration --in-parallel
-	 *
-	 *     # Run a migration for a specific batch in parallel
-	 *     $ wp migrations run my_migration --from-batch=1 --to-batch=10 --in-parallel
-	 *
-	 *     # Run a migration for a specific batch size
+	 *     # Run a migration with a custom batch size
 	 *     $ wp migrations run my_migration --batch-size=10
 	 *
-	 *     # Run a migration for a specific batch size in parallel
-	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel
-	 *
 	 *     # Run a migration with all options combined
-	 *     $ wp migrations run my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
+	 *     $ wp migrations run my_migration --batch-size=10 --from-batch=1 --to-batch=10
 	 *
 	 * @subcommand run
 	 *
@@ -193,33 +181,21 @@ class Commands {
 	 * : The batch number to end at. If not specified, ends at the last batch.
 	 *
 	 * [--batch-size=<batch-size>]
-	 * : The number of batches to run at once. If not specified, runs one batch at a time.
-	 *
-	 * [--in-parallel]
-	 * : Whether to run the batches in parallel. If not specified, runs the batches sequentially.
+	 * : The number of items to process per batch. If not specified, uses the migration's default batch size.
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Rollback a migration
 	 *     $ wp migrations rollback my_migration
 	 *
-	 *     # Rollback a migration for a specific batch
+	 *     # Rollback a migration for a specific batch range
 	 *     $ wp migrations rollback my_migration --from-batch=1 --to-batch=10
 	 *
-	 *     # Rollback a migration in parallel
-	 *     $ wp migrations rollback my_migration --in-parallel
-	 *
-	 *     # Rollback a migration for a specific batch in parallel
-	 *     $ wp migrations rollback my_migration --from-batch=1 --to-batch=10 --in-parallel
-	 *
-	 *     # Rollback a migration for a specific batch size
+	 *     # Rollback a migration with a custom batch size
 	 *     $ wp migrations rollback my_migration --batch-size=10
 	 *
-	 *     # Rollback a migration for a specific batch size in parallel
-	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel
-	 *
 	 *     # Rollback a migration with all options combined
-	 *     $ wp migrations rollback my_migration --batch-size=10 --in-parallel --from-batch=1 --to-batch=10
+	 *     $ wp migrations rollback my_migration --batch-size=10 --from-batch=1 --to-batch=10
 	 *
 	 * @subcommand rollback
 	 *
@@ -495,7 +471,12 @@ class Commands {
 		}
 
 		/** @var Migration $migration */
-		$batch_size    = Cast::to_int( Utils\get_flag_value( $assoc_args, 'batch-size', $migration->get_default_batch_size() ) );
+		$batch_size = Cast::to_int( Utils\get_flag_value( $assoc_args, 'batch-size', $migration->get_default_batch_size() ) );
+
+		if ( $batch_size < 1 ) {
+			WP_CLI::error( 'batch-size must be at least 1.' );
+		}
+
 		$total_batches = $migration->get_total_batches( $batch_size, $operation );
 
 		$from_batch = Cast::to_int( Utils\get_flag_value( $assoc_args, 'from-batch', 1 ) );
@@ -506,12 +487,6 @@ class Commands {
 
 		if ( $from_batch > $to_batch ) {
 			WP_CLI::error( 'from-batch cannot be greater than to-batch.' );
-		}
-
-		$in_parallel = isset( $assoc_args['in-parallel'] );
-
-		if ( $in_parallel ) {
-			WP_CLI::error( 'Running migrations in parallel is not supported yet.' );
 		}
 
 		$insert_status = Migration_Executions::insert(
@@ -538,7 +513,17 @@ class Commands {
 		$tasks = [];
 
 		for ( $i = $from_batch; $i <= $to_batch; $i++ ) {
-			$task    = new Execute( $operation->getValue(), $migration_id, $i, $batch_size, $execution_id, ...$migration->{'get_' . $operation->getValue() . '_extra_args_for_batch'}( $i, $batch_size ) );
+			$extra_args_method = 'get_' . $operation->getValue() . '_extra_args_for_batch';
+			$extra_args        = $migration->{$extra_args_method}( $i, $batch_size );
+
+			$task = new Execute(
+				$operation->getValue(),
+				$migration_id,
+				$i,
+				$batch_size,
+				$execution_id,
+				...$extra_args
+			);
 			$tasks[] = $task;
 		}
 
