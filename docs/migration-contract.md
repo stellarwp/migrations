@@ -28,23 +28,57 @@ public function get_description(): string {
 }
 ```
 
-#### `get_total_items(): int`
+#### `get_total_items( ?Operation $operation = null ): int`
 
 Returns the total number of items to process for the migration. Used for progress tracking.
 
+The optional `$operation` parameter allows returning different counts for `up` vs `down` operations. When `null` is passed, `Operation::UP()` is assumed.
+
 ```php
-public function get_total_items(): int {
+use StellarWP\Migrations\Enums\Operation;
+
+public function get_total_items( ?Operation $operation = null ): int {
     global $wpdb;
 
-    $count = (int) $wpdb->get_var(
+    // Use Operation::UP() as default if null.
+    $operation = $operation ?? Operation::UP();
+
+    // Return different counts based on operation.
+    if ( $operation->equals( Operation::DOWN() ) ) {
+        // Count items that need to be rolled back.
+        return (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+                $wpdb->postmeta,
+                'new_key'
+            )
+        );
+    }
+
+    // Default: count items for migration (up).
+    return (int) $wpdb->get_var(
         $wpdb->prepare(
             "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
             $wpdb->postmeta,
             'old_key'
         )
     );
+}
+```
 
-    return $count;
+For simple migrations where the count is the same for both operations, you can ignore the parameter:
+
+```php
+public function get_total_items( ?Operation $operation = null ): int {
+    global $wpdb;
+
+    return (int) $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM %i WHERE meta_key = %s",
+            $wpdb->postmeta,
+            'old_key'
+        )
+    );
 }
 ```
 
@@ -267,21 +301,142 @@ public function down( int $batch, int $batch_size, ...$extra_args ): void {
 }
 ```
 
+#### `get_total_batches( int $batch_size, ?Operation $operation = null ): int`
+
+Returns the total number of batches for the migration. This is calculated from `get_total_items()` divided by the batch size, rounded up.
+
+The optional `$operation` parameter is passed through to `get_total_items()` to support different batch counts for `up` vs `down` operations.
+
+```php
+use StellarWP\Migrations\Enums\Operation;
+
+// The default implementation in Migration_Abstract:
+public function get_total_batches( int $batch_size, ?Operation $operation = null ): int {
+    return (int) ceil( $this->get_total_items( $operation ) / $batch_size );
+}
+```
+
+You typically don't need to override this method unless you have custom batching logic.
+
+#### `get_status(): Status`
+
+Returns the current status of the migration based on its most recent execution. Used by the CLI and for reporting.
+
+The default implementation in `Migration_Abstract` queries the `Migration_Executions` table to find the latest execution for this migration and returns its status. If no executions exist, it returns `Status::PENDING()`.
+
+```php
+use StellarWP\Migrations\Enums\Status;
+
+public function get_status(): Status {
+    // The default implementation queries the last execution.
+    // Returns Status::PENDING() if no executions exist.
+}
+```
+
+**Available Status Values:**
+
+| Status | Description |
+| ------ | ----------- |
+| `Status::PENDING()` | Migration has not started |
+| `Status::SCHEDULED()` | Migration has been scheduled |
+| `Status::RUNNING()` | Migration is currently running |
+| `Status::COMPLETED()` | Migration finished successfully |
+| `Status::FAILED()` | Migration failed |
+| `Status::PAUSED()` | Migration is paused |
+| `Status::CANCELED()` | Migration was canceled |
+
+**Note:** The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history.
+
+#### `to_array(): array`
+
+Converts the migration to an array representation. This is used by the CLI commands and implements `JsonSerializable`.
+
+```php
+public function to_array(): array {
+    return [
+        'label'         => $this->get_label(),
+        'description'   => $this->get_description(),
+        'tags'          => $this->get_tags(),
+        'total_batches' => $this->get_total_batches( $this->get_default_batch_size() ),
+        'can_run'       => $this->can_run(),
+        'is_applicable' => $this->is_applicable(),
+        'status'        => $this->get_status(),
+    ];
+}
+```
+
+The `Migration` interface extends `JsonSerializable`, so migrations can be directly serialized to JSON via `json_encode()`.
+
+## Operation Enum
+
+The `Operation` enum (`StellarWP\Migrations\Enums\Operation`) represents the migration direction:
+
+| Value | Description |
+| ----- | ----------- |
+| `Operation::UP()` | Migration operation (forward) |
+| `Operation::DOWN()` | Rollback operation (reverse) |
+
+Usage:
+
+```php
+use StellarWP\Migrations\Enums\Operation;
+
+$operation = Operation::UP();
+
+// Check the operation type.
+if ( $operation->equals( Operation::DOWN() ) ) {
+    // Handle rollback case.
+}
+
+// Get the string value ('up' or 'down').
+$value = $operation->getValue(); // 'up'
+
+// Get human-readable label.
+$label = $operation->get_label(); // 'Up'
+```
+
 ## Abstract Class: `Migration_Abstract`
 
-`StellarWP\Migrations\Abstracts\Migration_Abstract` provides default implementations for the following methods:
+`StellarWP\Migrations\Abstracts\Migration_Abstract` provides a base class that implements the `Migration` interface with sensible defaults.
 
-| Method                              | Default Value |
-| ----------------------------------- | ------------- |
-| `before_up()`                       | No-op         |
-| `after_up()`                        | No-op         |
-| `before_down()`                     | No-op         |
-| `after_down()`                      | No-op         |
-| `can_run()`                         | `true`        |
-| `get_number_of_retries_per_batch()` | `0`           |
-| `get_tags()`                        | `[]`          |
-| `get_up_extra_args_for_batch()`     | `[]`          |
-| `get_down_extra_args_for_batch()`   | `[]`          |
+### Constructor
+
+The abstract class requires a migration ID to be passed to the constructor:
+
+```php
+public function __construct( string $migration_id )
+```
+
+This ID is used internally to query execution history and determine the current status. When using the `Registry`, the migration ID is automatically passed to the constructor when retrieving migrations.
+
+### `get_id(): string`
+
+Returns the migration ID that was passed to the constructor:
+
+```php
+$migration = $registry->get( 'my_plugin_migration' );
+echo $migration->get_id(); // 'my_plugin_migration'
+```
+
+### Default Implementations
+
+`Migration_Abstract` provides default implementations for the following methods:
+
+| Method                              | Default Value                          |
+| ----------------------------------- | -------------------------------------- |
+| `before_up()`                       | No-op                                  |
+| `after_up()`                        | No-op                                  |
+| `before_down()`                     | No-op                                  |
+| `after_down()`                      | No-op                                  |
+| `can_run()`                         | `true`                                 |
+| `get_number_of_retries_per_batch()` | `0`                                    |
+| `get_tags()`                        | `[]`                                   |
+| `get_up_extra_args_for_batch()`     | `[]`                                   |
+| `get_down_extra_args_for_batch()`   | `[]`                                   |
+| `get_total_batches()`               | Calculated from items/batch_size       |
+| `get_status()`                      | Queries last execution or `PENDING`    |
+| `to_array()`                        | Array of migration properties          |
+| `get_id()`                          | Returns the migration ID               |
 
 Extend this class to avoid implementing these methods when not needed.
 
@@ -289,6 +444,21 @@ Extend this class to avoid implementing these methods when not needed.
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
 
 class My_Migration extends Migration_Abstract {
+    // The constructor receives the migration ID from the Registry.
+    // You can add your own constructor if needed, but must call parent::__construct().
+    public function __construct( string $migration_id ) {
+        parent::__construct( $migration_id );
+        // Your initialization code here.
+    }
+
+    public function get_label(): string {
+        return 'My Migration';
+    }
+
+    public function get_description(): string {
+        return 'Performs data transformation.';
+    }
+
     public function is_applicable(): bool {
         return true;
     }
@@ -299,6 +469,10 @@ class My_Migration extends Migration_Abstract {
 
     public function is_down_done(): bool {
         // Implementation.
+    }
+
+    public function get_total_items( ?Operation $operation = null ): int {
+        return 1000;
     }
 
     public function get_default_batch_size(): int {
@@ -314,6 +488,8 @@ class My_Migration extends Migration_Abstract {
     }
 }
 ```
+
+**Note:** When extending `Migration_Abstract`, the constructor must accept the `$migration_id` parameter and pass it to the parent constructor. The Registry handles this automatically when retrieving migrations.
 
 ## Registry
 
@@ -344,13 +520,43 @@ $registry = new Registry( [
 
 ### Retrieving Migrations
 
-The registry returns a new instance of the migration class each time:
+The registry returns a new instance of the migration class each time, automatically passing the migration ID to the constructor:
 
 ```php
 $migration = $registry->get( 'my_plugin_migration' );
+// Equivalent to: new My_Migration( 'my_plugin_migration' )
 
 // Or via array access.
 $migration = $registry['my_plugin_migration'];
+```
+
+### Filtering Migrations
+
+The registry supports filtering migrations with a callback:
+
+```php
+// Get only migrations with a specific tag.
+$data_migrations = $registry->filter( function( Migration $migration ) {
+    return in_array( 'data', $migration->get_tags(), true );
+} );
+
+// Get only applicable migrations.
+$applicable = $registry->filter( fn( Migration $m ) => $m->is_applicable() );
+```
+
+The `filter()` method returns a new `Registry` instance containing only the matching migrations.
+
+### Getting All Migrations
+
+To retrieve all migrations as an array:
+
+```php
+$all_migrations = $registry->all();
+
+foreach ( $all_migrations as $migration_id => $migration ) {
+    // $migration is a Migration instance.
+    echo $migration->get_label();
+}
 ```
 
 ### Constraints

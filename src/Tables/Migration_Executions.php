@@ -2,7 +2,7 @@
 /**
  * The Migration Executions table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tables
  */
@@ -17,19 +17,25 @@ use StellarWP\Schema\Columns\ID;
 use StellarWP\Schema\Columns\Integer_Column;
 use StellarWP\Schema\Columns\String_Column;
 use StellarWP\Schema\Tables\Table_Schema;
+use StellarWP\Migrations\Enums\Status;
+use DateTimeInterface;
 
 /**
  * Migration Executions table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tables
+ *
+ * @method static array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }[] get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
+ * @method static ?array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface } get_first_by( string $column, $value )
+ * @method static ?array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface } get_by_id( $id )
  */
 class Migration_Executions extends Table_Abstract {
 	/**
 	 * The schema version.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -38,7 +44,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The base table name, without the table prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -47,7 +53,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The table group.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -56,7 +62,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The slug used to identify the custom table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -65,7 +71,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * Gets the schema history for the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, callable> The schema history for the table.
 	 */
@@ -78,7 +84,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * Gets the schema for version 0.0.1.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Table_Schema The schema for version 0.0.1.
 	 */
@@ -102,5 +108,49 @@ class Migration_Executions extends Table_Abstract {
 		);
 
 		return new Table_Schema( self::table_name( true ), $columns );
+	}
+
+	/**
+	 * Transforms a result array into a Migration_Execution array.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<string, mixed> $result_array The result array.
+	 *
+	 * @phpstan-param array{
+	 *     id: int,
+	 *     migration_id: string,
+	 *     start_date_gmt: DateTimeInterface,
+	 *     end_date_gmt: DateTimeInterface,
+	 *     status: string,
+	 *     items_total: int,
+	 *     items_processed: int,
+	 *     created_at: DateTimeInterface
+	 * } $result_array
+	 *
+	 * @return array<string, mixed> The Migration_Execution array.
+	 *
+	 * @phpstan-return array{
+	 *     id: int,
+	 *     migration_id: string,
+	 *     start_date_gmt: DateTimeInterface,
+	 *     end_date_gmt: DateTimeInterface,
+	 *     status: Status,
+	 *     items_total: int,
+	 *     items_processed: int,
+	 *     created_at: DateTimeInterface
+	 * }
+	 */
+	public static function transform_from_array( array $result_array ) {
+		return [
+			'id'              => $result_array['id'],
+			'migration_id'    => $result_array['migration_id'],
+			'start_date_gmt'  => $result_array['start_date_gmt'],
+			'end_date_gmt'    => $result_array['end_date_gmt'],
+			'status'          => Status::from( $result_array['status'] ),
+			'items_total'     => $result_array['items_total'],
+			'items_processed' => $result_array['items_processed'],
+			'created_at'      => $result_array['created_at'],
+		];
 	}
 }

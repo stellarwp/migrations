@@ -171,6 +171,37 @@ add_filter( 'stellarwp_migrations_{prefix}_automatic_schedule', '__return_false'
 
 This filter allows you to control automatic scheduling on a per-prefix basis.
 
+### `stellarwp_migrations_{prefix}_minimum_log_level`
+
+Controls the minimum log level that will be written to the database. Messages below this level are discarded.
+
+```php
+use StellarWP\Migrations\Enums\Log_Type;
+
+add_filter( 'stellarwp_migrations_{prefix}_minimum_log_level', function( Log_Type $minimum_log_level ) {
+    // Only log warnings and errors in production.
+    return Log_Type::WARNING();
+} );
+```
+
+**Log Level Hierarchy** (from most to least verbose):
+
+1. `Log_Type::DEBUG()` - Detailed debugging information
+2. `Log_Type::INFO()` - Informational messages
+3. `Log_Type::WARNING()` - Warning messages
+4. `Log_Type::ERROR()` - Error messages only
+
+**Default Behavior:**
+
+- When `WP_DEBUG` is `true`: Minimum level is `DEBUG` (all messages logged)
+- When `WP_DEBUG` is `false`: Minimum level is `INFO` (debug messages skipped)
+
+This filter is useful for:
+
+- Reducing database writes in production by only logging warnings and errors
+- Enabling verbose logging during troubleshooting
+- Customizing logging behavior per environment
+
 ## Hook Execution Order
 
 During a successful migration:

@@ -2,7 +2,7 @@
 /**
  * Migration Log Types Enum.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Enums
  */
@@ -14,7 +14,7 @@ use MyCLabs\Enum\Enum;
 /**
  * Migration Log Types enum.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @extends Enum<Log_Type::*>
  *
@@ -27,28 +27,28 @@ class Log_Type extends Enum {
 	/**
 	 * Data migration log type 'Info'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const INFO = 'info';
 
 	/**
 	 * Data migration log type 'Warning'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const WARNING = 'warning';
 
 	/**
 	 * Data migration log type 'Error'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const ERROR = 'error';
 
 	/**
 	 * Data migration log type 'Debug'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const DEBUG = 'debug';
 
@@ -56,7 +56,7 @@ class Log_Type extends Enum {
 	/**
 	 * Returns the human-readable label for the log type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The label.
 	 */

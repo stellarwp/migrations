@@ -139,7 +139,7 @@ class Execute_Task_Test extends WPTestCase {
 
 		// Assert.
 		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'method must be either "up" or "down"' );
+		$this->expectExceptionMessage( 'Execute task method must be `up` or `down`.' );
 
 		// Act.
 		new Execute( 'invalid', 'test_migration', 1, 1, $execution_id );

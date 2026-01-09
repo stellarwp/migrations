@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations\Tests\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * A simple one-batch migration for basic testing.
@@ -43,7 +44,7 @@ class Simple_Migration extends Migration_Abstract {
 		self::$down_batches = [];
 	}
 
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return 1;
 	}
 

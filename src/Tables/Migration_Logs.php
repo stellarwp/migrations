@@ -18,6 +18,8 @@ use StellarWP\Schema\Columns\String_Column;
 use StellarWP\Schema\Columns\Text_Column;
 use StellarWP\Schema\Tables\Table_Schema;
 use StellarWP\Schema\Columns\PHP_Types;
+use StellarWP\Migrations\Enums\Log_Type;
+use DateTimeInterface;
 
 /**
  * Migration Logs table schema.
@@ -25,6 +27,10 @@ use StellarWP\Schema\Columns\PHP_Types;
  * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tables
+ *
+ * @method static array{ id: int, migration_execution_id: int, type: Log_Type, message: string, data: array<string, mixed>, created_at: DateTimeInterface }[] get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
+ * @method static ?array{ id: int, migration_execution_id: int, type: Log_Type, message: string, data: array<string, mixed>, created_at: DateTimeInterface } get_first_by( string $column, $value )
+ * @method static ?array{ id: int, migration_execution_id: int, type: Log_Type, message: string, data: array<string, mixed>, created_at: DateTimeInterface } get_by_id( $id )
  */
 class Migration_Logs extends Table_Abstract {
 	/**
@@ -96,5 +102,43 @@ class Migration_Logs extends Table_Abstract {
 		);
 
 		return new Table_Schema( self::table_name( true ), $columns );
+	}
+
+	/**
+	 * Transforms a result array into a Migration_Log array.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<string, mixed> $result_array The result array.
+	 *
+	 * @phpstan-param array{
+	 *     id: int,
+	 *     migration_execution_id: int,
+	 *     type: string,
+	 *     message: string,
+	 *     data: array<string, mixed>,
+	 *     created_at: DateTimeInterface
+	 * } $result_array
+	 *
+	 * @return array<string, mixed> The Migration_Log array.
+	 *
+	 * @phpstan-return array{
+	 *     id: int,
+	 *     migration_execution_id: int,
+	 *     type: Log_Type,
+	 *     message: string,
+	 *     data: array<string, mixed>,
+	 *     created_at: DateTimeInterface
+	 * }
+	 */
+	public static function transform_from_array( array $result_array ) {
+		return [
+			'id'                     => $result_array['id'],
+			'migration_execution_id' => $result_array['migration_execution_id'],
+			'type'                   => Log_Type::from( $result_array['type'] ),
+			'message'                => $result_array['message'],
+			'data'                   => $result_array['data'],
+			'created_at'             => $result_array['created_at'],
+		];
 	}
 }

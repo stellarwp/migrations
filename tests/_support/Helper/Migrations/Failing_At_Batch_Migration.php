@@ -5,6 +5,7 @@ namespace StellarWP\Migrations\Tests\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
 use RuntimeException;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * A migration that fails at a specific batch number.
@@ -50,7 +51,7 @@ class Failing_At_Batch_Migration extends Migration_Abstract {
 		self::$down_batches   = [];
 	}
 
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return self::$total_batches;
 	}
 
