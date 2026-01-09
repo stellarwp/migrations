@@ -185,7 +185,7 @@ class RollbackCest {
 				'migrations',
 				'run',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		// Rollback.
@@ -195,7 +195,7 @@ class RollbackCest {
 				'migrations',
 				'rollback',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		// Check executions - should have at least 2 (run + rollback).
@@ -206,10 +206,57 @@ class RollbackCest {
 				'executions',
 				'tests_simple_migration',
 				'--format=json',
-			] 
+			]
 		);
 
 		$executions = json_decode( $output, true );
 		Assert::assertGreaterThanOrEqual( 2, count( $executions ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_create_execution_when_dry_run_is_used( Cli_integrationTester $I ): void {
+		// Get execution count before.
+		$before_output     = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=json',
+			]
+		);
+		$executions_before = json_decode( $before_output, true ) ?: [];
+		$count_before      = count( $executions_before );
+
+		// Run rollback with --dry-run.
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'rollback',
+				'tests_simple_migration',
+				'--dry-run',
+			]
+		);
+
+		// Verify dry run output.
+		Assert::assertStringContainsString( 'Dry run', $output );
+
+		// Verify no new executions were created.
+		$after_output     = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=json',
+			]
+		);
+		$executions_after = json_decode( $after_output, true ) ?: [];
+		$count_after      = count( $executions_after );
+
+		Assert::assertEquals( $count_before, $count_after, 'Dry run should not create new execution records' );
 	}
 }

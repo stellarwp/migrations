@@ -225,7 +225,7 @@ class RunCest {
 				'migrations',
 				'run',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		// Check executions.
@@ -236,11 +236,80 @@ class RunCest {
 				'executions',
 				'tests_simple_migration',
 				'--format=json',
-			] 
+			]
 		);
 
 		$executions = json_decode( $output, true );
 		Assert::assertNotEmpty( $executions );
 		Assert::assertEquals( 'tests_simple_migration', $executions[0]['migration_id'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_create_execution_when_dry_run_is_used( Cli_integrationTester $I ): void {
+		// Get execution count before.
+		$before_output     = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=json',
+			]
+		);
+		$executions_before = json_decode( $before_output, true ) ?: [];
+		$count_before      = count( $executions_before );
+
+		// Run the migration with --dry-run.
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_simple_migration',
+				'--dry-run',
+			]
+		);
+
+		// Verify dry run output.
+		Assert::assertStringContainsString( 'Dry run', $output );
+
+		// Verify no new executions were created.
+		$after_output     = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'executions',
+				'tests_simple_migration',
+				'--format=json',
+			]
+		);
+		$executions_after = json_decode( $after_output, true ) ?: [];
+		$count_after      = count( $executions_after );
+
+		Assert::assertEquals( $count_before, $count_after, 'Dry run should not create new execution records' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_output_dry_run_info_without_executing( Cli_integrationTester $I ): void {
+		// Run the migration with --dry-run.
+		$output = $I->cliToString(
+			[
+				tests_migrations_cli_integration_get_prefix(),
+				'migrations',
+				'run',
+				'tests_multi_batch_migration',
+				'--dry-run',
+				'--batch-size=5',
+			]
+		);
+
+		// Verify dry run output contains expected info.
+		Assert::assertStringContainsString( 'Dry run', $output );
+		Assert::assertStringContainsString( 'Total items', $output );
+		Assert::assertStringContainsString( 'Batch size: 5', $output );
 	}
 }
