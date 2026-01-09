@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\CLI;
 
-use MyCLabs\Enum\Enum;
 use WP_CLI;
 use WP_CLI\Utils;
 use StellarWP\Migrations\Config;
@@ -20,12 +19,11 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Contracts\Task;
 use StellarWP\Migrations\Enums\Operation;
-use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
-use DateTimeInterface;
+use StellarWP\Migrations\Abstracts\API_Abstract;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
 
@@ -50,7 +48,7 @@ use function WP_CLI\Utils\make_progress_bar;
  *     # Show migration status
  *     $ wp migrations status
  */
-class Commands {
+class Commands extends API_Abstract {
 	/**
 	 * List registered migrations.
 	 *
@@ -89,35 +87,12 @@ class Commands {
 	 */
 	public function list( array $args, array $assoc_args ): void {
 		/** @var string $tags_string */
-		$tags_string = Utils\get_flag_value( $assoc_args, 'tags', '' );
+		$tags_string = $this->get_param( $assoc_args, 'tags', '' );
+
 		/** @var string $format */
-		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
+		$format = $this->get_param( $assoc_args, 'format', 'table' );
 
-		$tags = array_filter( explode( ',', $tags_string ) );
-
-		$container = Config::get_container();
-		$registry  = $container->get( Registry::class );
-
-		if ( ! empty( $tags ) ) {
-			$registry = $registry->filter(
-				fn( ?Migration $migration ): bool => $migration && ! empty( array_intersect( $tags, $migration->get_tags() ) )
-			);
-		}
-
-		$items = $registry->all();
-
-		if ( empty( $items ) ) {
-			WP_CLI::log( 'No migrations found.' );
-			return;
-		}
-
-		$migrations_as_arrays = [];
-
-		foreach ( $items as $migration_id => $migration ) {
-			$migrations_as_arrays[] = array_merge( [ 'id' => $migration_id ], $migration->to_array() );
-		}
-
-		$this->display_items_in_format( $migrations_as_arrays, [ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'status' ], $format );
+		$this->real_list( $tags_string, $format );
 	}
 
 	/**
@@ -298,117 +273,26 @@ class Commands {
 	public function logs( array $args, array $assoc_args ): void {
 		$execution_id = $args[0] ?? null;
 
-		if ( ! $execution_id ) {
-			WP_CLI::error( 'Execution ID is required.' );
-		}
-
-		/** @var int $execution_id */
-		$execution = Migration_Executions::get_by_id( $execution_id );
-
-		if ( ! $execution || ! is_array( $execution ) ) {
-			WP_CLI::error( "Execution with ID '{$execution_id}' not found." );
-		}
-
-		$migration_id = ! empty( $execution['migration_id'] ) ? $execution['migration_id'] : false;
-
-		if ( ! $migration_id ) {
-			WP_CLI::error( "Execution with ID '{$execution_id}' not found." );
-		}
-
-		$container = Config::get_container();
-		$registry  = $container->get( Registry::class );
-		/** @var string $migration_id */
-		$migration = $registry->get( $migration_id );
-
-		if ( ! $migration ) {
-			WP_CLI::error( "The migration associated with execution '{$execution_id}' is no longer available." );
-		}
-
-		/** @var string $format */
-		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
-		/** @var string $types */
-		$types = Utils\get_flag_value( $assoc_args, 'type', '' );
-		/** @var string $not_types */
-		$not_types = Utils\get_flag_value( $assoc_args, 'not-type', '' );
-		$limit     = Cast::to_int( Utils\get_flag_value( $assoc_args, 'limit', 100 ) );
-		$offset    = Cast::to_int( Utils\get_flag_value( $assoc_args, 'offset', 0 ) );
-		$order     = strtoupper( Cast::to_string( Utils\get_flag_value( $assoc_args, 'order', 'DESC' ) ) );
-		/** @var string $order_by */
-		$order_by = Utils\get_flag_value( $assoc_args, 'order-by', 'created_at' );
-		/** @var string $search */
-		$search = Utils\get_flag_value( $assoc_args, 'search', '' );
-
-		// Validate order direction.
-		if ( ! in_array( $order, [ 'ASC', 'DESC' ], true ) ) {
-			WP_CLI::error( 'Invalid order direction. Use ASC or DESC.' );
-		}
-
-		// Validate order-by column.
-		$allowed_order_by = [ 'id', 'type', 'created_at' ];
-		if ( ! in_array( $order_by, $allowed_order_by, true ) ) {
-			WP_CLI::error( sprintf( 'Invalid order-by column. Allowed: %s', implode( ', ', $allowed_order_by ) ) );
-		}
-
-		$arguments = [
-			'offset'                 => $offset,
-			'orderby'                => $order_by,
-			'order'                  => $order,
-			'query_operator'         => 'AND',
-			'migration_execution_id' => [
-				'column'   => 'migration_execution_id',
-				'value'    => $execution_id,
-				'operator' => '=',
-			],
-		];
-
-		if ( $search ) {
-			$arguments['term'] = $search;
-		}
-
-		if ( $types && $not_types ) {
-			WP_CLI::error( 'Cannot filter by type and not-type at the same time. Use one or the other.' );
-		}
-
-		if ( $types ) {
-			$types             = explode( ',', $types );
-			$arguments['type'] = [
-				'query_operator' => 'OR',
-			];
-			foreach ( $types as $type ) {
-				$arguments['type'][] = [
-					'column'   => 'type',
-					'value'    => $type,
-					'operator' => '=',
-				];
-			}
-		}
-
-		if ( $not_types ) {
-			$not_types             = explode( ',', $not_types );
-			$arguments['not_type'] = [
-				'query_operator' => 'AND',
-			];
-			foreach ( $not_types as $type ) {
-				$arguments['not_type'][] = [
-					'column'   => 'type',
-					'value'    => $type,
-					'operator' => '!=',
-				];
-			}
-		}
-
-		/** @var array<int|string, array<string, mixed>> $logs */
-		$logs = Migration_Logs::paginate(
-			$arguments,
-			$limit
-		);
-
-		if ( empty( $logs ) ) {
-			WP_CLI::log( "No logs found for execution '{$execution_id}' of migration '{$migration_id}'." );
+		if ( ! ( $execution_id && is_int( $execution_id ) ) ) {
+			$this->error( 'Execution ID is required.' );
 			return;
 		}
 
-		$this->display_items_in_format( $logs, [ 'id', 'type', 'message', 'data', 'created_at' ], $format );
+		/** @var string $format */
+		$format = $this->get_param( $assoc_args, 'format', 'table' );
+		/** @var string $types */
+		$types = $this->get_param( $assoc_args, 'type', '' );
+		/** @var string $not_types */
+		$not_types = $this->get_param( $assoc_args, 'not-type', '' );
+		$limit     = Cast::to_int( $this->get_param( $assoc_args, 'limit', 100 ) );
+		$offset    = Cast::to_int( $this->get_param( $assoc_args, 'offset', 0 ) );
+		$order     = strtoupper( Cast::to_string( $this->get_param( $assoc_args, 'order', 'DESC' ) ) );
+		/** @var string $order_by */
+		$order_by = $this->get_param( $assoc_args, 'order-by', 'created_at' );
+		/** @var string $search */
+		$search = $this->get_param( $assoc_args, 'search', '' );
+
+		$this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
 	}
 
 	/**
@@ -443,15 +327,14 @@ class Commands {
 		$migration_id = $args[0] ?? null;
 
 		if ( ! $migration_id ) {
-			WP_CLI::error( 'Migration ID is required.' );
+			$this->error( 'Migration ID is required.' );
+			return;
 		}
 
 		/** @var string $format */
-		$format = Utils\get_flag_value( $assoc_args, 'format', 'table' );
+		$format = $this->get_param( $assoc_args, 'format', 'table' );
 
-		$executions = Migration_Executions::get_all_by( 'migration_id', $migration_id );
-
-		$this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
+		$this->real_executions( $migration_id, $format );
 	}
 
 	/**
@@ -465,11 +348,12 @@ class Commands {
 	 *
 	 * @return void
 	 */
-	private function run_operation( Operation $operation, array $args, array $assoc_args ): void {
+	protected function run_operation( Operation $operation, array $args, array $assoc_args ): void {
 		$migration_id = $args[0] ?? null;
 
 		if ( ! $migration_id ) {
-			WP_CLI::error( 'Migration ID is required.' );
+			$this->error( 'Migration ID is required.' );
+			return;
 		}
 
 		$container = Config::get_container();
@@ -479,7 +363,8 @@ class Commands {
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
-			WP_CLI::error( "Migration with ID {$migration_id} not found." );
+			$this->error( "Migration with ID {$migration_id} not found." );
+			return;
 		}
 
 		/** @var Migration $migration */
@@ -591,96 +476,50 @@ class Commands {
 	 *
 	 * @return void
 	 */
-	private function display_items_in_format( array $items, array $columns, string $format = 'table' ): void {
+	protected function display_items_in_format( array $items, array $columns, string $format = 'table' ): void {
 		$items = $this->normalize_items( $items, $format );
 
 		Utils\format_items( $format, $items, $columns );
 	}
 
 	/**
-	 * Normalize items to be displayed in the CLI.
+	 * Get a parameter from the arguments.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<int|string, array<string, mixed>> $items  The items to normalize.
-	 * @param string                                  $format The format to normalize the items to.
+	 * @param array<mixed>               $args       The arguments.
+	 * @param string                     $param_key The parameter key.
+	 * @param mixed|null                 $default   The default value.
 	 *
-	 * @return array<int|string, array<string, mixed>> The normalized items.
+	 * @return mixed The parameter value.
 	 */
-	private function normalize_items( array $items, string $format ): array {
-		foreach ( $items as $offset => $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
-
-			foreach ( $item as $column => $value ) {
-				if ( is_array( $value ) ) {
-					$normalized                  = $this->normalize_array_value( $value, $format );
-					$items[ $offset ][ $column ] = 'table' === $format ? implode( ', ', $normalized ) : $normalized;
-					continue;
-				}
-
-				if ( $value instanceof Enum ) {
-					$items[ $offset ][ $column ] = $value->getValue();
-					continue;
-				}
-
-				if ( is_bool( $value ) ) {
-					if ( 'table' === $format ) {
-						$items[ $offset ][ $column ] = $value ? 'true' : 'false';
-					} elseif ( 'csv' === $format ) {
-						$items[ $offset ][ $column ] = (int) $value;
-					} else {
-						$items[ $offset ][ $column ] = $value;
-					}
-					continue;
-				}
-
-				if ( $value instanceof DateTimeInterface ) {
-					$items[ $offset ][ $column ] = $value->format( DateTimeInterface::ATOM );
-					continue;
-				}
-			}
-		}
-
-		return $items;
+	protected function get_param( array $args, string $param_key, $default = null ) {
+		return Utils\get_flag_value( $args, $param_key, $default );
 	}
 
 	/**
-	 * Normalize an array value for CLI display.
-	 *
-	 * Handles nested arrays by converting objects (Enums, DateTimes) to their string representations.
+	 * Log a message.
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<mixed> $value  The array value to normalize.
-	 * @param string       $format The format to normalize to.
+	 * @param string $message The message to log.
 	 *
-	 * @return array<mixed> The normalized array.
+	 * @return void
 	 */
-	private function normalize_array_value( array $value, string $format ): array {
-		$normalized = [];
+	protected function log( string $message ): void {
+		WP_CLI::log( $message );
+	}
 
-		foreach ( $value as $key => $item ) {
-			if ( is_array( $item ) ) {
-				$normalized[ $key ] = $this->normalize_array_value( $item, $format );
-			} elseif ( $item instanceof Enum ) {
-				$normalized[ $key ] = $item->getValue();
-			} elseif ( $item instanceof DateTimeInterface ) {
-				$normalized[ $key ] = $item->format( DateTimeInterface::ATOM );
-			} elseif ( is_bool( $item ) ) {
-				if ( 'table' === $format ) {
-					$normalized[ $key ] = $item ? 'true' : 'false';
-				} elseif ( 'csv' === $format ) {
-					$normalized[ $key ] = (int) $item;
-				} else {
-					$normalized[ $key ] = $item;
-				}
-			} else {
-				$normalized[ $key ] = $item;
-			}
-		}
-
-		return $normalized;
+	/**
+	 * Log an error message.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $message The error message to log.
+	 *
+	 * @return void
+	 */
+	protected function error( string $message ): void {
+		WP_CLI::error( $message );
 	}
 }
