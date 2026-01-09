@@ -129,20 +129,4 @@
 	<rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames">
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
-
-	<rule ref="Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
-
-	<rule ref="Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
-
-	<rule ref="Universal.Namespaces.OneDeclarationPerFile.MultipleFound">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
-
-	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
 </ruleset>
