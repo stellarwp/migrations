@@ -2,7 +2,7 @@
 /**
  * REST API tests for the Executions endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -19,7 +19,7 @@ use StellarWP\Migrations\Tests\TestCases\REST_Test_Case;
 /**
  * REST API tests for the Executions endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -28,7 +28,7 @@ class Executions_Test extends REST_Test_Case {
 	/**
 	 * Create test executions.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<int> The created execution IDs.
 	 */

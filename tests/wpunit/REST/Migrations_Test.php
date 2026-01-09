@@ -2,7 +2,7 @@
 /**
  * REST API tests for the Migrations list endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -17,7 +17,7 @@ use StellarWP\Migrations\Tests\TestCases\REST_Test_Case;
 /**
  * REST API tests for the Migrations list endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */

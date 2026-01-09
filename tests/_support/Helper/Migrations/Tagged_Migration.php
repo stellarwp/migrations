@@ -2,7 +2,7 @@
 /**
  * Tagged Migration for REST integration testing.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\Migrations
  */
@@ -19,7 +19,7 @@ use StellarWP\Migrations\Enums\Operation;
  *
  * Used for testing the `tags` filter parameter on the migrations endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\Migrations
  */
@@ -48,7 +48,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Reset the migration state.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -62,7 +62,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Get the migration label.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string
 	 */
@@ -73,7 +73,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Get the migration description.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string
 	 */
@@ -84,7 +84,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Get migration tags.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string>
 	 */
@@ -95,7 +95,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Get total items to process.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Operation|null $operation The operation type.
 	 *
@@ -108,7 +108,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Get default batch size.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int
 	 */
@@ -119,7 +119,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Whether this migration is applicable.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -130,7 +130,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Check if the migration has completed running up.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -141,7 +141,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Check if the migration has completed rolling back.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -152,7 +152,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Run the migration up.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $batch      The current batch number.
 	 * @param int $batch_size The batch size.
@@ -167,7 +167,7 @@ class Tagged_Migration extends Migration_Abstract {
 	/**
 	 * Roll back the migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $batch      The current batch number.
 	 * @param int $batch_size The batch size.

@@ -2,7 +2,7 @@
 /**
  * REST Service Provider.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\REST;
  */
@@ -20,7 +20,7 @@ use WP_REST_Server;
  *
  * Registers REST API routes.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\REST;
  */
@@ -29,7 +29,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * The API version.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -38,7 +38,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Register the REST routes.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -49,7 +49,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Get the REST API namespace.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The namespace (e.g., "tec/v1").
 	 */
@@ -63,7 +63,7 @@ class Provider extends Provider_Abstract {
 	/**
 	 * Register REST API routes.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */

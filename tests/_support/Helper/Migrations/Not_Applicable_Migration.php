@@ -51,7 +51,7 @@ class Not_Applicable_Migration extends Migration_Abstract {
 	/**
 	 * Get migration tags.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string>
 	 */

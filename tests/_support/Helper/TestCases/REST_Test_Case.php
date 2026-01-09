@@ -2,7 +2,7 @@
 /**
  * Base test case for REST API tests.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -30,7 +30,7 @@ use WP_REST_Server;
 /**
  * Base test case for REST API tests.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -40,7 +40,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * The REST server instance.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var WP_REST_Server
 	 */
@@ -49,7 +49,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * The endpoints instance.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var Endpoints
 	 */
@@ -58,7 +58,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * The REST namespace.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -109,7 +109,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	 *
 	 * Override this method in subclasses to register additional migrations.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Registry $registry The migration registry.
 	 *
@@ -148,7 +148,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * Make a REST API request.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string               $path   The endpoint path (without namespace).
 	 * @param string               $method The HTTP method.
@@ -175,7 +175,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * Assert an endpoint response.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string               $path          The endpoint path.
 	 * @param string               $method        The HTTP method.
@@ -201,7 +201,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * Create an admin user and set as current user.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The user ID.
 	 */
@@ -215,7 +215,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * Data provider for different user roles.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Generator<string, array{Closure}>
 	 */
@@ -251,7 +251,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * Check if the current user can manage migrations (has manage_options capability).
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -262,7 +262,7 @@ abstract class REST_Test_Case extends WPTestCase {
 	/**
 	 * Get the expected status code based on user permissions.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $success_code The success status code.
 	 *

@@ -2,7 +2,7 @@
 /**
  * REST API tests for the Logs endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -22,7 +22,7 @@ use StellarWP\DB\DB;
 /**
  * REST API tests for the Logs endpoint.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\REST
  */
@@ -31,7 +31,7 @@ class Logs_Test extends REST_Test_Case {
 	/**
 	 * The test execution ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int|null
 	 */
@@ -40,7 +40,7 @@ class Logs_Test extends REST_Test_Case {
 	/**
 	 * Create a test execution with logs.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The execution ID.
 	 */

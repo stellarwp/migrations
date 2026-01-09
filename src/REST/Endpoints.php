@@ -2,7 +2,7 @@
 /**
  * REST Endpoints for Migrations.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\REST
  */
@@ -29,7 +29,7 @@ use function StellarWP\Shepherd\shepherd;
 /**
  * REST API Endpoints for Migrations.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\REST
  */
@@ -38,7 +38,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * The last error message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string|null
 	 */
@@ -47,7 +47,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * The collected items for display.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<int|string, array<string, mixed>>
 	 */
@@ -56,7 +56,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * The columns for the collected items.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<string>
 	 */
@@ -65,7 +65,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Log messages collected during operation.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<string>
 	 */
@@ -74,7 +74,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Check if the current user can manage migrations.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -85,9 +85,11 @@ class Endpoints extends API_Abstract {
 	/**
 	 * List registered migrations.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
-	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
+	 *
+	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -111,9 +113,11 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Run a migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
-	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
+	 *
+	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -124,9 +128,11 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Rollback a migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
-	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
+	 *
+	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
@@ -137,9 +143,11 @@ class Endpoints extends API_Abstract {
 	/**
 	 * List logs for a specific execution.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
-	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
+	 *
+	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -178,9 +186,11 @@ class Endpoints extends API_Abstract {
 	/**
 	 * List executions for a migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
-	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
+	 *
+	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
@@ -217,10 +227,12 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Run a migration operation.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
-	 * @param Operation                             $operation The operation to run.
-	 * @param WP_REST_Request<array<string, mixed>> $request   The request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
+	 *
+	 * @param Operation       $operation The operation to run.
+	 * @param WP_REST_Request $request   The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -297,7 +309,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Display items in the specified format.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param array<int|string, array<string, mixed>> $items   The items to display.
 	 * @param array<string>                           $columns The columns to display.
@@ -315,7 +327,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Log a message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $message The message to log.
 	 *
@@ -328,7 +340,7 @@ class Endpoints extends API_Abstract {
 	/**
 	 * Return an error response.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string $message The error message to return.
 	 *
