@@ -2,7 +2,7 @@
 /**
  * The Migration Executions table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tables
  */
@@ -23,7 +23,7 @@ use DateTimeInterface;
 /**
  * Migration Executions table schema.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tables
  *
@@ -35,7 +35,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The schema version.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -44,7 +44,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The base table name, without the table prefix.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -53,7 +53,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The table group.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -62,7 +62,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * The slug used to identify the custom table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var string
 	 */
@@ -71,7 +71,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * Gets the schema history for the table.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, callable> The schema history for the table.
 	 */
@@ -84,7 +84,7 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * Gets the schema for version 0.0.1.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Table_Schema The schema for version 0.0.1.
 	 */
@@ -113,15 +113,33 @@ class Migration_Executions extends Table_Abstract {
 	/**
 	 * Transforms a result array into a Migration_Execution array.
 	 *
-	 * @since TBD
-	 *
-	 * @phpstan-param array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: string, items_total: int, items_processed: int, created_at: DateTimeInterface } $result_array
-	 *
-	 * @phpstan-return array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }
+	 * @since 0.0.1
 	 *
 	 * @param array<string, mixed> $result_array The result array.
 	 *
+	 * @phpstan-param array{
+	 *     id: int,
+	 *     migration_id: string,
+	 *     start_date_gmt: DateTimeInterface,
+	 *     end_date_gmt: DateTimeInterface,
+	 *     status: string,
+	 *     items_total: int,
+	 *     items_processed: int,
+	 *     created_at: DateTimeInterface
+	 * } $result_array
+	 *
 	 * @return array<string, mixed> The Migration_Execution array.
+	 *
+	 * @phpstan-return array{
+	 *     id: int,
+	 *     migration_id: string,
+	 *     start_date_gmt: DateTimeInterface,
+	 *     end_date_gmt: DateTimeInterface,
+	 *     status: Status,
+	 *     items_total: int,
+	 *     items_processed: int,
+	 *     created_at: DateTimeInterface
+	 * }
 	 */
 	public static function transform_from_array( array $result_array ) {
 		return [

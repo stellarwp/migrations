@@ -107,7 +107,7 @@ class Migration_Logs extends Table_Abstract {
 	/**
 	 * Transforms a result array into a Migration_Log array.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @phpstan-param array{ id: int, migration_execution_id: int, type: string, message: string, data: array<string, mixed>, created_at: DateTimeInterface } $result_array
 	 *

@@ -2,7 +2,7 @@
 /**
  * Migrations Operations Enum.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Enums
  */
@@ -14,7 +14,7 @@ use MyCLabs\Enum\Enum;
 /**
  * Migrations Operations enum.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @extends Enum<Operation::*>
  *
@@ -25,21 +25,21 @@ class Operation extends Enum {
 	/**
 	 * Data migration operation 'Up'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const UP = 'up';
 
 	/**
 	 * Data migration operation 'Down'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const DOWN = 'down';
 
 	/**
 	 * Returns the human-readable label for the log type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The label.
 	 */

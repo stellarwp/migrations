@@ -177,7 +177,7 @@ class Provider extends Provider_Abstract {
 		/**
 		 * Filters whether migrations should be automatically scheduled for this prefix.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param bool $automatic_schedule Whether the migration should be automatically scheduled. Default is true.
 		 *
