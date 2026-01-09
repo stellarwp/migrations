@@ -46,7 +46,7 @@ abstract class API_Abstract {
 
 		if ( ! empty( $tags ) ) {
 			$registry = $registry->filter(
-				fn( ?Migration $migration ): bool => $migration && ! empty( array_intersect( $tags, $migration->get_tags() ) )
+				static fn( ?Migration $migration ): bool => $migration && ! empty( array_intersect( $tags, $migration->get_tags() ) )
 			);
 		}
 
