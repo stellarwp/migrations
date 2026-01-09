@@ -87,7 +87,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param WP_REST_Request $request The request object.
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -113,7 +113,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param WP_REST_Request $request The request object.
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -126,7 +126,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param WP_REST_Request $request The request object.
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
@@ -139,7 +139,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param WP_REST_Request $request The request object.
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -165,7 +165,7 @@ class Endpoints extends API_Abstract {
 		/** @var string $search */
 		$search = $request->get_param( 'search' ) ?? '';
 
-		$result = $this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+		$result = $this->real_logs( Cast::to_int( $execution_id ), $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
 
 		// Handle empty result or error from base class.
 		if ( ! $result instanceof WP_REST_Response ) {
@@ -180,7 +180,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param WP_REST_Request $request The request object.
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
@@ -219,9 +219,8 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @since TBD
 	 *
-	 * @param Operation                  $operation  The operation to run.
-	 * @param array<mixed>               $args       The arguments.
-	 * @param array<string, bool|string> $assoc_args The associative arguments.
+	 * @param Operation                             $operation The operation to run.
+	 * @param WP_REST_Request<array<string, mixed>> $request   The request object.
 	 *
 	 * @return WP_REST_Response
 	 */
@@ -304,7 +303,7 @@ class Endpoints extends API_Abstract {
 	 * @param array<string>                           $columns The columns to display.
 	 * @param string                                  $format  The format to display the items in.
 	 *
-	 * @return void
+	 * @return WP_REST_Response
 	 */
 	protected function display_items_in_format( array $items, array $columns, string $format = 'table' ): WP_REST_Response {
 		// Format is only JSON for REST endpoints.

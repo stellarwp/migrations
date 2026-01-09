@@ -88,7 +88,6 @@ abstract class API_Abstract {
 			return $this->error( 'Execution ID is required.' );
 		}
 
-		/** @var int $execution_id */
 		$execution = Migration_Executions::get_by_id( $execution_id );
 
 		if ( ! $execution || ! is_array( $execution ) ) {

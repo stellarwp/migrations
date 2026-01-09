@@ -334,7 +334,7 @@ class Commands extends API_Abstract {
 		/** @var string $format */
 		$format = $this->get_param( $assoc_args, 'format', 'table' );
 
-		$this->real_executions( $migration_id, $format );
+		$this->real_executions( Cast::to_string( $migration_id ), $format );
 	}
 
 	/**
@@ -487,14 +487,14 @@ class Commands extends API_Abstract {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<mixed> $args       The arguments.
-	 * @param string       $param_key The parameter key.
-	 * @param mixed|null   $default   The default value.
+	 * @param array<string, bool|string> $args          The arguments.
+	 * @param string                     $param_key     The parameter key.
+	 * @param mixed|null                 $default_value The default value.
 	 *
 	 * @return mixed The parameter value.
 	 */
-	protected function get_param( array $args, string $param_key, $default = null ) {
-		return Utils\get_flag_value( $args, $param_key, $default );
+	protected function get_param( array $args, string $param_key, $default_value = null ) {
+		return Utils\get_flag_value( $args, $param_key, $default_value );
 	}
 
 	/**
