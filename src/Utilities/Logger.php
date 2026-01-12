@@ -2,7 +2,7 @@
 /**
  * Migration Logger Utility.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Utilities
  */
@@ -16,7 +16,7 @@ use StellarWP\Migrations\Config;
 /**
  * Logger utility for migration executions.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Utilities
  */
@@ -24,7 +24,7 @@ class Logger {
 	/**
 	 * Log level priorities (lower = more verbose).
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var array<string, int>
 	 */
@@ -38,7 +38,7 @@ class Logger {
 	/**
 	 * The execution ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var int
 	 */
@@ -47,7 +47,7 @@ class Logger {
 	/**
 	 * The minimum log level to write to database.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @var Log_Type
 	 */
@@ -56,7 +56,7 @@ class Logger {
 	/**
 	 * Constructor.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $execution_id The migration execution ID.
 	 */
@@ -68,7 +68,7 @@ class Logger {
 	/**
 	 * Logs an info message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string            $message The log message.
 	 * @param array<mixed>|null $data    Optional. Additional data to store.
@@ -82,7 +82,7 @@ class Logger {
 	/**
 	 * Logs a warning message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string            $message The log message.
 	 * @param array<mixed>|null $data    Optional. Additional data to store.
@@ -96,7 +96,7 @@ class Logger {
 	/**
 	 * Logs an error message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string            $message The log message.
 	 * @param array<mixed>|null $data    Optional. Additional data to store.
@@ -110,7 +110,7 @@ class Logger {
 	/**
 	 * Logs a debug message.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param string            $message The log message.
 	 * @param array<mixed>|null $data    Optional. Additional data to store.
@@ -124,7 +124,7 @@ class Logger {
 	/**
 	 * Gets the execution ID.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int The execution ID.
 	 */
@@ -135,7 +135,7 @@ class Logger {
 	/**
 	 * Logs a message with the specified type.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Log_Type          $type    The log type.
 	 * @param string            $message The log message.
@@ -165,7 +165,7 @@ class Logger {
 	/**
 	 * Determines the minimum log level to write to the database.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return Log_Type The minimum log level.
 	 */
@@ -178,7 +178,7 @@ class Logger {
 		/**
 		 * Filters the minimum log level for migrations.
 		 *
-		 * @since TBD
+		 * @since 0.0.1
 		 *
 		 * @param Log_Type $minimum_log_level The minimum log level.
 		 *
@@ -190,7 +190,7 @@ class Logger {
 	/**
 	 * Determines if a log message should be written based on the minimum log level.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param Log_Type $type The log type to check.
 	 *

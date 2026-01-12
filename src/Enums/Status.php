@@ -2,7 +2,7 @@
 /**
  * Migrations Statuses Enum.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Enums
  */
@@ -14,7 +14,7 @@ use MyCLabs\Enum\Enum;
 /**
  * Migrations Statuses enum.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @extends Enum<Status::*>
  *
@@ -30,56 +30,56 @@ class Status extends Enum {
 	/**
 	 * Data migration status 'Canceled'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const CANCELED = 'canceled';
 
 	/**
 	 * Data migration status 'Completed'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const COMPLETED = 'completed';
 
 	/**
 	 * Data migration status 'Failed'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const FAILED = 'failed';
 
 	/**
 	 * Data migration status 'Paused'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const PAUSED = 'paused';
 
 	/**
 	 * Data migration status 'Scheduled'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const SCHEDULED = 'scheduled';
 
 	/**
 	 * Data migration status 'Pending'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const PENDING = 'pending';
 
 	/**
 	 * Data migration status 'Running'.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const RUNNING = 'running';
 
 	/**
 	 * Returns the human-readable label for the status.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string The label.
 	 */

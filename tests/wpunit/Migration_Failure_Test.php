@@ -54,7 +54,7 @@ class Migration_Failure_Test extends WPTestCase {
 		$error_logs = array_filter(
 			$logs,
 			function ( $log ) {
-				return $log['type'] === 'error';
+				return $log['type']->getValue() === 'error';
 			}
 		);
 
@@ -87,7 +87,7 @@ class Migration_Failure_Test extends WPTestCase {
 
 		$error_logs = array_filter(
 			$logs,
-			fn( $log ) => $log['type'] === 'error'
+			fn( $log ) => $log['type']->getValue() === 'error'
 		);
 
 		$this->assertNotEmpty( $error_logs, 'Should have error log entries' );
@@ -210,7 +210,7 @@ class Migration_Failure_Test extends WPTestCase {
 		$rollback_scheduled = array_filter(
 			$logs,
 			function ( $log ) {
-				return $log['type'] === 'warning'
+				return $log['type']->getValue() === 'warning'
 					&& strpos( $log['message'], 'Rollback scheduled' ) !== false;
 			}
 		);

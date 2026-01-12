@@ -13,6 +13,7 @@ jobs:
       matrix:
         suite:
           - wpunit
+          - cli_integration
 
     runs-on: ubuntu-latest
 

@@ -93,7 +93,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	public function current(): ?Migration {
 		$migration_class = current( $this->migrations );
 
-		return $migration_class === false ? null : new $migration_class();
+		return $migration_class === false ? null : new $migration_class( key( $this->migrations ) );
 	}
 
 	/**
@@ -130,7 +130,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 */
 	public function offsetGet( $offset ): ?Migration {
 		$migration_class = $this->migrations[ $offset ] ?? null;
-		return $migration_class ? new $migration_class() : null;
+		return $migration_class ? new $migration_class( $offset ) : null;
 	}
 
 	/**
@@ -202,5 +202,53 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 */
 	public function flush(): void {
 		$this->migrations = [];
+	}
+
+	/**
+	 * Filter the migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param callable( Migration ): bool $callback The callback to filter the migrations.
+	 *
+	 * @return self
+	 */
+	public function filter( callable $callback ): self {
+		$migrations = $this->build_migrations();
+		$migrations = array_filter( $migrations, $callback );
+
+		$clean = [];
+
+		foreach ( $migrations as $migration_id => $migration ) {
+			$clean[ $migration_id ] = get_class( $migration );
+		}
+
+		return new self( $clean );
+	}
+
+	/**
+	 * Get all the migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array<Migration>
+	 */
+	public function all(): array {
+		return $this->build_migrations();
+	}
+
+	/**
+	 * Build the migrations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array<string, Migration>
+	 */
+	private function build_migrations(): array {
+		$migrations = [];
+		foreach ( $this->migrations as $migration_id => $migration_class ) {
+			$migrations[ $migration_id ] = new $migration_class( $migration_id );
+		}
+		return $migrations;
 	}
 }

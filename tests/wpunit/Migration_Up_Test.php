@@ -78,7 +78,7 @@ class Migration_Up_Test extends WPTestCase {
 
 		$this->assertNotNull( $execution );
 		$this->assertEquals( 'tests_simple_migration', $execution['migration_id'] );
-		$this->assertContains( $execution['status'], [ 'scheduled', 'running', 'completed' ] );
+		$this->assertContains( $execution['status']->getValue(), [ 'scheduled', 'running', 'completed' ] );
 	}
 
 	/**

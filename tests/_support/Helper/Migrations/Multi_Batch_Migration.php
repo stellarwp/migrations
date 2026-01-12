@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations\Tests\Migrations;
 
 use StellarWP\Migrations\Abstracts\Migration_Abstract;
+use StellarWP\Migrations\Enums\Operation;
 
 /**
  * A migration that requires multiple batches to complete.
@@ -65,7 +66,7 @@ class Multi_Batch_Migration extends Migration_Abstract {
 		return true;
 	}
 
-	public function get_total_items(): int {
+	public function get_total_items( ?Operation $operation = null ): int {
 		return self::$total_batches;
 	}
 
