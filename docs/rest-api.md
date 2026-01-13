@@ -4,7 +4,7 @@ The Migrations library provides REST API endpoints for managing and monitoring m
 
 ## API Namespace
 
-All endpoints are registered under the `{prefix}/v1` namespace, where `{prefix}` is determined by your configured hook prefix (converted to lowercase with underscores/spaces replaced by hyphens).
+All endpoints are registered under the `{prefix}/migrations/v1` namespace, where `{prefix}` is determined by your configured hook prefix (converted to lowercase with underscores/spaces replaced by hyphens).
 
 For example, if you configured:
 
@@ -15,7 +15,7 @@ Config::set_hook_prefix( 'my_plugin' );
 The API base URL will be:
 
 ```
-/wp-json/my-plugin/v1/migrations
+/wp-json/my-plugin/migrations/v1
 ```
 
 ## Authentication
@@ -33,7 +33,7 @@ All endpoints require the `manage_options` capability. Requests must be authenti
 Lists all registered migrations.
 
 ```
-GET /wp-json/{prefix}/v1/migrations
+GET /wp-json/{prefix}/migrations/v1/migrations
 ```
 
 **Parameters:**
@@ -62,11 +62,11 @@ GET /wp-json/{prefix}/v1/migrations
 **Example:**
 
 ```bash
-curl -X GET "https://example.com/wp-json/my-plugin/v1/migrations" \
+curl -X GET "https://example.com/wp-json/my-plugin/migrations/v1/migrations" \
   -H "Authorization: Basic <credentials>"
 
 # Filter by tags
-curl -X GET "https://example.com/wp-json/my-plugin/v1/migrations?tags=database,cleanup" \
+curl -X GET "https://example.com/wp-json/my-plugin/migrations/v1/migrations?tags=database,cleanup" \
   -H "Authorization: Basic <credentials>"
 ```
 
@@ -77,7 +77,7 @@ curl -X GET "https://example.com/wp-json/my-plugin/v1/migrations?tags=database,c
 Schedules a migration for execution.
 
 ```
-POST /wp-json/{prefix}/v1/migrations/{migration_id}/run
+POST /wp-json/{prefix}/migrations/v1/migrations/{migration_id}/run
 ```
 
 **URL Parameters:**
@@ -112,11 +112,11 @@ POST /wp-json/{prefix}/v1/migrations/{migration_id}/run
 
 ```bash
 # Run a migration with default settings
-curl -X POST "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_key/run" \
+curl -X POST "https://example.com/wp-json/my-plugin/migrations/v1/migrations/rename_meta_key/run" \
   -H "Authorization: Basic <credentials>"
 
 # Run specific batches with custom batch size
-curl -X POST "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_key/run" \
+curl -X POST "https://example.com/wp-json/my-plugin/migrations/v1/migrations/rename_meta_key/run" \
   -H "Authorization: Basic <credentials>" \
   -H "Content-Type: application/json" \
   -d '{"from-batch": 5, "to-batch": 10, "batch-size": 50}'
@@ -129,7 +129,7 @@ curl -X POST "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_ke
 Schedules a migration rollback.
 
 ```
-POST /wp-json/{prefix}/v1/migrations/{migration_id}/rollback
+POST /wp-json/{prefix}/migrations/v1/migrations/{migration_id}/rollback
 ```
 
 **URL Parameters:**
@@ -163,7 +163,7 @@ POST /wp-json/{prefix}/v1/migrations/{migration_id}/rollback
 **Example:**
 
 ```bash
-curl -X POST "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_key/rollback" \
+curl -X POST "https://example.com/wp-json/my-plugin/migrations/v1/migrations/rename_meta_key/rollback" \
   -H "Authorization: Basic <credentials>"
 ```
 
@@ -174,7 +174,7 @@ curl -X POST "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_ke
 Lists execution records for a specific migration.
 
 ```
-GET /wp-json/{prefix}/v1/migrations/{migration_id}/executions
+GET /wp-json/{prefix}/migrations/v1/migrations/{migration_id}/executions
 ```
 
 **URL Parameters:**
@@ -203,7 +203,7 @@ GET /wp-json/{prefix}/v1/migrations/{migration_id}/executions
 **Example:**
 
 ```bash
-curl -X GET "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_key/executions" \
+curl -X GET "https://example.com/wp-json/my-plugin/migrations/v1/migrations/rename_meta_key/executions" \
   -H "Authorization: Basic <credentials>"
 ```
 
@@ -214,7 +214,7 @@ curl -X GET "https://example.com/wp-json/my-plugin/v1/migrations/rename_meta_key
 Lists log entries for a specific execution.
 
 ```
-GET /wp-json/{prefix}/v1/executions/{execution_id}/logs
+GET /wp-json/{prefix}/migrations/v1/migrations/executions/{execution_id}/logs
 ```
 
 **URL Parameters:**
@@ -260,15 +260,15 @@ GET /wp-json/{prefix}/v1/executions/{execution_id}/logs
 
 ```bash
 # Get all logs for an execution
-curl -X GET "https://example.com/wp-json/my-plugin/v1/executions/123/logs" \
+curl -X GET "https://example.com/wp-json/my-plugin/migrations/v1/executions/123/logs" \
   -H "Authorization: Basic <credentials>"
 
 # Get only error logs
-curl -X GET "https://example.com/wp-json/my-plugin/v1/executions/123/logs?type=error" \
+curl -X GET "https://example.com/wp-json/my-plugin/migrations/v1/executions/123/logs?type=error" \
   -H "Authorization: Basic <credentials>"
 
 # Search logs with pagination
-curl -X GET "https://example.com/wp-json/my-plugin/v1/executions/123/logs?search=failed&limit=50&offset=0" \
+curl -X GET "https://example.com/wp-json/my-plugin/migrations/v1/executions/123/logs?search=failed&limit=50&offset=0" \
   -H "Authorization: Basic <credentials>"
 ```
 
