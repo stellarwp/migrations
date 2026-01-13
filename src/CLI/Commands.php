@@ -307,7 +307,7 @@ class Commands {
 		try {
 			$items = $this->get_logs( $execution_id, $types, $not_types, $limit, $offset, $order, $order_by, $search );
 			if ( empty( $items ) ) {
-				$this->log( "No logs found for execution '{$execution_id}' of migration '{$migration_id}'." );
+				$this->log( "No logs found for execution '{$execution_id}'." );
 				return;
 			}
 

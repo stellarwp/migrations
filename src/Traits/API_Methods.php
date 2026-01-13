@@ -35,7 +35,7 @@ trait API_Methods {
 	 *
 	 * @param string $tags_string The tags to list migrations for.
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>> The list of migrations.
 	 */
 	protected function get_list( string $tags_string = '' ): array {
 		$tags = array_filter( explode( ',', $tags_string ) );
@@ -57,8 +57,9 @@ trait API_Methods {
 
 		$migrations_as_arrays = [];
 
+		/** @var string $migration_id */
 		foreach ( $items as $migration_id => $migration ) {
-			$migrations_as_arrays[] = array_merge( [ 'id' => $migration_id ], $migration->to_array() );
+			$migrations_as_arrays[ $migration_id ] = array_merge( [ 'id' => $migration_id ], $migration->to_array() );
 		}
 
 		return $migrations_as_arrays;
@@ -78,9 +79,9 @@ trait API_Methods {
 	 * @param string $order_by     The column to order logs by.
 	 * @param string $search       The search term to list logs for.
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 *
-	 * @throws ApiMethodException
+	 * @throws ApiMethodException If invalid arguments are provided.
 	 */
 	public function get_logs( int $execution_id, string $types = '', string $not_types = '', int $limit = 100, int $offset = 0, string $order = 'DESC', string $order_by = 'created_at', string $search = '' ): array {
 		$execution = Migration_Executions::get_by_id( $execution_id );
@@ -163,6 +164,7 @@ trait API_Methods {
 			}
 		}
 
+		/** @var array<string, array<string, mixed>> $logs */
 		$logs = Migration_Logs::paginate(
 			$arguments,
 			$limit
@@ -182,7 +184,7 @@ trait API_Methods {
 	 *
 	 * @param string $migration_id The migration ID to list executions for.
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
 	public function get_executions( string $migration_id ): array {
 		return Migration_Executions::get_all_by( 'migration_id', $migration_id );
