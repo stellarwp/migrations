@@ -51,6 +51,7 @@ use function WP_CLI\Utils\make_progress_bar;
  */
 class Commands {
 	use API_Methods;
+
 	/**
 	 * List registered migrations.
 	 *
