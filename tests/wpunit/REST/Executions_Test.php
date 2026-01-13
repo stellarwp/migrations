@@ -64,7 +64,7 @@ class Executions_Test extends REST_Test_Case {
 	public function it_should_return_401_for_guest_user(): void {
 		wp_set_current_user( 0 );
 
-		$response = $this->do_rest_api_request( '/tests_simple_migration/executions' );
+		$response = $this->do_rest_api_request( '/migrations/tests_simple_migration/executions' );
 
 		$this->assertEquals( 401, $response->get_status() );
 	}
@@ -76,7 +76,7 @@ class Executions_Test extends REST_Test_Case {
 		$user_id = $this->factory()->user->create( [ 'role' => 'editor' ] );
 		wp_set_current_user( $user_id );
 
-		$response = $this->do_rest_api_request( '/tests_simple_migration/executions' );
+		$response = $this->do_rest_api_request( '/migrations/tests_simple_migration/executions' );
 
 		$this->assertEquals( 403, $response->get_status() );
 	}
@@ -87,7 +87,7 @@ class Executions_Test extends REST_Test_Case {
 	public function it_should_return_200_for_admin_user(): void {
 		$this->set_admin_user();
 
-		$response = $this->do_rest_api_request( '/tests_simple_migration/executions' );
+		$response = $this->do_rest_api_request( '/migrations/tests_simple_migration/executions' );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertIsArray( $response->get_data() );
@@ -98,9 +98,9 @@ class Executions_Test extends REST_Test_Case {
 	 */
 	public function it_should_list_executions_for_a_migration(): void {
 		$this->set_admin_user();
-		$this->create_test_executions();
+		$execution_ids = $this->create_test_executions();
 
-		$data = $this->assert_endpoint( '/tests_simple_migration/executions' );
+		$data = $this->assert_endpoint( '/migrations/tests_simple_migration/executions' );
 
 		$this->assertIsArray( $data );
 		$this->assertNotEmpty( $data );
@@ -123,7 +123,7 @@ class Executions_Test extends REST_Test_Case {
 		$this->set_admin_user();
 
 		// Use a migration that hasn't been run.
-		$data = $this->assert_endpoint( '/tests_not_applicable_migration/executions' );
+		$data = $this->assert_endpoint( '/migrations/tests_not_applicable_migration/executions' );
 
 		$this->assertIsArray( $data );
 		// May or may not be empty depending on test state, but should be an array.
@@ -148,7 +148,7 @@ class Executions_Test extends REST_Test_Case {
 			]
 		);
 
-		$data = $this->assert_endpoint( '/tests_simple_migration/executions' );
+		$data = $this->assert_endpoint( '/migrations/tests_simple_migration/executions' );
 
 		// All returned executions should be for the simple migration.
 		foreach ( $data as $execution ) {
@@ -163,7 +163,7 @@ class Executions_Test extends REST_Test_Case {
 		$this->set_admin_user();
 		$this->create_test_executions();
 
-		$data = $this->assert_endpoint( '/tests_simple_migration/executions' );
+		$data = $this->assert_endpoint( '/migrations/tests_simple_migration/executions' );
 
 		$statuses = array_column( $data, 'status' );
 
@@ -179,7 +179,7 @@ class Executions_Test extends REST_Test_Case {
 		$fixture();
 
 		$expected_code = $this->get_expected_status_code();
-		$response      = $this->do_rest_api_request( '/tests_simple_migration/executions' );
+		$response      = $this->do_rest_api_request( '/migrations/tests_simple_migration/executions' );
 
 		$this->assertEquals( $expected_code, $response->get_status() );
 	}

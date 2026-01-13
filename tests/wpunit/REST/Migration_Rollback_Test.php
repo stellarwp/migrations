@@ -43,7 +43,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 	public function it_should_return_401_for_guest_user(): void {
 		wp_set_current_user( 0 );
 
-		$response = $this->do_rest_api_request( '/tests_simple_migration/rollback', 'POST' );
+		$response = $this->do_rest_api_request( '/migrations/tests_simple_migration/rollback', 'POST' );
 
 		$this->assertEquals( 401, $response->get_status() );
 	}
@@ -55,7 +55,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 		$user_id = $this->factory()->user->create( [ 'role' => 'editor' ] );
 		wp_set_current_user( $user_id );
 
-		$response = $this->do_rest_api_request( '/tests_simple_migration/rollback', 'POST' );
+		$response = $this->do_rest_api_request( '/migrations/tests_simple_migration/rollback', 'POST' );
 
 		$this->assertEquals( 403, $response->get_status() );
 	}
@@ -66,7 +66,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 	public function it_should_rollback_a_simple_migration(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/tests_simple_migration/rollback', 'POST', 200 );
+		$data = $this->assert_endpoint( '/migrations/tests_simple_migration/rollback', 'POST', 200 );
 
 		$this->assertArrayHasKey( 'success', $data );
 		$this->assertTrue( $data['success'] );
@@ -88,7 +88,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 	public function it_should_create_execution_record_when_rolling_back_migration(): void {
 		$this->set_admin_user();
 
-		$this->assert_endpoint( '/tests_simple_migration/rollback', 'POST', 200 );
+		$this->assert_endpoint( '/migrations/tests_simple_migration/rollback', 'POST', 200 );
 
 		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_simple_migration' );
 
@@ -105,7 +105,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 	public function it_should_return_error_for_nonexistent_migration(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/nonexistent_migration_xyz/rollback', 'POST', 400 );
+		$data = $this->assert_endpoint( '/migrations/nonexistent_migration_xyz/rollback', 'POST', 400 );
 
 		$this->assertArrayHasKey( 'code', $data );
 		$this->assertEquals( 'migrations_error', $data['code'] );
@@ -118,7 +118,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 		$this->set_admin_user();
 
 		$data = $this->assert_endpoint(
-			'/tests_multi_batch_migration/rollback',
+			'/migrations/tests_multi_batch_migration/rollback',
 			'POST',
 			200,
 			[ 'from-batch' => 2 ]
@@ -134,7 +134,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 		$this->set_admin_user();
 
 		$data = $this->assert_endpoint(
-			'/tests_multi_batch_migration/rollback',
+			'/migrations/tests_multi_batch_migration/rollback',
 			'POST',
 			200,
 			[ 'to-batch' => 2 ]
@@ -150,7 +150,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 		$this->set_admin_user();
 
 		$data = $this->assert_endpoint(
-			'/tests_multi_batch_migration/rollback',
+			'/migrations/tests_multi_batch_migration/rollback',
 			'POST',
 			200,
 			[ 'batch-size' => 10 ]
@@ -166,7 +166,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 		$this->set_admin_user();
 
 		$data = $this->assert_endpoint(
-			'/tests_multi_batch_migration/rollback',
+			'/migrations/tests_multi_batch_migration/rollback',
 			'POST',
 			200,
 			[
@@ -190,7 +190,7 @@ class Migration_Rollback_Test extends REST_Test_Case {
 		$fixture();
 
 		$expected_code = $this->get_expected_status_code();
-		$response      = $this->do_rest_api_request( '/tests_simple_migration/rollback', 'POST' );
+		$response      = $this->do_rest_api_request( '/migrations/tests_simple_migration/rollback', 'POST' );
 
 		$this->assertEquals( $expected_code, $response->get_status() );
 	}

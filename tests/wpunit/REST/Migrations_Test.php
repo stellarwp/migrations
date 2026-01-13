@@ -29,7 +29,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_return_401_for_guest_user(): void {
 		wp_set_current_user( 0 );
 
-		$response = $this->do_rest_api_request( '/' );
+		$response = $this->do_rest_api_request( '/migrations' );
 
 		$this->assertEquals( 401, $response->get_status() );
 	}
@@ -41,7 +41,7 @@ class Migrations_Test extends REST_Test_Case {
 		$user_id = $this->factory()->user->create( [ 'role' => 'subscriber' ] );
 		wp_set_current_user( $user_id );
 
-		$response = $this->do_rest_api_request( '/' );
+		$response = $this->do_rest_api_request( '/migrations' );
 
 		$this->assertEquals( 403, $response->get_status() );
 	}
@@ -53,7 +53,7 @@ class Migrations_Test extends REST_Test_Case {
 		$user_id = $this->factory()->user->create( [ 'role' => 'editor' ] );
 		wp_set_current_user( $user_id );
 
-		$response = $this->do_rest_api_request( '/' );
+		$response = $this->do_rest_api_request( '/migrations' );
 
 		$this->assertEquals( 403, $response->get_status() );
 	}
@@ -64,7 +64,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_return_200_for_admin_user(): void {
 		$this->set_admin_user();
 
-		$response = $this->do_rest_api_request( '/' );
+		$response = $this->do_rest_api_request( '/migrations' );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertIsArray( $response->get_data() );
@@ -76,7 +76,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_list_all_migrations(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/' );
+		$data = $this->assert_endpoint( '/migrations' );
 
 		$this->assertIsArray( $data );
 		$this->assertNotEmpty( $data );
@@ -100,7 +100,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_filter_migrations_by_tag(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/', 'GET', 200, [ 'tags' => 'data' ] );
+		$data = $this->assert_endpoint( '/migrations', 'GET', 200, [ 'tags' => 'data' ] );
 
 		$this->assertIsArray( $data );
 		$this->assertNotEmpty( $data );
@@ -117,7 +117,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_filter_migrations_by_multiple_tags(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/', 'GET', 200, [ 'tags' => 'data,test' ] );
+		$data = $this->assert_endpoint( '/migrations', 'GET', 200, [ 'tags' => 'data,test' ] );
 
 		$this->assertIsArray( $data );
 
@@ -135,7 +135,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_return_empty_array_for_nonexistent_tag(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/', 'GET', 200, [ 'tags' => 'nonexistent_tag_xyz' ] );
+		$data = $this->assert_endpoint( '/migrations', 'GET', 200, [ 'tags' => 'nonexistent_tag_xyz' ] );
 
 		$this->assertIsArray( $data );
 		$this->assertEmpty( $data );
@@ -147,7 +147,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_include_multi_batch_migration(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/' );
+		$data = $this->assert_endpoint( '/migrations' );
 
 		$multi_batch = array_filter( $data, fn( $m ) => $m['id'] === 'tests_multi_batch_migration' );
 		$this->assertNotEmpty( $multi_batch );
@@ -163,7 +163,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_include_simple_migration(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/' );
+		$data = $this->assert_endpoint( '/migrations' );
 
 		$simple = array_filter( $data, fn( $m ) => $m['id'] === 'tests_simple_migration' );
 		$this->assertNotEmpty( $simple );
@@ -179,7 +179,7 @@ class Migrations_Test extends REST_Test_Case {
 	public function it_should_show_is_applicable_false_for_non_applicable_migration(): void {
 		$this->set_admin_user();
 
-		$data = $this->assert_endpoint( '/', 'GET', 200, [ 'tags' => 'legacy' ] );
+		$data = $this->assert_endpoint( '/migrations', 'GET', 200, [ 'tags' => 'legacy' ] );
 
 		$not_applicable = array_filter( $data, fn( $m ) => $m['id'] === 'tests_not_applicable_migration' );
 		$this->assertNotEmpty( $not_applicable );
@@ -196,7 +196,7 @@ class Migrations_Test extends REST_Test_Case {
 		$fixture();
 
 		$expected_code = $this->get_expected_status_code();
-		$response      = $this->do_rest_api_request( '/' );
+		$response      = $this->do_rest_api_request( '/migrations' );
 
 		$this->assertEquals( $expected_code, $response->get_status() );
 	}
