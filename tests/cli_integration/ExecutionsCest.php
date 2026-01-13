@@ -205,6 +205,6 @@ class ExecutionsCest {
 			]
 		);
 
-		Assert::assertSame( 'No executions found.', $output );
+		Assert::assertSame( 'No executions found.' . PHP_EOL, $output );
 	}
 }
