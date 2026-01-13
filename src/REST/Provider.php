@@ -74,7 +74,7 @@ class Provider extends Provider_Abstract {
 		// List migrations.
 		register_rest_route(
 			$namespace,
-			'/',
+			'/migrations',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
@@ -94,7 +94,7 @@ class Provider extends Provider_Abstract {
 		// Run a migration.
 		register_rest_route(
 			$namespace,
-			'/(?P<migration_id>[a-zA-Z0-9_-]+)/run',
+			'/migrations/(?P<migration_id>[a-zA-Z0-9_-]+)/run',
 			[
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
@@ -129,7 +129,7 @@ class Provider extends Provider_Abstract {
 		// Rollback a migration.
 		register_rest_route(
 			$namespace,
-			'/(?P<migration_id>[a-zA-Z0-9_-]+)/rollback',
+			'/migrations/(?P<migration_id>[a-zA-Z0-9_-]+)/rollback',
 			[
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
@@ -164,7 +164,7 @@ class Provider extends Provider_Abstract {
 		// List executions for a migration.
 		register_rest_route(
 			$namespace,
-			'/(?P<migration_id>[a-zA-Z0-9_-]+)/executions',
+			'/migrations/(?P<migration_id>[a-zA-Z0-9_-]+)/executions',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
