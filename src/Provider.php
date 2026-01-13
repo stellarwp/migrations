@@ -19,7 +19,7 @@ use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
-use StellarWP\Migrations\Tasks\Cleanup_Logs;
+use StellarWP\Migrations\Tasks\Clear_Logs;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\Contracts\Migration;
@@ -120,8 +120,8 @@ class Provider extends Provider_Abstract {
 		add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
 		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
 
-		// Schedule the cleanup logs task to run daily.
-		$this->schedule_cleanup_logs_task();
+		// Schedule the clear old logs task to run daily.
+		$this->schedule_clear_logs_task();
 	}
 
 	/**
@@ -268,33 +268,33 @@ class Provider extends Provider_Abstract {
 	}
 
 	/**
-	 * Dispatch the cleanup logs task.
+	 * Dispatch the clear logs task.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
-	public function dispatch_cleanup_logs_task(): void {
-		shepherd()->dispatch( new Cleanup_Logs() );
+	public function dispatch_clear_logs_task(): void {
+		shepherd()->dispatch( new Clear_Logs() );
 	}
 
 	/**
-	 * Schedule the cleanup logs task to run daily.
+	 * Schedule the clear logs task to run daily.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
-	private function schedule_cleanup_logs_task(): void {
+	private function schedule_clear_logs_task(): void {
 		$prefix = Config::get_hook_prefix();
-		$hook   = "stellarwp_migrations_{$prefix}_cleanup_logs";
+		$hook   = "stellarwp_migrations_{$prefix}_clear_logs";
 
 		// Schedule the task if it's not already scheduled.
 		if ( ! wp_next_scheduled( $hook ) ) {
 			wp_schedule_event( time(), 'daily', $hook );
 		}
 
-		// Hook into the scheduled event to dispatch the cleanup task.
-		add_action( $hook, [ $this, 'dispatch_cleanup_logs_task' ] );
+		// Hook into the scheduled event to dispatch the clear logs task.
+		add_action( $hook, [ $this, 'dispatch_clear_logs_task' ] );
 	}
 }
