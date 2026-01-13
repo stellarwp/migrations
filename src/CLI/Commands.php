@@ -23,7 +23,8 @@ use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
-use StellarWP\Migrations\Abstracts\API_Abstract;
+use StellarWP\Migrations\Exceptions\ApiMethodException;
+use StellarWP\Migrations\Traits\API_Methods;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
 
@@ -48,7 +49,8 @@ use function WP_CLI\Utils\make_progress_bar;
  *     # Show migration status
  *     $ wp migrations status
  */
-class Commands extends API_Abstract {
+class Commands {
+	use API_Methods;
 	/**
 	 * List registered migrations.
 	 *
@@ -89,10 +91,17 @@ class Commands extends API_Abstract {
 		/** @var string $tags_string */
 		$tags_string = $this->get_param( $assoc_args, 'tags', '' );
 
+		$items = $this->get_list( $tags_string );
+
+		if ( empty( $items ) ) {
+			$this->log( 'No migrations found.' );
+			return;
+		}
+
 		/** @var string $format */
 		$format = $this->get_param( $assoc_args, 'format', 'table' );
 
-		$this->real_list( $tags_string, $format );
+		$this->display_items_in_format( $items, [ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'status' ], $format );
 	}
 
 	/**
@@ -294,7 +303,17 @@ class Commands extends API_Abstract {
 		/** @var string $search */
 		$search = $this->get_param( $assoc_args, 'search', '' );
 
-		$this->real_logs( $execution_id, $format, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+		try {
+			$items = $this->get_logs( $execution_id, $types, $not_types, $limit, $offset, $order, $order_by, $search );
+			if ( empty( $items ) ) {
+				$this->log( "No logs found for execution '{$execution_id}' of migration '{$migration_id}'." );
+				return;
+			}
+
+			$this->display_items_in_format( $items, [ 'id', 'type', 'message', 'data', 'created_at' ], $format );
+		} catch ( ApiMethodException $e ) {
+			$this->error( $e->getMessage() );
+		}
 	}
 
 	/**
@@ -336,7 +355,14 @@ class Commands extends API_Abstract {
 		/** @var string $format */
 		$format = $this->get_param( $assoc_args, 'format', 'table' );
 
-		$this->real_executions( Cast::to_string( $migration_id ), $format );
+		$executions = $this->get_executions( Cast::to_string( $migration_id ) );
+
+		if ( empty( $executions ) ) {
+			$this->log( 'No executions found.' );
+			return;
+		}
+
+		$this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
 	}
 
 	/**

@@ -20,9 +20,10 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Tables\Migration_Executions;
-use StellarWP\Migrations\Abstracts\API_Abstract;
+use StellarWP\Migrations\Traits\API_Methods;
 use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Exceptions\ApiMethodException;
 use StellarWP\DB\DB;
 use function StellarWP\Shepherd\shepherd;
 
@@ -33,43 +34,8 @@ use function StellarWP\Shepherd\shepherd;
  *
  * @package StellarWP\Migrations\REST
  */
-class Endpoints extends API_Abstract {
-
-	/**
-	 * The last error message.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var string|null
-	 */
-	protected ?string $last_error = null;
-
-	/**
-	 * The collected items for display.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var array<int|string, array<string, mixed>>
-	 */
-	protected array $collected_items = [];
-
-	/**
-	 * The columns for the collected items.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var array<string>
-	 */
-	protected array $collected_columns = [];
-
-	/**
-	 * Log messages collected during operation.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var array<string>
-	 */
-	protected array $log_messages = [];
+class Endpoints {
+	use API_Methods;
 
 	/**
 	 * Check if the current user can manage migrations.
@@ -97,14 +63,11 @@ class Endpoints extends API_Abstract {
 		/** @var string $tags_string */
 		$tags_string = $request->get_param( 'tags' ) ?? '';
 
-		$result = $this->real_list( $tags_string, 'json' );
+		$items = $this->get_list( $tags_string );
 
-		// Handle empty result from base class (returns void when no items).
-		if ( ! $result instanceof WP_REST_Response ) {
-			return new WP_REST_Response( [], 200 );
-		}
+		$items = $this->normalize_items( $items, 'json' );
 
-		return $result;
+		return new WP_REST_Response( $items, 200 );
 	}
 
 	/**
@@ -148,7 +111,7 @@ class Endpoints extends API_Abstract {
 	 *
 	 * @return WP_REST_Response
 	 */
-	public function logs( WP_REST_Request $request ) {
+	public function logs( WP_REST_Request $request ): WP_REST_Response {
 		$execution_id = $request->get_param( 'execution_id' ) ?? null;
 
 		if ( ! ( $execution_id && is_numeric( $execution_id ) ) ) {
@@ -170,14 +133,15 @@ class Endpoints extends API_Abstract {
 		/** @var string $search */
 		$search = $request->get_param( 'search' ) ?? '';
 
-		$result = $this->real_logs( $execution_id, 'json', $types, $not_types, $limit, $offset, $order, $order_by, $search );
+		try {
+			$items = $this->get_logs( $execution_id, $types, $not_types, $limit, $offset, $order, $order_by, $search );
 
-		// Handle empty result or error from base class.
-		if ( ! $result instanceof WP_REST_Response ) {
-			return new WP_REST_Response( [], 200 );
+			$items = $this->normalize_items( $items, 'json' );
+
+			return new WP_REST_Response( $items, 200 );
+		} catch ( ApiMethodException $e ) {
+			return $this->error( $e->getMessage() );
 		}
-
-		return $result;
 	}
 
 	/**
@@ -208,14 +172,11 @@ class Endpoints extends API_Abstract {
 			return $this->error( "Migration with ID {$migration_id} not found." );
 		}
 
-		$result = $this->real_executions( $migration_id, 'json' );
+		$items = $this->get_executions( $migration_id );
 
-		// Handle empty result from base class.
-		if ( ! $result instanceof WP_REST_Response ) {
-			return new WP_REST_Response( [], 200 );
-		}
+		$items = $this->normalize_items( $items, 'json' );
 
-		return $result;
+		return new WP_REST_Response( $items, 200 );
 	}
 
 	/**
@@ -298,24 +259,6 @@ class Endpoints extends API_Abstract {
 			],
 			200
 		);
-	}
-
-	/**
-	 * Display items in the specified format.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @param array<int|string, array<string, mixed>> $items   The items to display.
-	 * @param array<string>                           $columns The columns to display.
-	 * @param string                                  $format  The format to display the items in.
-	 *
-	 * @return WP_REST_Response
-	 */
-	protected function display_items_in_format( array $items, array $columns, string $format = 'json' ): WP_REST_Response {
-		// Format is only JSON for REST endpoints.
-		$items = $this->normalize_items( $items, 'json' );
-
-		return new WP_REST_Response( $items, 200 );
 	}
 
 	/**

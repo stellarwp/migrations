@@ -1,44 +1,43 @@
 <?php
 /**
- * WP-CLI Commands for Migrations.
+ * API Abstract Trait for Migrations.
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\CLI
+ * @package StellarWP\Migrations\Traits
  */
 
 declare(strict_types=1);
 
-namespace StellarWP\Migrations\Abstracts;
+namespace StellarWP\Migrations\Traits;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Exceptions\ApiMethodException;
 use DateTimeInterface;
 use MyCLabs\Enum\Enum;
-use WP_REST_Response;
 
 /**
- * Manage database migrations.
+ * API Methods Trait for Migrations.
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\Abstracts
+ * @package StellarWP\Migrations\Traits
  */
-abstract class API_Abstract {
+trait API_Methods {
 	/**
 	 * List registered migrations.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @param string $tags_string The tags to list migrations for.
-	 * @param string $format The format to list migrations in.
 	 *
-	 * @return void|WP_REST_Response
+	 * @return array
 	 */
-	protected function real_list( string $tags_string = '', string $format = 'table' ) {
+	protected function get_list( string $tags_string = '' ): array {
 		$tags = array_filter( explode( ',', $tags_string ) );
 
 		$container = Config::get_container();
@@ -53,8 +52,7 @@ abstract class API_Abstract {
 		$items = $registry->all();
 
 		if ( empty( $items ) ) {
-			$this->log( 'No migrations found.' );
-			return;
+			return [];
 		}
 
 		$migrations_as_arrays = [];
@@ -63,7 +61,7 @@ abstract class API_Abstract {
 			$migrations_as_arrays[] = array_merge( [ 'id' => $migration_id ], $migration->to_array() );
 		}
 
-		return $this->display_items_in_format( $migrations_as_arrays, [ 'id', 'label', 'description', 'tags', 'total_batches', 'can_run', 'is_applicable', 'status' ], $format );
+		return $migrations_as_arrays;
 	}
 
 	/**
@@ -72,7 +70,6 @@ abstract class API_Abstract {
 	 * @since 0.0.1
 	 *
 	 * @param int    $execution_id The execution ID to list logs for.
-	 * @param string $format       The format to list logs in.
 	 * @param string $types        The types to list logs for.
 	 * @param string $not_types    The types to not list logs for.
 	 * @param int    $limit        The limit of logs to list.
@@ -81,23 +78,21 @@ abstract class API_Abstract {
 	 * @param string $order_by     The column to order logs by.
 	 * @param string $search       The search term to list logs for.
 	 *
-	 * @return void|WP_REST_Response
+	 * @return array
+	 *
+	 * @throws ApiMethodException
 	 */
-	public function real_logs( int $execution_id, string $format = 'table', string $types = '', string $not_types = '', int $limit = 100, int $offset = 0, string $order = 'DESC', string $order_by = 'created_at', string $search = '' ) {
-		if ( ! $execution_id ) {
-			return $this->error( 'Execution ID is required.' );
-		}
-
+	public function get_logs( int $execution_id, string $types = '', string $not_types = '', int $limit = 100, int $offset = 0, string $order = 'DESC', string $order_by = 'created_at', string $search = '' ): array {
 		$execution = Migration_Executions::get_by_id( $execution_id );
 
 		if ( ! $execution || ! is_array( $execution ) ) {
-			return $this->error( "Execution with ID '{$execution_id}' not found." );
+			throw new ApiMethodException( "Execution with ID '{$execution_id}' not found." );
 		}
 
 		$migration_id = ! empty( $execution['migration_id'] ) ? $execution['migration_id'] : false;
 
 		if ( ! $migration_id ) {
-			return $this->error( "Execution with ID '{$execution_id}' not found." );
+			throw new ApiMethodException( "Execution with ID '{$execution_id}' not found." );
 		}
 
 		$container = Config::get_container();
@@ -106,18 +101,18 @@ abstract class API_Abstract {
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
-			return $this->error( "The migration associated with execution '{$execution_id}' is no longer available." );
+			throw new ApiMethodException( "The migration associated with execution '{$execution_id}' is no longer available." );
 		}
 
 		// Validate order direction.
 		if ( ! in_array( $order, [ 'ASC', 'DESC' ], true ) ) {
-			return $this->error( 'Invalid order direction. Use ASC or DESC.' );
+			throw new ApiMethodException( 'Invalid order direction. Use ASC or DESC.' );
 		}
 
 		// Validate order-by column.
 		$allowed_order_by = [ 'id', 'type', 'created_at' ];
 		if ( ! in_array( $order_by, $allowed_order_by, true ) ) {
-			return $this->error( sprintf( 'Invalid order-by column. Allowed: %s', implode( ', ', $allowed_order_by ) ) );
+			throw new ApiMethodException( sprintf( 'Invalid order-by column. Allowed: %s', implode( ', ', $allowed_order_by ) ) );
 		}
 
 		$arguments = [
@@ -137,7 +132,7 @@ abstract class API_Abstract {
 		}
 
 		if ( $types && $not_types ) {
-			return $this->error( 'Cannot filter by type and not-type at the same time. Use one or the other.' );
+			throw new ApiMethodException( 'Cannot filter by type and not-type at the same time. Use one or the other.' );
 		}
 
 		if ( $types ) {
@@ -174,15 +169,10 @@ abstract class API_Abstract {
 		);
 
 		if ( empty( $logs ) ) {
-			$this->log( "No logs found for execution '{$execution_id}' of migration '{$migration_id}'." );
-			return;
+			return [];
 		}
 
-		return $this->display_items_in_format(
-			$logs,
-			[ 'id', 'type', 'message', 'data', 'created_at' ],
-			$format
-		);
+		return $logs;
 	}
 
 	/**
@@ -191,18 +181,11 @@ abstract class API_Abstract {
 	 * @since 0.0.1
 	 *
 	 * @param string $migration_id The migration ID to list executions for.
-	 * @param string $format The format to list executions in.
 	 *
-	 * @return void|WP_REST_Response
+	 * @return array
 	 */
-	public function real_executions( string $migration_id, string $format = 'table' ) {
-		if ( ! $migration_id ) {
-			return $this->error( 'Migration ID is required.' );
-		}
-
-		$executions = Migration_Executions::get_all_by( 'migration_id', $migration_id );
-
-		return $this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
+	public function get_executions( string $migration_id ): array {
+		return Migration_Executions::get_all_by( 'migration_id', $migration_id );
 	}
 
 	/**
@@ -291,39 +274,4 @@ abstract class API_Abstract {
 
 		return $normalized;
 	}
-
-	/**
-	 * Log a message.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @param string $message The message to log.
-	 *
-	 * @return void
-	 */
-	abstract protected function log( string $message ): void;
-
-	/**
-	 * Log an error message.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @param string $message The error message to log.
-	 *
-	 * @return void|WP_REST_Response
-	 */
-	abstract protected function error( string $message );
-
-	/**
-	 * Display items in a format.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @param array<mixed>  $items The items to display.
-	 * @param array<string> $columns The columns to display.
-	 * @param string        $format The format to display the items in.
-	 *
-	 * @return void|WP_REST_Response
-	 */
-	abstract protected function display_items_in_format( array $items, array $columns, string $format = 'table' );
 }
