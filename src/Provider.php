@@ -123,7 +123,7 @@ class Provider extends Provider_Abstract {
 		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
 
 		// Schedule the clear old logs task to run daily.
-		shepherd()->dispatch( new Clear_Logs(), DAY_IN_SECONDS );
+		add_action( 'shutdown', [ $this, 'dispatch_clear_logs_task' ], 100 );
 	}
 
 	/**
@@ -267,5 +267,16 @@ class Provider extends Provider_Abstract {
 		 * @since 0.0.1
 		 */
 		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
+	}
+
+	/**
+	 * Dispatch the clear logs task.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function dispatch_clear_logs_task(): void {
+		shepherd()->dispatch( new Clear_Logs(), DAY_IN_SECONDS );
 	}
 }
