@@ -19,6 +19,7 @@ use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
+use StellarWP\Migrations\Tasks\Clear_Logs;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\Contracts\Migration;
@@ -118,6 +119,9 @@ class Provider extends Provider_Abstract {
 
 		add_action( 'shutdown', [ $this, 'trigger_migrations_scheduling_action' ], 100 );
 		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
+
+		// Schedule the clear old logs task to run daily.
+		shepherd()->dispatch( new Clear_Logs(), DAY_IN_SECONDS );
 	}
 
 	/**

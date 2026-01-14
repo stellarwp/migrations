@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use StellarWP\DB\DB;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
@@ -28,12 +29,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_create_execute_task_with_correct_arguments(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Act.
 		$task = new Execute( 'up', 'test_migration', 1, 1, $execution_id );
@@ -52,12 +54,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_have_correct_task_prefix_for_up(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Act.
 		$task = new Execute( 'up', 'test_migration', 1, 1, $execution_id );
@@ -71,12 +74,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_have_correct_task_prefix_for_down(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Act.
 		$task = new Execute( 'down', 'test_migration', 1, 1, $execution_id );
@@ -90,12 +94,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_have_correct_group(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		$prefix = Config::get_hook_prefix();
 
@@ -111,12 +116,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_not_allow_retries(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Act.
 		$task = new Execute( 'up', 'test_migration', 1, 1, $execution_id );
@@ -130,12 +136,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_throw_if_method_is_invalid(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Assert.
 		$this->expectException( InvalidArgumentException::class );
@@ -150,12 +157,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_throw_if_batch_is_zero(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Assert.
 		$this->expectException( InvalidArgumentException::class );
@@ -170,12 +178,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_throw_if_batch_is_negative(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'test_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		// Assert.
 		$this->expectException( InvalidArgumentException::class );
@@ -190,12 +199,13 @@ class Execute_Task_Test extends WPTestCase {
 	 */
 	public function it_should_throw_if_migration_not_found(): void {
 		// Arrange.
-		$execution_id = Migration_Executions::insert(
+		Migration_Executions::insert(
 			[
 				'migration_id' => 'non_existent_migration',
 				'status'       => Status::SCHEDULED()->getValue(),
 			]
 		);
+		$execution_id = (int) DB::last_insert_id();
 
 		$task = new Execute( 'up', 'non_existent_migration', 1, 1, $execution_id );
 
