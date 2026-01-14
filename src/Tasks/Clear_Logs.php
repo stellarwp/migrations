@@ -149,17 +149,4 @@ class Clear_Logs extends Task_Abstract {
 	public function get_group(): string {
 		return sprintf( '%s_migrations', Config::get_hook_prefix() );
 	}
-
-	/**
-	 * Validate the task's arguments.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 *
-	 * @throws InvalidArgumentException If the task's arguments are invalid.
-	 */
-	protected function validate_args(): void {
-		// This task doesn't require any arguments.
-	}
 }

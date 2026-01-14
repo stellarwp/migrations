@@ -121,7 +121,7 @@ class Provider extends Provider_Abstract {
 		add_action( "stellarwp_migrations_{$prefix}_schedule_migrations", [ $this, 'schedule_migrations' ] );
 
 		// Schedule the clear old logs task to run daily.
-		$this->schedule_clear_logs_task();
+		shepherd()->dispatch( new Clear_Logs(), DAY_IN_SECONDS );
 	}
 
 	/**
@@ -265,36 +265,5 @@ class Provider extends Provider_Abstract {
 		 * @since 0.0.1
 		 */
 		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
-	}
-
-	/**
-	 * Dispatch the clear logs task.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 */
-	public function dispatch_clear_logs_task(): void {
-		shepherd()->dispatch( new Clear_Logs() );
-	}
-
-	/**
-	 * Schedule the clear logs task to run daily.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 */
-	private function schedule_clear_logs_task(): void {
-		$prefix = Config::get_hook_prefix();
-		$hook   = "stellarwp_migrations_{$prefix}_clear_logs";
-
-		// Schedule the task if it's not already scheduled.
-		if ( ! wp_next_scheduled( $hook ) ) {
-			wp_schedule_event( time(), 'daily', $hook );
-		}
-
-		// Hook into the scheduled event to dispatch the clear logs task.
-		add_action( $hook, [ $this, 'dispatch_clear_logs_task' ] );
 	}
 }
