@@ -21,6 +21,7 @@ use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
+use StellarWP\Migrations\REST\Provider as REST_Provider;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use function StellarWP\Shepherd\shepherd;
@@ -110,6 +111,7 @@ class Provider extends Provider_Abstract {
 		$prefix = Config::get_hook_prefix();
 
 		$this->container->get( CLI_Provider::class )->register();
+		$this->container->get( REST_Provider::class )->register();
 
 		// During WP-CLI execution, we don't need to schedule migrations, we'll run them directly.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {

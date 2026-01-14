@@ -27,7 +27,7 @@ use DateTimeInterface;
  *
  * @package StellarWP\Migrations\Tables
  *
- * @method static array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }[] get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
+ * @method static array<string, array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }> get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
  * @method static ?array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface } get_first_by( string $column, $value )
  * @method static ?array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface } get_by_id( $id )
  */

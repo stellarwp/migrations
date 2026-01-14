@@ -14,13 +14,13 @@ use StellarWP\Migrations\Enums\Operation;
 /**
  * Student Meta Migration class.
  *
- * @since TBD
+ * @since 0.0.1
  */
 class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Checks if the migration is applicable to the current site.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool True if the migration is applicable, false otherwise.
 	 */
@@ -31,7 +31,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Returns the total number of items for the migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int Total number of items.
 	 */
@@ -42,7 +42,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Returns the default batch size for the migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int Default batch size.
 	 */
@@ -53,7 +53,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Checks if the migration has been completed.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool True if the migration has been completed, false otherwise.
 	 */
@@ -64,7 +64,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Gets the count of distinct users that need to be migrated.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return int Count of distinct users.
 	 */
@@ -81,7 +81,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Checks if the migration has been rolled back.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return bool True if the migration has been rolled back, false otherwise.
 	 */
@@ -93,7 +93,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Executes the migration logic for a single batch.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @param int $batch      The batch number.
 	 * @param int $batch_size The batch size.
@@ -131,7 +131,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Returns the base query for the migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return QueryBuilder The base query for the migration.
 	 */
@@ -157,7 +157,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Returns the human-readable migration label.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string Migration label.
 	 */
@@ -168,7 +168,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Returns the migration description.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return string Migration description.
 	 */
@@ -179,7 +179,7 @@ class Student_Meta_Migration extends Migration_Abstract {
 	/**
 	 * Returns the list of tags for the migration.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string> Array of tags.
 	 */

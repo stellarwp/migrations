@@ -15,7 +15,7 @@ use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
 /**
  * Tests migration execution tracking throughout the lifecycle.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations
  */
