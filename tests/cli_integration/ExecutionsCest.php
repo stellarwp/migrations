@@ -25,7 +25,7 @@ class ExecutionsCest {
 				'option',
 				'delete',
 				'test_plugin_multi_batch_processed',
-			] 
+			]
 		);
 
 		// Clean up executions for test migrations to ensure consistent test state.
@@ -34,7 +34,7 @@ class ExecutionsCest {
 				'db',
 				'query',
 				"DELETE FROM wp_stellarwp_bar_migration_executions WHERE migration_id LIKE 'tests_%'",
-			] 
+			]
 		);
 	}
 
@@ -49,7 +49,7 @@ class ExecutionsCest {
 				'migrations',
 				'run',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		$output = $I->cliToString(
@@ -59,7 +59,7 @@ class ExecutionsCest {
 				'executions',
 				'tests_simple_migration',
 				'--format=json',
-			] 
+			]
 		);
 
 		$executions = json_decode( $output, true );
@@ -90,7 +90,7 @@ class ExecutionsCest {
 				'migrations',
 				'run',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		$output = $I->cliToString(
@@ -100,7 +100,7 @@ class ExecutionsCest {
 				'executions',
 				'tests_simple_migration',
 				'--format=table',
-			] 
+			]
 		);
 
 		// Table format should contain headers.
@@ -124,7 +124,7 @@ class ExecutionsCest {
 				'migrations',
 				'run',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		$I->cli(
@@ -133,7 +133,7 @@ class ExecutionsCest {
 				'migrations',
 				'run',
 				'tests_simple_migration',
-			] 
+			]
 		);
 
 		$output = $I->cliToString(
@@ -143,7 +143,7 @@ class ExecutionsCest {
 				'executions',
 				'tests_simple_migration',
 				'--format=json',
-			] 
+			]
 		);
 
 		$executions = json_decode( $output, true );
@@ -164,7 +164,7 @@ class ExecutionsCest {
 				'migrations',
 				'run',
 				'tests_multi_batch_migration',
-			] 
+			]
 		);
 
 		$output = $I->cliToString(
@@ -174,7 +174,7 @@ class ExecutionsCest {
 				'executions',
 				'tests_multi_batch_migration',
 				'--format=json',
-			] 
+			]
 		);
 
 		$executions = json_decode( $output, true );
@@ -202,14 +202,9 @@ class ExecutionsCest {
 				'executions',
 				'tests_not_applicable_migration',
 				'--format=json',
-			] 
+			]
 		);
 
-		// Should return empty array or no results.
-		$executions = json_decode( $output, true );
-		// It's valid if empty or if array (could have previous test runs).
-		Assert::assertIsArray( $executions );
-		// Empty result should be an empty array.
-		Assert::assertEmpty( $executions );
+		Assert::assertSame( 'No executions found.' . PHP_EOL, $output );
 	}
 }

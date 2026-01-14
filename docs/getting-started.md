@@ -279,5 +279,7 @@ Failures during `down()` are recorded but do not trigger additional rollbacks.
 
 ## Next Steps
 
-- [Migration Contract](./migration-contract.md) - Full API reference.
-- [Hooks Reference](./hooks.md) - Available actions and filters.
+- [Migration Contract](./migration-contract.md) - Full API reference
+- [CLI Reference](./cli.md) - WP-CLI commands for migrations
+- [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Hooks Reference](./hooks.md) - Available actions and filters
