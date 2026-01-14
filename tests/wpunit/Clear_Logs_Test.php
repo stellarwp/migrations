@@ -173,10 +173,7 @@ class Clear_Logs_Test extends WPTestCase {
 
 		codecept_debug( $old_logs );
 
-
-		// Original logs should be deleted, only summary log should remain.
-		$this->assertCount( 1, $old_logs, 'Should have only one summary log entry after deletion' );
-		$this->assertStringContainsString( 'Old logs deleted on', $old_logs[0]['message'] );
+		$this->assertCount( 0, $old_logs, 'Old logs should be deleted' );
 
 		$recent_logs = Migration_Logs::get_all_by( 'migration_execution_id', $recent_execution_id );
 		$this->assertCount( 1, $recent_logs, 'Recent logs should not be deleted' );
@@ -186,7 +183,7 @@ class Clear_Logs_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_create_summary_log_entry_after_deleting_logs(): void {
+	public function it_should_delete_all_old_logs(): void {
 		// Arrange.
 		$old_date = gmdate( 'Y-m-d H:i:s', strtotime( '-200 days' ) );
 
@@ -215,17 +212,8 @@ class Clear_Logs_Test extends WPTestCase {
 
 		// Assert.
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
-		// Original log should be deleted, only summary log should remain.
-		$this->assertCount( 1, $logs, 'Should have only one summary log entry' );
 
-		$summary_log = $logs[0];
-		$this->assertEquals( Log_Type::INFO()->getValue(), $summary_log['type']->getValue() );
-		$this->assertStringContainsString( 'Old logs deleted on', $summary_log['message'] );
-		$this->assertStringContainsString( 'Migration execution status: completed', $summary_log['message'] );
-		$this->assertArrayHasKey( 'deletion_date', $summary_log['data'] );
-		$this->assertArrayHasKey( 'migration_status', $summary_log['data'] );
-		$this->assertArrayHasKey( 'retention_days', $summary_log['data'] );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $summary_log['data']['migration_status'] );
+		$this->assertCount( 0, $logs, 'All old logs should be deleted' );
 	}
 
 	/**
@@ -285,9 +273,8 @@ class Clear_Logs_Test extends WPTestCase {
 
 		// Assert.
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id );
-		// Summary log should be created even when no logs existed.
-		$this->assertCount( 1, $logs, 'Should create summary log even when no logs existed' );
-		$this->assertStringContainsString( 'Old logs deleted on', $logs[0]['message'] );
+
+		$this->assertCount( 0, $logs, 'Should have no logs when execution had no logs' );
 	}
 
 	/**
@@ -341,16 +328,12 @@ class Clear_Logs_Test extends WPTestCase {
 
 		// Assert.
 		$logs_1 = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id_1 );
-		// Original log should be deleted, only summary log should remain.
-		$this->assertCount( 1, $logs_1, 'Should have only summary log for execution 1' );
-		$this->assertStringContainsString( 'Old logs deleted on', $logs_1[0]['message'] );
-		$this->assertStringContainsString( 'completed', $logs_1[0]['message'] );
+
+		$this->assertCount( 0, $logs_1, 'All logs should be deleted for execution 1' );
 
 		$logs_2 = Migration_Logs::get_all_by( 'migration_execution_id', $execution_id_2 );
-		// Original log should be deleted, only summary log should remain.
-		$this->assertCount( 1, $logs_2, 'Should have only summary log for execution 2' );
-		$this->assertStringContainsString( 'Old logs deleted on', $logs_2[0]['message'] );
-		$this->assertStringContainsString( 'failed', $logs_2[0]['message'] );
+
+		$this->assertCount( 0, $logs_2, 'All logs should be deleted for execution 2' );
 	}
 
 	/**
@@ -414,9 +397,8 @@ class Clear_Logs_Test extends WPTestCase {
 
 		// Assert.
 		$old_logs = Migration_Logs::get_all_by( 'migration_execution_id', $old_execution_id );
-		// Original log should be deleted, only summary log should remain.
-		$this->assertCount( 1, $old_logs, 'Should have only summary log for old execution' );
-		$this->assertStringContainsString( 'Old logs deleted on', $old_logs[0]['message'] );
+
+		$this->assertCount( 0, $old_logs, 'Old logs should be deleted' );
 
 		$recent_logs = Migration_Logs::get_all_by( 'migration_execution_id', $recent_execution_id );
 		$this->assertCount( 1, $recent_logs, 'Recent logs should not be deleted' );

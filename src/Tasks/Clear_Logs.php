@@ -14,14 +14,12 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Tasks;
 
 use StellarWP\DB\DB;
+use StellarWP\DB\QueryBuilder\QueryBuilder;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tables\Migration_Logs;
-use StellarWP\Migrations\Utilities\Logger;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
-use stdClass;
-use StellarWP\Migrations\Utilities\Cast;
 
 /**
  * Task to clear old migration logs.
@@ -71,58 +69,24 @@ class Clear_Logs extends Task_Abstract {
 		// Calculate the cutoff date.
 		$cutoff_date = gmdate( 'Y-m-d H:i:s', (int) strtotime( "-{$retention_days} days" ) );
 
-		// Get all executions older than the retention period.
-
-		$old_executions = DB::table( Migration_Executions::table_name( false ) )
-			->select( 'id', 'status' )
-			->where( 'end_date_gmt', $cutoff_date, '<' )
-			->getAll();
-
-		if (
-			! is_array( $old_executions )
-			|| empty( $old_executions )
-		) {
-			// No executions to process.
-			return;
-		}
-
-		// Delete all logs for these execution IDs.
+		// Delete all logs for executions older than the retention period.
 
 		$deleted_count = DB::table( Migration_Logs::table_name( false ) )
-			->whereIn(
+			->where(
 				'migration_execution_id',
-				array_column( $old_executions, 'id' )
+				function ( QueryBuilder $builder ) use ( $cutoff_date ) {
+					$builder
+					->select( 'id' )
+					->from( Migration_Executions::table_name( false ) )
+					->where( 'end_date_gmt', $cutoff_date, '<' );
+				},
+				'IN'
 			)
 			->delete();
 
 		if ( false === $deleted_count ) {
 			throw new ShepherdTaskFailWithoutRetryException(
 				'Failed to delete old migration logs.'
-			);
-		}
-
-		// Add summary log entries for each execution that was processed.
-
-		$deletion_date = current_time( 'mysql', true );
-
-		/** @var stdClass $execution */
-		foreach ( $old_executions as $execution ) {
-			$execution_id = Cast::to_int( $execution->id );
-			$status       = Cast::to_string( $execution->status );
-
-			$logger = new Logger( $execution_id );
-
-			$logger->info(
-				sprintf(
-					'Old logs deleted on %s. Migration execution status: %s.',
-					$deletion_date,
-					$status
-				),
-				[
-					'deletion_date'    => $deletion_date,
-					'migration_status' => $status,
-					'retention_days'   => $retention_days,
-				]
 			);
 		}
 	}
