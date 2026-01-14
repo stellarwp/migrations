@@ -20,7 +20,6 @@ use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Utilities\Logger;
 use StellarWP\Shepherd\Abstracts\Task_Abstract;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
-use InvalidArgumentException;
 use stdClass;
 use StellarWP\Migrations\Utilities\Cast;
 
