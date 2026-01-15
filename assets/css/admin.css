@@ -1,0 +1,455 @@
+/**
+ * Migrations Admin Styles
+ *
+ * @package StellarWP\Migrations
+ */
+
+.stellarwp-migrations-filters {
+	margin-bottom: 20px;
+	max-width: 1200px;
+}
+
+.stellarwp-migrations-filters__row {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.stellarwp-migrations-filters__field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.stellarwp-migrations-filters__actions {
+	display: flex;
+	gap: 8px;
+}
+
+.stellarwp-migrations-filters__checkboxes {
+	align-items: center;
+	display: flex;
+	gap: 16px;
+	margin-left: auto;
+}
+
+.stellarwp-migrations-filters__checkboxes label {
+	align-items: center;
+	color: #1d2327;
+	cursor: pointer;
+	display: flex;
+	font-size: 13px;
+	gap: 6px;
+	white-space: nowrap;
+}
+
+.stellarwp-migrations-filters__checkboxes input[type="checkbox"] {
+	margin: 0;
+}
+
+.stellarwp-migrations-filters__field--tags {
+	flex: 1;
+	max-width: 400px;
+	min-width: 250px;
+}
+
+.stellarwp-migrations-filters__field--tags .select2-container {
+	width: 100% !important;
+}
+
+/* Make Select2 compact to match button height */
+.stellarwp-migrations-filters__field--tags .select2-container--default .select2-selection--multiple {
+	border-color: #8c8f94;
+	border-radius: 3px;
+	max-height: 30px;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 2px 4px;
+}
+
+.stellarwp-migrations-filters__field--tags .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+	line-height: 1;
+	padding: 0;
+}
+
+.stellarwp-migrations-filters__field--tags .select2-container--default .select2-selection--multiple .select2-selection__choice {
+	background-color: #f0f0f1;
+	border-color: #c3c4c7;
+	font-size: 12px;
+	line-height: 1.3;
+	margin: 1px 2px 1px 0;
+	padding: 2px 4px 2px 6px;
+}
+
+.stellarwp-migrations-filters__field--tags .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+	margin-right: 3px;
+}
+
+.stellarwp-migrations-filters__field--tags .select2-container--default .select2-search--inline .select2-search__field {
+	font-size: 13px;
+	height: 22px;
+	line-height: 22px;
+	margin: 0;
+	padding: 0;
+}
+
+
+/* List Container */
+.stellarwp-migrations-list {
+	max-width: 1200px;
+}
+
+.stellarwp-migrations-empty {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	color: #646970;
+	padding: 20px;
+	text-align: center;
+}
+
+/* Migration Card */
+.stellarwp-migration-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	margin-bottom: 16px;
+	padding: 20px;
+}
+
+.stellarwp-migration-card:last-child {
+	margin-bottom: 0;
+}
+
+.stellarwp-migration-card__header {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.stellarwp-migration-card__label {
+	color: #1d2327;
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0;
+}
+
+.stellarwp-migration-card__label a {
+	color: #2271b1;
+	text-decoration: none;
+}
+
+.stellarwp-migration-card__label a:hover {
+	color: #135e96;
+	text-decoration: underline;
+}
+
+.stellarwp-migration-card__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.stellarwp-migration-card__tag {
+	background: #f0f0f1;
+	border-radius: 3px;
+	color: #50575e;
+	font-size: 11px;
+	letter-spacing: 0.5px;
+	padding: 2px 8px;
+	text-transform: uppercase;
+}
+
+.stellarwp-migration-card__description {
+	color: #50575e;
+	font-size: 14px;
+	line-height: 1.5;
+	margin: 0 0 16px;
+}
+
+.stellarwp-migration-card__separator {
+	border: none;
+	border-top: 1px solid #f0f0f1;
+	margin: 0 0 16px;
+}
+
+.stellarwp-migration-card__footer {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.stellarwp-migration-card__status {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	min-width: 120px;
+}
+
+.stellarwp-migration-card__status-label {
+	border-radius: 3px;
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 4px 10px;
+	text-transform: capitalize;
+}
+
+/* Status Colors */
+.stellarwp-migration-card__status-label--pending {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.stellarwp-migration-card__status-label--scheduled {
+	background: #e7f5fe;
+	color: #0a4b78;
+}
+
+.stellarwp-migration-card__status-label--running {
+	background: #fef8e7;
+	color: #8b6914;
+}
+
+.stellarwp-migration-card__status-label--completed {
+	background: #edfaef;
+	color: #1e7e34;
+}
+
+.stellarwp-migration-card__status-label--failed {
+	background: #fcf0f1;
+	color: #8b1a1a;
+}
+
+.stellarwp-migration-card__status-label--paused {
+	background: #fef8e7;
+	color: #8b6914;
+}
+
+.stellarwp-migration-card__status-label--canceled {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.stellarwp-migration-card__status-label--not-applicable {
+	background: #f0f0f1;
+	color: #8c8f94;
+}
+
+.stellarwp-migration-card__progress-text {
+	color: #646970;
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Progress Bar */
+.stellarwp-migration-progress {
+	flex: 1;
+	max-width: 300px;
+	min-width: 150px;
+}
+
+.stellarwp-migration-progress__bar {
+	background: #f0f0f1;
+	border-radius: 10px;
+	height: 10px;
+	overflow: hidden;
+}
+
+.stellarwp-migration-progress__fill {
+	border-radius: 10px;
+	height: 100%;
+	transition: width 0.3s ease;
+}
+
+/* Progress Fill Colors by Status */
+.stellarwp-migration-progress__fill--pending {
+	background: #c3c4c7;
+}
+
+.stellarwp-migration-progress__fill--scheduled {
+	background: #72aee6;
+}
+
+.stellarwp-migration-progress__fill--running {
+	animation: stellarwp-migrations-progress-stripe 1s linear infinite;
+	background: #f0b849;
+	background-image: linear-gradient(
+		-45deg,
+		rgba(255, 255, 255, 0.2) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(255, 255, 255, 0.2) 50%,
+		rgba(255, 255, 255, 0.2) 75%,
+		transparent 75%,
+		transparent
+	);
+	background-size: 20px 20px;
+}
+
+.stellarwp-migration-progress__fill--completed {
+	background: #00a32a;
+}
+
+.stellarwp-migration-progress__fill--failed {
+	background: #d63638;
+}
+
+.stellarwp-migration-progress__fill--paused {
+	background: #f0b849;
+}
+
+.stellarwp-migration-progress__fill--canceled {
+	background: #c3c4c7;
+}
+
+@keyframes stellarwp-migrations-progress-stripe {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 20px 0;
+	}
+}
+
+/* Actions */
+.stellarwp-migration-card__actions {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	margin-left: auto;
+}
+
+.stellarwp-migration-btn {
+	align-items: center;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	cursor: pointer;
+	display: inline-flex;
+	font-size: 13px;
+	font-weight: 500;
+	justify-content: center;
+	line-height: 1.4;
+	padding: 6px 12px;
+	text-decoration: none;
+	transition: all 0.1s ease;
+}
+
+.stellarwp-migration-btn:disabled,
+.stellarwp-migration-btn--loading {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.stellarwp-migration-btn--loading {
+	position: relative;
+}
+
+.stellarwp-migration-btn--loading::after {
+	animation: stellarwp-migrations-spin 0.6s linear infinite;
+	border: 2px solid transparent;
+	border-radius: 50%;
+	border-top-color: currentColor;
+	content: "";
+	height: 12px;
+	margin-left: 8px;
+	position: absolute;
+	width: 12px;
+}
+
+@keyframes stellarwp-migrations-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.stellarwp-migration-btn--primary {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+}
+
+.stellarwp-migration-btn--primary:hover:not(:disabled) {
+	background: #135e96;
+	border-color: #135e96;
+}
+
+.stellarwp-migration-btn--primary:focus {
+	box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2271b1;
+	outline: none;
+}
+
+.stellarwp-migration-btn--secondary {
+	background: #f6f7f7;
+	border-color: #c3c4c7;
+	color: #2271b1;
+}
+
+.stellarwp-migration-btn--secondary:hover:not(:disabled) {
+	background: #f0f0f1;
+	border-color: #8c8f94;
+	color: #135e96;
+}
+
+.stellarwp-migration-btn--secondary:focus {
+	box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2271b1;
+	outline: none;
+}
+
+.stellarwp-migration-btn--danger {
+	background: #d63638;
+	border-color: #d63638;
+	color: #fff;
+}
+
+.stellarwp-migration-btn--danger:hover:not(:disabled) {
+	background: #b32d2e;
+	border-color: #b32d2e;
+}
+
+/* Message Area */
+.stellarwp-migration-card__message {
+	border-radius: 4px;
+	font-size: 13px;
+	line-height: 1.5;
+	margin-top: 16px;
+	padding: 12px 16px;
+}
+
+.stellarwp-migration-card__message--success {
+	background: #edfaef;
+	border: 1px solid #c3e6cb;
+	color: #1e7e34;
+}
+
+.stellarwp-migration-card__message--error {
+	background: #fcf0f1;
+	border: 1px solid #f5c6cb;
+	color: #8b1a1a;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+	.stellarwp-migration-card__footer {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.stellarwp-migration-card__status {
+		justify-content: space-between;
+	}
+
+	.stellarwp-migration-progress {
+		max-width: none;
+	}
+
+	.stellarwp-migration-card__actions {
+		justify-content: flex-start;
+		margin-left: 0;
+	}
+}
