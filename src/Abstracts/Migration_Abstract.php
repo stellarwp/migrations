@@ -15,6 +15,7 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Enums\Status;
+use DateTimeInterface;
 
 /**
  * Base class for migrations.
@@ -233,7 +234,8 @@ abstract class Migration_Abstract implements Migration {
 	/**
 	 * Get the migration status.
 	 *
-	 * Queries the database for the latest execution of this migration
+	 * Returns NOT_APPLICABLE for non-applicable migrations.
+	 * Otherwise queries the database for the latest execution
 	 * and returns its status. If no executions exist, returns PENDING.
 	 *
 	 * @since 0.0.1
@@ -241,8 +243,28 @@ abstract class Migration_Abstract implements Migration {
 	 * @return Status The current status of the migration.
 	 */
 	public function get_status(): Status {
-		/** @var array<int, array{status?: Status}> $latest_execution */
-		$latest_execution = Migration_Executions::paginate(
+		if ( ! $this->is_applicable() ) {
+			return Status::NOT_APPLICABLE();
+		}
+
+		$latest_execution = $this->get_latest_execution();
+
+		if ( empty( $latest_execution['status'] ) || ! $latest_execution['status'] instanceof Status ) {
+			return Status::PENDING();
+		}
+
+		return $latest_execution['status'];
+	}
+
+	/**
+	 * Get the latest execution for this migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }|null The execution data or null if none found.
+	 */
+	public function get_latest_execution(): ?array {
+		$executions = Migration_Executions::paginate(
 			[
 				'order'        => 'DESC',
 				'orderby'      => 'created_at',
@@ -256,10 +278,19 @@ abstract class Migration_Abstract implements Migration {
 			1
 		);
 
-		if ( empty( $latest_execution[0]['status'] ) || ! $latest_execution[0]['status'] instanceof Status ) {
-			return Status::PENDING();
-		}
+		return $executions[0] ?? null;
+	}
 
-		return $latest_execution[0]['status'];
+	/**
+	 * Get the number of items processed in the latest execution.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return int The number of items processed.
+	 */
+	public function get_items_processed(): int {
+		$latest_execution = $this->get_latest_execution();
+
+		return empty( $latest_execution['items_processed'] ) ? 0 : $latest_execution['items_processed'];
 	}
 }

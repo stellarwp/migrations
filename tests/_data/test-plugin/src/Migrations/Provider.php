@@ -30,5 +30,6 @@ class Provider extends Provider_Abstract {
 		$registry['tests_multi_batch_migration']    = Multi_Batch_Migration::class;
 		$registry['tests_not_applicable_migration'] = Not_Applicable_Migration::class;
 		$registry['tests_failing_migration']        = Failing_Migration::class;
+		$registry['tests_tagged_migration']         = Tagged_Migration::class;
 	}
 }

@@ -23,6 +23,7 @@ use StellarWP\Migrations\Provider;
 use StellarWP\Migrations\Config;
 use StellarWP\ContainerContract\ContainerInterface;
 use Test_Plugin\Migrations\Provider as MigrationsProvider;
+use Test_Plugin\Admin\Provider as AdminProvider;
 use Test_Plugin\Container;
 
 function test_plugin_get_container(): ContainerInterface {
@@ -46,5 +47,6 @@ add_action(
 
 		$container->register( Provider::class );
 		$container->register( MigrationsProvider::class );
+		$container->register( AdminProvider::class );
 	}
 );
