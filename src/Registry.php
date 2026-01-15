@@ -231,7 +231,7 @@ class Registry implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array<Migration>
+	 * @return array<string,Migration>
 	 */
 	public function all(): array {
 		return $this->build_migrations();
