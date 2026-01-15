@@ -6,7 +6,7 @@
  *
  * @package StellarWP\Migrations\views
  *
- * @var array<array<string,StellarWP\Migrations\Contracts\Migration>>              $migrations    Array of migration data.
+ * @var list<StellarWP\Migrations\Contracts\Migration>                             $migrations    List of migrations objects.
  * @var list<string>                                                               $all_tags      All available tags.
  * @var array{tags: list<string>, show_completed: bool, show_non_applicable: bool} $filters       Current filter values.
  * @var string                                                                     $rest_base_url REST API base URL.

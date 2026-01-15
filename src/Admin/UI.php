@@ -108,7 +108,7 @@ class UI {
 	 *
 	 * @param array<string,mixed> $filters Filters to apply.
 	 *
-	 * @return array<string,Migration> Filtered migrations.
+	 * @return list<Migration> Filtered migrations.
 	 */
 	private function get_filtered_migrations( array $filters ): array {
 		$show_completed      = ! empty( $filters['show_completed'] );
@@ -117,7 +117,7 @@ class UI {
 
 		$registry = Config::get_container()->get( Registry::class );
 
-		return $registry->filter(
+		$migrations = $registry->filter(
 			static function ( Migration $migration ) use ( $show_completed, $show_non_applicable, $filter_tags ): bool {
 				if ( ! $show_non_applicable && $migration->get_status()->equals( Status::NOT_APPLICABLE() ) ) {
 					return false;
@@ -136,5 +136,81 @@ class UI {
 				return true;
 			}
 		)->all();
+
+		return $this->sort_migrations( $migrations );
+	}
+
+	/**
+	 * Sort migrations by status priority and then by latest execution date.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<string,Migration> $migrations Migrations to sort.
+	 *
+	 * @return list<Migration> Sorted migrations.
+	 */
+	private function sort_migrations( array $migrations ): array {
+		$status_priority = $this->get_status_priority();
+
+		usort(
+			$migrations,
+			static function ( Migration $a, Migration $b ) use ( $status_priority ): int {
+				$status_a = $a->get_status()->getValue();
+				$status_b = $b->get_status()->getValue();
+
+				$priority_a = $status_priority[ $status_a ] ?? 999;
+				$priority_b = $status_priority[ $status_b ] ?? 999;
+
+				// First sort by status priority.
+				if ( $priority_a !== $priority_b ) {
+					return $priority_a <=> $priority_b;
+				}
+
+				// Then sort by latest execution date (newest first).
+				$execution_a = $a->get_latest_execution();
+				$execution_b = $b->get_latest_execution();
+
+				$date_a = $execution_a['created_at'] ?? null;
+				$date_b = $execution_b['created_at'] ?? null;
+
+				// Migrations with executions come before those without.
+				if ( $date_a === null && $date_b === null ) {
+					return 0;
+				}
+				if ( $date_a === null ) {
+					return 1;
+				}
+				if ( $date_b === null ) {
+					return -1;
+				}
+
+				// Newest first (descending order).
+				return $date_b <=> $date_a;
+			}
+		);
+
+		return $migrations;
+	}
+
+	/**
+	 * Get status priority map for sorting.
+	 *
+	 * Lower numbers have higher priority (appear first).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array<string,int> Status value to priority map.
+	 */
+	private function get_status_priority(): array {
+		return [
+			Status::RUNNING()->getValue()        => 1,
+			Status::FAILED()->getValue()         => 2,
+			Status::PAUSED()->getValue()         => 3,
+			Status::PENDING()->getValue()        => 4,
+			Status::SCHEDULED()->getValue()      => 5,
+			Status::CANCELED()->getValue()       => 6,
+			Status::NOT_APPLICABLE()->getValue() => 7,
+			Status::COMPLETED()->getValue()      => 8,
+		];
 	}
 }
