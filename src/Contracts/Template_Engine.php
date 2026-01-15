@@ -30,9 +30,9 @@ interface Template_Engine {
 	 *
 	 * @param string              $name    Template name (e.g., 'list', 'components/progress-bar').
 	 * @param array<string,mixed> $context Variables to pass to the template.
-	 * @param bool                $echo    Whether to echo or return the output.
+	 * @param bool                $output  Whether to echo or return the output.
 	 *
 	 * @return string|void The rendered template if $echo is false, void otherwise.
 	 */
-	public function template( string $name, array $context = [], bool $echo = true );
+	public function template( string $name, array $context = [], bool $output = true );
 }

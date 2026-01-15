@@ -35,8 +35,8 @@ class Provider extends Provider_Abstract {
 	 */
 	public function add_admin_page(): void {
 		add_menu_page(
-			__( 'Migrations', 'test-plugin' ),
-			__( 'Migrations', 'test-plugin' ),
+			'Migrations',
+			'Migrations',
 			'manage_options',
 			'test-plugin-migrations',
 			[ $this, 'render_page' ],
@@ -56,8 +56,8 @@ class Provider extends Provider_Abstract {
 
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Migrations', 'test-plugin' ); ?></h1>
-			<p><?php esc_html_e( 'Manage your database migrations below.', 'test-plugin' ); ?></p>
+			<h1>Migrations</h1>
+			<p>Manage your database migrations below.</p>
 
 			<?php
 			// Render the migrations list UI.

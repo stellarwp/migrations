@@ -28,13 +28,13 @@ $template = Config::get_template_engine();
 <div class="wrap">
 	<form method="get" class="stellarwp-migrations-filters">
 		<?php
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Display only, no state change.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Display only, no state change.
 		if ( isset( $_GET['page'] ) ) :
 			?>
 			<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( Cast::to_string( $_GET['page'] ) ) ) ); ?>" />
 			<?php
 		endif;
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		?>
 
 		<div class="stellarwp-migrations-filters__row">
