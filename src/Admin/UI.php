@@ -13,7 +13,6 @@ namespace StellarWP\Migrations\Admin;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
-use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
 
@@ -79,12 +78,15 @@ class UI {
 		$tags = [];
 
 		if ( isset( $_GET['tags'] ) ) {
-			if ( is_array( $_GET['tags'] ) ) {
-				$tags = array_map( static fn( $tag ) => sanitize_text_field( (string) $tag ), $_GET['tags'] );
-			} elseif ( is_string( $_GET['tags'] ) && strstr( $_GET['tags'], ',' ) ) {
-				$tags = array_map( static fn( $tag ) => sanitize_text_field( (string) $tag ), explode( ',', $_GET['tags'] ) );
-			} elseif ( is_string( $_GET['tags'] ) ) {
-				$tags = [ sanitize_text_field( (string) $_GET['tags'] ) ];
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization happens in array_map.
+			$raw_tags = $_GET['tags'];
+			if ( is_array( $raw_tags ) ) {
+				$tags = array_map( static fn( $tag ): string => is_string( $tag ) ? sanitize_text_field( $tag ) : '', $raw_tags );
+				$tags = array_filter( $tags );
+			} elseif ( is_string( $raw_tags ) && strstr( $raw_tags, ',' ) ) {
+				$tags = array_map( 'sanitize_text_field', explode( ',', $raw_tags ) );
+			} elseif ( is_string( $raw_tags ) ) {
+				$tags = [ sanitize_text_field( $raw_tags ) ];
 			} else {
 				$tags = [];
 			}
@@ -105,7 +107,7 @@ class UI {
 	 *
 	 * @param array<string,mixed> $filters Filters to apply.
 	 *
-	 * @return array<array<string,mixed>> Filtered migrations.
+	 * @return array<string,Migration> Filtered migrations.
 	 */
 	private function get_filtered_migrations( array $filters ): array {
 		$show_completed      = ! empty( $filters['show_completed'] );

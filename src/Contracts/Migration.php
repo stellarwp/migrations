@@ -12,6 +12,7 @@ namespace StellarWP\Migrations\Contracts;
 use JsonSerializable;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Enums\Status;
+use DateTimeInterface;
 
 /**
  * Interface for migrations.
@@ -262,4 +263,22 @@ interface Migration extends JsonSerializable {
 	 * @return Status
 	 */
 	public function get_status(): Status;
+
+	/**
+	 * Get the latest execution for this migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }|null The execution data or null if none found.
+	 */
+	public function get_latest_execution(): ?array;
+
+	/**
+	 * Get the number of items processed in the latest execution.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return int The number of items processed.
+	 */
+	public function get_items_processed(): int;
 }
