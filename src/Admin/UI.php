@@ -63,7 +63,6 @@ class UI {
 				'all_tags'      => $all_tags,
 				'filters'       => $filters,
 				'rest_base_url' => rest_url( REST_Provider::get_namespace() ),
-				'nonce'         => wp_create_nonce( 'wp_rest' ),
 			]
 		);
 	}
