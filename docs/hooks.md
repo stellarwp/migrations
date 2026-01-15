@@ -237,3 +237,13 @@ During a failure:
 1. `stellarwp_migrations_{prefix}_{method}_batch_failed`
 1. `stellarwp_migrations_{prefix}_batch_failed`
 1. (If `up` failed) Rollback is automatically dispatched.
+
+---
+
+## Next Steps
+
+- [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
+- [CLI Reference](./cli.md) - WP-CLI commands for migrations
+- [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Getting Started](./getting-started.md) - Basic usage guide
+- [Migration Contract](./migration-contract.md) - Full API reference
