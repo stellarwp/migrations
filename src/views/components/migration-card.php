@@ -6,7 +6,7 @@
  *
  * @package StellarWP\Migrations\views\components
  *
- * @var Migration $migration Migration object.
+ * @var StellarWP\Migrations\Contracts\Migration $migration Migration object.
  */
 
 defined( 'ABSPATH' ) || exit;

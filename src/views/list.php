@@ -6,16 +6,16 @@
  *
  * @package StellarWP\Migrations\views
  *
- * @var array<array<string,Migration>>                                             $migrations    Array of migration data.
+ * @var array<array<string,StellarWP\Migrations\Contracts\Migration>>              $migrations    Array of migration data.
  * @var list<string>                                                               $all_tags      All available tags.
- * @var array<tags: list<string>, show_completed: bool, show_non_applicable: bool> $filters       Current filter values.
+ * @var array{tags: list<string>, show_completed: bool, show_non_applicable: bool} $filters       Current filter values.
  * @var string                                                                     $rest_base_url REST API base URL.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
-use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Utilities\Cast;
 
 $migrations    ??= [];
 $all_tags      ??= [];
@@ -31,7 +31,7 @@ $template = Config::get_template_engine();
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Display only, no state change.
 		if ( isset( $_GET['page'] ) ) :
 			?>
-			<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['page'] ) ) ); ?>" />
+			<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( Cast::to_string($_GET['page']) ) ) ); ?>" />
 			<?php
 		endif;
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
