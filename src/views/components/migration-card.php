@@ -11,7 +11,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-use StellarWP\Migrations\Admin\UI;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
