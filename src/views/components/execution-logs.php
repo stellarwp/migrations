@@ -9,8 +9,17 @@
  * @package StellarWP\Migrations\views\components
  *
  * @var StellarWP\Migrations\Contracts\Migration $migration     Migration object.
- * @var list<array<string,mixed>>                $executions    List of execution records.
  * @var string                                   $rest_base_url REST API base URL.
+ * @var list<array{
+ *     id: int,
+ *     migration_id: string,
+ *     start_date_gmt: DateTimeInterface,
+ *     end_date_gmt: DateTimeInterface,
+ *     status: StellarWP\Migrations\Enums\Status,
+ *     items_total: int,
+ *     items_processed: int,
+ *     created_at: DateTimeInterface
+ * }> $executions List of execution records.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -59,12 +68,15 @@ $rest_base_url ??= '';
 						$date_label,
 						$status_label
 					);
+
+					$start_date = $execution['start_date_gmt'] instanceof DateTimeInterface ? wp_date( 'M j, Y g:i:s a', $execution['start_date_gmt']->getTimestamp() ) : '';
+					$end_date   = $execution['end_date_gmt'] instanceof DateTimeInterface ? wp_date( 'M j, Y g:i:s a', $execution['end_date_gmt']->getTimestamp() ) : '';
 					?>
 					<option
 						value="<?php echo esc_attr( (string) $exec_id ); ?>"
 						<?php selected( 0 === $index ); ?>
-						data-start="<?php echo $execution['start_date_gmt'] instanceof DateTimeInterface ? esc_attr( wp_date( 'M j, Y g:i:s a', $execution['start_date_gmt']->getTimestamp() ) ) : ''; ?>"
-						data-end="<?php echo $execution['end_date_gmt'] instanceof DateTimeInterface ? esc_attr( wp_date( 'M j, Y g:i:s a', $execution['end_date_gmt']->getTimestamp() ) ) : ''; ?>"
+						data-start="<?php echo esc_attr( $start_date && is_string( $start_date ) ? $start_date : '' ); ?>"
+						data-end="<?php echo esc_attr( $end_date && is_string( $end_date ) ? $end_date : '' ); ?>"
 						data-status="<?php echo $exec_status instanceof Status ? esc_attr( $exec_status->getValue() ) : ''; ?>"
 					>
 						<?php echo esc_html( $label ); ?>

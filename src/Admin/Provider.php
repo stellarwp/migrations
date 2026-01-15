@@ -57,9 +57,8 @@ class Provider {
 	 * @return void
 	 */
 	public function register_hidden_pages(): void {
-		// Using null as parent_slug makes it hidden from the menu.
 		add_submenu_page(
-			null,
+			'',
 			__( 'Migration Details', 'stellarwp-migrations' ),
 			__( 'Migration Details', 'stellarwp-migrations' ),
 			'manage_options',
@@ -77,7 +76,7 @@ class Provider {
 	 */
 	public function render_single_page(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only, no state change.
-		$migration_id = isset( $_GET['migration_id'] ) ? sanitize_text_field( wp_unslash( $_GET['migration_id'] ) ) : '';
+		$migration_id = isset( $_GET['migration_id'] ) && is_string( $_GET['migration_id'] ) ? sanitize_text_field( wp_unslash( $_GET['migration_id'] ) ) : '';
 
 		if ( empty( $migration_id ) ) {
 			Config::get_template_engine()->template(

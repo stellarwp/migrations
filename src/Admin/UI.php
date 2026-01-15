@@ -17,6 +17,7 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use DateTimeInterface;
 
 /**
  * Admin UI.
@@ -116,7 +117,7 @@ class UI {
 	 *
 	 * @param string $migration_id The migration ID.
 	 *
-	 * @return array<int,array<string,mixed>> List of execution records.
+	 * @return array<string, array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }> List of execution records.
 	 */
 	private function get_migration_executions( string $migration_id ): array {
 		return Migration_Executions::get_all_by(
