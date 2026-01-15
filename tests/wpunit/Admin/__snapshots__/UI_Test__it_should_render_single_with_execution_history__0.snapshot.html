@@ -1,0 +1,118 @@
+<div class="wrap stellarwp-migration-single" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1" data-migration-id="tests_simple_migration">
+	<div class="stellarwp-migration-single__header">
+		<h1 class="stellarwp-migration-single__label">Simple Migration</h1>
+		<p class="stellarwp-migration-single__description">This is a simple migration that runs a single batch.</p>
+	</div>
+
+	<h2 class="stellarwp-migration-single__section-title">Status</h2>
+	<div class="stellarwp-migration-status-card" data-migration-id="tests_simple_migration">
+	<div class="stellarwp-migration-status-card__content">
+		<div class="stellarwp-migration-status-card__status">
+			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--completed">
+				Completed			</span>
+							<span class="stellarwp-migration-card__progress-text">
+					1 / 1				</span>
+					</div>
+
+					<div class="stellarwp-migration-status-card__progress">
+				<div class="stellarwp-migration-progress">
+	<div class="stellarwp-migration-progress__bar">
+		<div
+			class="stellarwp-migration-progress__fill stellarwp-migration-progress__fill--completed"
+			style="width: 100%;"
+		></div>
+	</div>
+</div>
+			</div>
+		
+		<div class="stellarwp-migration-card__actions">
+										<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--secondary" data-action="rollback">
+					Rollback				</button>
+					</div>
+	</div>
+
+	<hr class="stellarwp-migration-card__separator" />
+
+	<div class="stellarwp-migration-status-card__timing">
+					<span class="stellarwp-migration-status-card__not-started">
+				Not yet started			</span>
+			</div>
+
+	<div class="stellarwp-migration-card__message" style="display: none;"></div>
+</div>
+
+	<h2 class="stellarwp-migration-single__section-title">Configuration</h2>
+	<div class="stellarwp-migration-config-box">
+	<div class="stellarwp-migration-config-box__grid">
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label">Total Items</span>
+			<span class="stellarwp-migration-config-box__value">1</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label">Batch Size</span>
+			<span class="stellarwp-migration-config-box__value">1</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label">Total Batches</span>
+			<span class="stellarwp-migration-config-box__value">1</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label">Retry Attempts</span>
+			<span class="stellarwp-migration-config-box__value">0</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label">Applicable</span>
+			<span class="stellarwp-migration-config-box__value stellarwp-migration-config-box__value--yes">
+				Yes			</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label">Can Run</span>
+			<span class="stellarwp-migration-config-box__value stellarwp-migration-config-box__value--yes">
+				Yes			</span>
+		</div>
+
+			</div>
+</div>
+
+	<h2 class="stellarwp-migration-single__section-title">Logs</h2>
+	<div class="stellarwp-migration-logs" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1">
+			<div class="stellarwp-migration-logs__selector">
+			<label for="stellarwp-execution-select" class="screen-reader-text">
+				Select Execution			</label>
+			<select id="stellarwp-execution-select" class="stellarwp-migration-logs__select">
+														<option
+						value="728366"
+						 selected='selected'						data-start=""
+						data-end=""
+						data-status="completed"
+					>
+						#728366 - Jan 15, 2026 6:53 pm (Completed)					</option>
+							</select>
+		</div>
+
+		<div class="stellarwp-migration-logs__execution-info">
+			<span class="stellarwp-migration-logs__execution-start"></span>
+			<span class="stellarwp-migration-logs__execution-end"></span>
+		</div>
+
+		<div class="stellarwp-migration-logs__container">
+			<div class="stellarwp-migration-logs__list"></div>
+			<div class="stellarwp-migration-logs__loading" style="display: none;">
+				<span class="spinner is-active"></span>
+				<span>Loading logs...</span>
+			</div>
+			<div class="stellarwp-migration-logs__no-logs" style="display: none;">
+				<p>No logs for this execution.</p>
+			</div>
+			<div class="stellarwp-migration-logs__load-more" style="display: none;">
+				<button type="button" class="button stellarwp-migration-logs__load-more-btn">
+					Load More				</button>
+			</div>
+		</div>
+	</div>
+</div>

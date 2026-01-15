@@ -1,0 +1,39 @@
+<div class="wrap">
+	<form method="get" class="stellarwp-migrations-filters">
+		
+		<div class="stellarwp-migrations-filters__row">
+			
+			<div class="stellarwp-migrations-filters__actions">
+				<button type="submit" class="button button-primary">
+					Filter				</button>
+				<a href="" class="button button-secondary">
+					Reset				</a>
+			</div>
+
+			<div class="stellarwp-migrations-filters__checkboxes">
+				<label>
+					<input
+						type="checkbox"
+						name="show_completed"
+						value="1"
+												onchange="this.form.submit();"
+					/>
+					Show Completed				</label>
+				<label>
+					<input
+						type="checkbox"
+						name="show_non_applicable"
+						value="1"
+												onchange="this.form.submit();"
+					/>
+					Show Non-Applicable				</label>
+			</div>
+		</div>
+	</form>
+
+	<div class="stellarwp-migrations-list" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1">
+					<div class="stellarwp-migrations-empty">
+				<p>No migrations to display.</p>
+			</div>
+			</div>
+</div>

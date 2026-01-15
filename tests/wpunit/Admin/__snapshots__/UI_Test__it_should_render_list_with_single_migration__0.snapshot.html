@@ -1,0 +1,67 @@
+<div class="wrap">
+	<form method="get" class="stellarwp-migrations-filters">
+		
+		<div class="stellarwp-migrations-filters__row">
+			
+			<div class="stellarwp-migrations-filters__actions">
+				<button type="submit" class="button button-primary">
+					Filter				</button>
+				<a href="" class="button button-secondary">
+					Reset				</a>
+			</div>
+
+			<div class="stellarwp-migrations-filters__checkboxes">
+				<label>
+					<input
+						type="checkbox"
+						name="show_completed"
+						value="1"
+												onchange="this.form.submit();"
+					/>
+					Show Completed				</label>
+				<label>
+					<input
+						type="checkbox"
+						name="show_non_applicable"
+						value="1"
+												onchange="this.form.submit();"
+					/>
+					Show Non-Applicable				</label>
+			</div>
+		</div>
+	</form>
+
+	<div class="stellarwp-migrations-list" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1">
+									<div class="stellarwp-migration-card" data-migration-id="tests_simple_migration">
+	<div class="stellarwp-migration-card__header">
+		<h3 class="stellarwp-migration-card__label">
+			<a href="http://wordpress.test/wp-admin/admin.php?page=stellarwp-migrations-foobar-single&#038;migration_id=tests_simple_migration">Simple Migration</a>
+		</h3>
+			</div>
+	<p class="stellarwp-migration-card__description">
+		This is a simple migration that runs a single batch.	</p>
+	<hr class="stellarwp-migration-card__separator" />
+	<div class="stellarwp-migration-card__footer">
+		<div class="stellarwp-migration-card__status">
+			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--pending">
+				Pending			</span>
+							<span class="stellarwp-migration-card__progress-text">
+					0 / 1				</span>
+					</div>
+					<div class="stellarwp-migration-progress">
+	<div class="stellarwp-migration-progress__bar">
+		<div
+			class="stellarwp-migration-progress__fill stellarwp-migration-progress__fill--pending"
+			style="width: 0%;"
+		></div>
+	</div>
+</div>
+				<div class="stellarwp-migration-card__actions">
+							<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--primary" data-action="run">
+					Run				</button>
+								</div>
+	</div>
+	<div class="stellarwp-migration-card__message" style="display: none;"></div>
+</div>
+						</div>
+</div>
