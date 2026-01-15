@@ -127,12 +127,12 @@ class Settings_Migration extends Migration_Abstract {
 
 		// Convert flat settings to structured format.
 		$new_settings = [
-			'general'  => [
+			'general'     => [
 				'enabled' => $old_settings['enabled'] ?? true,
 				'name'    => $old_settings['name'] ?? 'Default',
 			],
-			'advanced' => [
-				'debug'    => $old_settings['debug'] ?? false,
+			'advanced'    => [
+				'debug'     => $old_settings['debug'] ?? false,
 				'log_level' => $old_settings['log_level'] ?? 'info',
 			],
 			'migrated_at' => current_time( 'mysql' ),
