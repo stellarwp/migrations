@@ -14,6 +14,7 @@ namespace StellarWP\Migrations\Admin;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
 
 /**
@@ -118,11 +119,11 @@ class UI {
 
 		return $registry->filter(
 			static function ( Migration $migration ) use ( $show_completed, $show_non_applicable, $filter_tags ): bool {
-				if ( ! $show_non_applicable && ! $migration->is_applicable() ) {
+				if ( ! $show_non_applicable && $migration->get_status()->equals( Status::NOT_APPLICABLE() ) ) {
 					return false;
 				}
 
-				if ( ! $show_completed && $migration->is_up_done() ) {
+				if ( ! $show_completed && $migration->get_status()->equals( Status::COMPLETED() ) ) {
 					return false;
 				}
 
