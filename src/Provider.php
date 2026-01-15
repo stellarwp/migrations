@@ -22,6 +22,9 @@ use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
+use StellarWP\Migrations\Admin\Provider as Admin_Provider;
+use StellarWP\Migrations\Admin\UI;
+use StellarWP\Migrations\Admin\Assets;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use function StellarWP\Shepherd\shepherd;
@@ -43,6 +46,15 @@ class Provider extends Provider_Abstract {
 	 * @var bool
 	 */
 	private static bool $registered = false;
+
+	/**
+	 * The version of the plugin.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var string
+	 */
+	public const VERSION = '0.0.1';
 
 	/**
 	 * Register the service provider.
@@ -95,9 +107,16 @@ class Provider extends Provider_Abstract {
 		add_action( "stellarwp_migrations_{$prefix}_tables_registered", [ $this, 'on_migrations_schema_up' ] );
 
 		$this->container->singleton( Registry::class );
+		$this->container->singleton( UI::class );
+		$this->container->singleton( Assets::class );
+		$this->container->singleton( Admin_Provider::class );
 
 		$tables_provider = $this->container->get( Tables_Provider::class );
 		$tables_provider->register();
+
+		if ( is_admin() ) {
+			$this->container->get( Admin_Provider::class )->register();
+		}
 	}
 
 	/**

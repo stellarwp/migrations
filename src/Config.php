@@ -11,6 +11,8 @@ namespace StellarWP\Migrations;
 
 use RuntimeException;
 use StellarWP\ContainerContract\ContainerInterface;
+use StellarWP\Migrations\Contracts\Template_Engine;
+use StellarWP\Migrations\Utilities\Default_Template_Engine;
 
 /**
  * Migrations Config
@@ -37,6 +39,15 @@ class Config {
 	 * @var string
 	 */
 	protected static string $hook_prefix;
+
+	/**
+	 * Template engine instance.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var ?Template_Engine
+	 */
+	protected static ?Template_Engine $template_engine = null;
 
 	/**
 	 * Get the container.
@@ -106,6 +117,36 @@ class Config {
 	}
 
 	/**
+	 * Set the template engine.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param Template_Engine $engine Template engine instance.
+	 *
+	 * @return void
+	 */
+	public static function set_template_engine( Template_Engine $engine ): void {
+		static::$template_engine = $engine;
+	}
+
+	/**
+	 * Get the template engine.
+	 *
+	 * Returns the configured template engine, or creates a default one if not set.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Template_Engine
+	 */
+	public static function get_template_engine(): Template_Engine {
+		if ( static::$template_engine === null ) {
+			static::$template_engine = new Default_Template_Engine();
+		}
+
+		return static::$template_engine;
+	}
+
+	/**
 	 * Resets the config.
 	 *
 	 * @since 0.0.1
@@ -113,7 +154,8 @@ class Config {
 	 * @return void
 	 */
 	public static function reset(): void {
-		static::$container   = null;
-		static::$hook_prefix = '';
+		static::$container       = null;
+		static::$hook_prefix     = '';
+		static::$template_engine = null;
 	}
 }
