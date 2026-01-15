@@ -12,12 +12,42 @@
 	'use strict';
 
 	/**
+	 * Logs per page for pagination.
+	 *
+	 * @type {number}
+	 */
+	const LOGS_PER_PAGE = 50;
+
+	/**
+	 * Current logs state for single view.
+	 *
+	 * @type {Object}
+	 */
+	const logsState = {
+		executionId: null,
+		offset: 0,
+		hasMore: true,
+		loading: false,
+	};
+
+	/**
 	 * Initialize the migrations admin functionality.
 	 */
 	function init() {
 		// Initialize Select2 on tags multi-select.
 		initSelect2();
 
+		// Initialize list view.
+		initListView();
+
+		// Initialize single view.
+		initSingleView();
+	}
+
+	/**
+	 * Initialize the list view functionality.
+	 */
+	function initListView() {
 		const container = document.querySelector( '.stellarwp-migrations-list' );
 		if ( ! container ) {
 			return;
@@ -52,6 +82,60 @@
 			}
 
 			handleAction( card, button, migrationId, action, restUrl );
+		} );
+	}
+
+	/**
+	 * Initialize the single view functionality.
+	 */
+	function initSingleView() {
+		const container = document.querySelector( '.stellarwp-migration-single' );
+		if ( ! container ) {
+			return;
+		}
+
+		const restUrl = container.dataset.restUrl;
+
+		if ( ! restUrl ) {
+			console.error( 'Migrations: Missing REST URL' );
+			return;
+		}
+
+		// Initialize action buttons on status card.
+		initSingleViewActions( container, restUrl );
+
+		// Initialize logs.
+		initLogs( restUrl );
+	}
+
+	/**
+	 * Initialize action buttons on the single view status card.
+	 *
+	 * @param {HTMLElement} container The single view container.
+	 * @param {string}      restUrl   The REST API base URL.
+	 */
+	function initSingleViewActions( container, restUrl ) {
+		const statusCard = container.querySelector( '.stellarwp-migration-status-card' );
+		if ( ! statusCard ) {
+			return;
+		}
+
+		statusCard.addEventListener( 'click', function( event ) {
+			const button = event.target.closest( '.stellarwp-migration-btn[data-action]' );
+			if ( ! button ) {
+				return;
+			}
+
+			event.preventDefault();
+
+			const migrationId = statusCard.dataset.migrationId;
+			const action = button.dataset.action;
+
+			if ( ! migrationId || ! action ) {
+				return;
+			}
+
+			handleAction( statusCard, button, migrationId, action, restUrl );
 		} );
 	}
 
@@ -205,6 +289,226 @@
 			allowClear: true,
 			width: '100%',
 		} );
+	}
+
+	/**
+	 * Initialize the logs functionality.
+	 *
+	 * @param {string} restUrl The REST API base URL.
+	 */
+	function initLogs( restUrl ) {
+		const logsContainer = document.querySelector( '.stellarwp-migration-logs' );
+		if ( ! logsContainer ) {
+			return;
+		}
+
+		const select = logsContainer.querySelector( '#stellarwp-execution-select' );
+		if ( ! select ) {
+			return;
+		}
+
+		// Handle execution selection change.
+		select.addEventListener( 'change', function() {
+			const selectedOption = select.options[ select.selectedIndex ];
+			const executionId = selectedOption.value;
+
+			if ( executionId ) {
+				logsState.executionId = executionId;
+				logsState.offset = 0;
+				logsState.hasMore = true;
+
+				updateExecutionInfo( selectedOption );
+				loadLogs( restUrl, true );
+			}
+		} );
+
+		// Handle load more button.
+		const loadMoreBtn = logsContainer.querySelector( '.stellarwp-migration-logs__load-more-btn' );
+		if ( loadMoreBtn ) {
+			loadMoreBtn.addEventListener( 'click', function() {
+				loadLogs( restUrl, false );
+			} );
+		}
+
+		// Load logs for initially selected execution.
+		if ( select.value ) {
+			logsState.executionId = select.value;
+			updateExecutionInfo( select.options[ select.selectedIndex ] );
+			loadLogs( restUrl, true );
+		}
+	}
+
+	/**
+	 * Update execution info display.
+	 *
+	 * @param {HTMLOptionElement} option The selected option element.
+	 */
+	function updateExecutionInfo( option ) {
+		const startEl = document.querySelector( '.stellarwp-migration-logs__execution-start' );
+		const endEl = document.querySelector( '.stellarwp-migration-logs__execution-end' );
+
+		if ( startEl ) {
+			startEl.textContent = option.dataset.start || 'Not started';
+		}
+
+		if ( endEl ) {
+			const endDate = option.dataset.end;
+			endEl.textContent = endDate || 'In progress';
+			endEl.style.display = endDate ? '' : 'none';
+		}
+	}
+
+	/**
+	 * Load logs for the current execution.
+	 *
+	 * @param {string}  restUrl The REST API base URL.
+	 * @param {boolean} reset   Whether to reset the logs list.
+	 */
+	function loadLogs( restUrl, reset ) {
+		if ( logsState.loading || ! logsState.hasMore ) {
+			return;
+		}
+
+		if ( reset ) {
+			logsState.offset = 0;
+			logsState.hasMore = true;
+		}
+
+		logsState.loading = true;
+
+		const logsContainer = document.querySelector( '.stellarwp-migration-logs' );
+		const listEl = logsContainer.querySelector( '.stellarwp-migration-logs__list' );
+		const loadingEl = logsContainer.querySelector( '.stellarwp-migration-logs__loading' );
+		const noLogsEl = logsContainer.querySelector( '.stellarwp-migration-logs__no-logs' );
+		const loadMoreEl = logsContainer.querySelector( '.stellarwp-migration-logs__load-more' );
+
+		// Show loading state.
+		loadingEl.style.display = 'flex';
+		loadMoreEl.style.display = 'none';
+		noLogsEl.style.display = 'none';
+
+		if ( reset ) {
+			listEl.innerHTML = '';
+		}
+
+		const endpoint = restUrl + '/executions/' + encodeURIComponent( logsState.executionId ) + '/logs';
+		const url = endpoint + '?limit=' + LOGS_PER_PAGE + '&offset=' + logsState.offset + '&order=ASC';
+
+		apiFetch( { url: url } )
+			.then( function( logs ) {
+				loadingEl.style.display = 'none';
+
+				if ( ! logs || logs.length === 0 ) {
+					if ( reset ) {
+						noLogsEl.style.display = 'block';
+					}
+					logsState.hasMore = false;
+					return;
+				}
+
+				// Render logs.
+				logs.forEach( function( log ) {
+					listEl.appendChild( createLogElement( log ) );
+				} );
+
+				// Update pagination state.
+				logsState.offset += logs.length;
+				logsState.hasMore = logs.length === LOGS_PER_PAGE;
+
+				// Show/hide load more button.
+				loadMoreEl.style.display = logsState.hasMore ? 'block' : 'none';
+			} )
+			.catch( function( error ) {
+				console.error( 'Failed to load logs:', error );
+				loadingEl.style.display = 'none';
+
+				if ( reset ) {
+					noLogsEl.style.display = 'block';
+					noLogsEl.querySelector( 'p' ).textContent = 'Failed to load logs: ' + ( error.message || 'Unknown error' );
+				}
+			} )
+			.finally( function() {
+				logsState.loading = false;
+			} );
+	}
+
+	/**
+	 * Create a log entry element.
+	 *
+	 * @param {Object} log The log data.
+	 *
+	 * @return {HTMLElement} The log element.
+	 */
+	function createLogElement( log ) {
+		const type = ( log.type || 'info' ).toLowerCase();
+		const message = log.message || '';
+		const createdAt = log.created_at || '';
+
+		const el = document.createElement( 'div' );
+		el.className = 'stellarwp-migration-log stellarwp-migration-log--' + type;
+
+		// Add icon (except for info type).
+		const iconEl = document.createElement( 'span' );
+		iconEl.className = 'stellarwp-migration-log__icon';
+		iconEl.textContent = getLogIcon( type );
+		el.appendChild( iconEl );
+
+		// Add content.
+		const contentEl = document.createElement( 'span' );
+		contentEl.className = 'stellarwp-migration-log__content';
+
+		const messageEl = document.createElement( 'span' );
+		messageEl.className = 'stellarwp-migration-log__message';
+		messageEl.textContent = message;
+		contentEl.appendChild( messageEl );
+
+		el.appendChild( contentEl );
+
+		// Add timestamp.
+		if ( createdAt ) {
+			const timeEl = document.createElement( 'span' );
+			timeEl.className = 'stellarwp-migration-log__time';
+			timeEl.textContent = formatLogTime( createdAt );
+			el.appendChild( timeEl );
+		}
+
+		return el;
+	}
+
+	/**
+	 * Get the icon for a log type.
+	 *
+	 * @param {string} type The log type.
+	 *
+	 * @return {string} The icon character.
+	 */
+	function getLogIcon( type ) {
+		switch ( type ) {
+			case 'error':
+				return '\u2718'; // ✘
+			case 'warning':
+				return '\u26A0'; // ⚠
+			case 'debug':
+				return '\u2699'; // ⚙
+			default:
+				return ''; // No icon for info.
+		}
+	}
+
+	/**
+	 * Format a log timestamp for display.
+	 *
+	 * @param {string} timestamp The ISO timestamp.
+	 *
+	 * @return {string} The formatted time.
+	 */
+	function formatLogTime( timestamp ) {
+		try {
+			const date = new Date( timestamp );
+			return date.toLocaleTimeString( [], { hour: '2-digit', minute: '2-digit', second: '2-digit' } );
+		} catch ( e ) {
+			return timestamp;
+		}
 	}
 
 	// Initialize when DOM is ready using wp.domReady.

@@ -22,6 +22,7 @@ use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
+use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Admin\UI;
 use StellarWP\Migrations\Admin\Assets;
 use StellarWP\Migrations\Contracts\Migration;
@@ -108,9 +109,14 @@ class Provider extends Provider_Abstract {
 		$this->container->singleton( Registry::class );
 		$this->container->singleton( UI::class );
 		$this->container->singleton( Assets::class );
+		$this->container->singleton( Admin_Provider::class );
 
 		$tables_provider = $this->container->get( Tables_Provider::class );
 		$tables_provider->register();
+
+		if ( is_admin() ) {
+			$this->container->get( Admin_Provider::class )->register();
+		}
 	}
 
 	/**

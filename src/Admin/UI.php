@@ -16,6 +16,7 @@ use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
+use StellarWP\Migrations\Tables\Migration_Executions;
 
 /**
  * Admin UI.
@@ -64,6 +65,66 @@ class UI {
 				'filters'       => $filters,
 				'rest_base_url' => rest_url( REST_Provider::get_namespace() ),
 			]
+		);
+	}
+
+	/**
+	 * Render the single migration detail page.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $migration_id The migration ID to display.
+	 *
+	 * @return void
+	 */
+	public function render_single( string $migration_id ): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$container = Config::get_container();
+
+		$container->get( Assets::class )->enqueue_assets();
+
+		$registry  = $container->get( Registry::class );
+		$migration = $registry->get( $migration_id );
+
+		if ( ! $migration ) {
+			Config::get_template_engine()->template(
+				'single-not-found',
+				[ 'migration_id' => $migration_id ]
+			);
+			return;
+		}
+
+		$executions = $this->get_migration_executions( $migration_id );
+
+		Config::get_template_engine()->template(
+			'single',
+			[
+				'migration'     => $migration,
+				'executions'    => $executions,
+				'rest_base_url' => rest_url( REST_Provider::get_namespace() ),
+			]
+		);
+	}
+
+	/**
+	 * Get executions for a migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $migration_id The migration ID.
+	 *
+	 * @return array<int,array<string,mixed>> List of execution records.
+	 */
+	private function get_migration_executions( string $migration_id ): array {
+		return Migration_Executions::get_all_by(
+			'migration_id',
+			$migration_id,
+			'=',
+			100,
+			'created_at DESC'
 		);
 	}
 

@@ -1,64 +1,55 @@
 <?php
 /**
- * Migration Card Component Template.
+ * Migration Status Card Component Template.
+ *
+ * Displays the current migration status with progress and action buttons.
+ * Used on the single migration detail page.
  *
  * @since 0.0.1
  *
  * @package StellarWP\Migrations\views\components
  *
- * @var StellarWP\Migrations\Contracts\Migration $migration Migration object.
+ * @var StellarWP\Migrations\Contracts\Migration $migration  Migration object.
+ * @var list<array<string,mixed>>                $executions List of execution records.
  */
 
 defined( 'ABSPATH' ) || exit;
 
-use StellarWP\Migrations\Admin\UI;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
-use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
+$executions ??= [];
+
 $migration_id     = $migration->get_id();
-$single_url       = Admin_Provider::get_single_url( $migration_id );
-$migration_label  = $migration->get_label();
-$description      = $migration->get_description();
 $migration_status = $migration->get_status();
 $can_run          = $migration->can_run();
 $is_applicable    = $migration->is_applicable();
 $total_items      = $migration->get_total_items();
 $items_processed  = $migration->get_items_processed();
-$migration_tags   = $migration->get_tags();
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
 
 // Determine which buttons to show based on status.
-// Note: Non-applicable migrations should not show any action buttons.
 $show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $can_run;
 $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true );
+
+// Get the latest execution for timing info.
+$latest_execution = $migration->get_latest_execution();
+$started_at       = null;
+
+if ( $latest_execution && isset( $latest_execution['start_date_gmt'] ) && $latest_execution['start_date_gmt'] instanceof DateTimeInterface ) {
+	$started_at = $latest_execution['start_date_gmt'];
+}
 ?>
-<div class="stellarwp-migration-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
-	<div class="stellarwp-migration-card__header">
-		<h3 class="stellarwp-migration-card__label">
-			<a href="<?php echo esc_url( $single_url ); ?>"><?php echo esc_html( $migration_label ); ?></a>
-		</h3>
-		<?php if ( ! empty( $migration_tags ) ) : ?>
-			<div class="stellarwp-migration-card__tags">
-				<?php foreach ( $migration_tags as $migration_tag ) : ?>
-					<span class="stellarwp-migration-card__tag"><?php echo esc_html( $migration_tag ); ?></span>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
-	</div>
-	<p class="stellarwp-migration-card__description">
-		<?php echo esc_html( $description ); ?>
-	</p>
-	<hr class="stellarwp-migration-card__separator" />
-	<div class="stellarwp-migration-card__footer">
-		<div class="stellarwp-migration-card__status">
+<div class="stellarwp-migration-status-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
+	<div class="stellarwp-migration-status-card__content">
+		<div class="stellarwp-migration-status-card__status">
 			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--<?php echo esc_attr( $status_value ); ?>">
 				<?php echo esc_html( $status_label ); ?>
 			</span>
@@ -75,14 +66,18 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 				</span>
 			<?php endif; ?>
 		</div>
+
 		<?php if ( $total_items > 0 ) : ?>
-			<?php
-			Config::get_template_engine()->template(
-				'components/progress-bar',
-				[ 'migration' => $migration ]
-			);
-			?>
+			<div class="stellarwp-migration-status-card__progress">
+				<?php
+				Config::get_template_engine()->template(
+					'components/progress-bar',
+					[ 'migration' => $migration ]
+				);
+				?>
+			</div>
 		<?php endif; ?>
+
 		<div class="stellarwp-migration-card__actions">
 			<?php if ( $show_run ) : ?>
 				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--primary" data-action="run">
@@ -96,5 +91,26 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 			<?php endif; ?>
 		</div>
 	</div>
+
+	<hr class="stellarwp-migration-card__separator" />
+
+	<div class="stellarwp-migration-status-card__timing">
+		<?php if ( $started_at ) : ?>
+			<span class="stellarwp-migration-status-card__started">
+				<?php
+				printf(
+					/* translators: %s: human-readable time difference */
+					esc_html__( 'Started %s ago', 'stellarwp-migrations' ),
+					esc_html( human_time_diff( $started_at->getTimestamp() ) )
+				);
+				?>
+			</span>
+		<?php else : ?>
+			<span class="stellarwp-migration-status-card__not-started">
+				<?php esc_html_e( 'Not yet started', 'stellarwp-migrations' ); ?>
+			</span>
+		<?php endif; ?>
+	</div>
+
 	<div class="stellarwp-migration-card__message" style="display: none;"></div>
 </div>
