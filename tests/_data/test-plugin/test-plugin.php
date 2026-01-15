@@ -48,5 +48,18 @@ add_action(
 		$container->register( Provider::class );
 		$container->register( MigrationsProvider::class );
 		$container->register( AdminProvider::class );
+
+		// Set up test data for Settings_Migration to be applicable.
+		if ( get_option( 'test_plugin_old_settings' ) === false ) {
+			update_option(
+				'test_plugin_old_settings',
+				[
+					'enabled'   => true,
+					'name'      => 'Test Plugin',
+					'debug'     => false,
+					'log_level' => 'warning',
+				]
+			);
+		}
 	}
 );
