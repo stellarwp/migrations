@@ -53,7 +53,7 @@ class Clear_Logs extends Task_Abstract {
 		$retention_days = (int) apply_filters( "stellarwp_migrations_{$prefix}_log_retention_days", $default_retention_days );
 
 		// Fallback to the default retention days if the filtered value is invalid.
-		return $retention_days > 1 ? $retention_days : $default_retention_days;
+		return $retention_days >= 1 ? $retention_days : $default_retention_days;
 	}
 
 	/**

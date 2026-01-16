@@ -78,9 +78,6 @@ class Clear_Logs_Test extends WPTestCase {
 
 		// Assert.
 		$this->assertEquals( 90, $retention_days );
-
-		// Clean up.
-		remove_all_filters( "stellarwp_migrations_{$prefix}_log_retention_days" );
 	}
 
 	/**
@@ -102,9 +99,6 @@ class Clear_Logs_Test extends WPTestCase {
 
 		// Assert.
 		$this->assertEquals( 180, $retention_days, 'Should fallback to default when filter returns 0' );
-
-		// Clean up.
-		remove_all_filters( "stellarwp_migrations_{$prefix}_log_retention_days" );
 	}
 
 	/**
@@ -403,8 +397,74 @@ class Clear_Logs_Test extends WPTestCase {
 		$recent_logs = Migration_Logs::get_all_by( 'migration_execution_id', $recent_execution_id );
 		$this->assertCount( 1, $recent_logs, 'Recent logs should not be deleted' );
 		$this->assertEquals( 'Recent log', $recent_logs[0]['message'] );
+	}
 
-		// Clean up.
-		remove_all_filters( "stellarwp_migrations_{$prefix}_log_retention_days" );
+	/**
+	 * @test
+	 */
+	public function it_should_respect_retention_period_of_one_day(): void {
+		// Arrange.
+		$prefix = Config::get_hook_prefix();
+
+		// Set retention to 1 day.
+		add_filter(
+			"stellarwp_migrations_{$prefix}_log_retention_days",
+			function () {
+				return 1;
+			}
+		);
+
+		// Create execution that is 2 days old (should be deleted).
+		Migration_Executions::insert(
+			[
+				'migration_id'    => 'test_migration_old',
+				'status'          => Status::COMPLETED()->getValue(),
+				'end_date_gmt'    => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
+				'items_total'     => 10,
+				'items_processed' => 10,
+			]
+		);
+		$old_execution_id = (int) DB::last_insert_id();
+
+		// Create execution that is 12 hours old (should NOT be deleted).
+		Migration_Executions::insert(
+			[
+				'migration_id'    => 'test_migration_recent',
+				'status'          => Status::COMPLETED()->getValue(),
+				'end_date_gmt'    => gmdate( 'Y-m-d H:i:s', strtotime( '-12 hours' ) ),
+				'items_total'     => 5,
+				'items_processed' => 5,
+			]
+		);
+		$recent_execution_id = (int) DB::last_insert_id();
+
+		Migration_Logs::insert(
+			[
+				'migration_execution_id' => $old_execution_id,
+				'type'                   => Log_Type::INFO()->getValue(),
+				'message'                => 'Old log',
+			]
+		);
+
+		Migration_Logs::insert(
+			[
+				'migration_execution_id' => $recent_execution_id,
+				'type'                   => Log_Type::INFO()->getValue(),
+				'message'                => 'Recent log',
+			]
+		);
+
+		// Act.
+		$task = new Clear_Logs();
+		$task->process();
+
+		// Assert.
+		$old_logs = Migration_Logs::get_all_by( 'migration_execution_id', $old_execution_id );
+
+		$this->assertCount( 0, $old_logs, 'Old logs should be deleted with 1 day retention' );
+
+		$recent_logs = Migration_Logs::get_all_by( 'migration_execution_id', $recent_execution_id );
+		$this->assertCount( 1, $recent_logs, 'Recent logs should not be deleted with 1 day retention' );
+		$this->assertEquals( 'Recent log', $recent_logs[0]['message'] );
 	}
 }
