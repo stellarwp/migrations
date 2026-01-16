@@ -13,6 +13,7 @@ A batched database migrations library for WordPress plugins powered by [Shepherd
 - **Batched execution** - Process large datasets incrementally without timeouts.
 - **Automatic rollback** - Failed migrations trigger automatic rollback via `down()`.
 - **Activity logging** - All migration activity is logged to a database table.
+- **Automatic log cleanup** - Old logs are automatically cleaned up after a configurable retention period.
 - **Extensible hooks** - Actions and filters for custom behavior at each stage.
 - **WP-CLI integration** - Full CLI support for running, rolling back, and monitoring migrations.
 
@@ -135,6 +136,10 @@ public function up( int $batch, int $batch_size ): void {
 ```
 
 Available log levels: `info()`, `warning()`, `error()`, `debug()`
+
+**Log Cleanup:**
+
+Old migration logs are automatically cleaned up after 180 days (configurable via the `stellarwp_migrations_{prefix}_log_retention_days` filter). See [Getting Started](./docs/getting-started.md#log-cleanup) for details.
 
 ## WP-CLI
 

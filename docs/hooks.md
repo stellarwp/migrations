@@ -202,6 +202,36 @@ This filter is useful for:
 - Enabling verbose logging during troubleshooting
 - Customizing logging behavior per environment
 
+### `stellarwp_migrations_{prefix}_log_retention_days`
+
+Controls the retention period in days for migration logs. Logs older than this period are automatically cleaned up by the `Clear_Logs` task.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_log_retention_days', function( int $retention_days ) {
+    // Retain logs for 90 days instead of the default 180 days.
+    return 90;
+} );
+```
+
+**Default Behavior:**
+
+- Default retention period is **180 days** (6 months)
+- The filter must return a value greater than 1, otherwise the default is used
+- Logs are automatically cleaned up by the `Clear_Logs` Shepherd task
+
+**How It Works:**
+
+1. The `Clear_Logs` task runs periodically via Shepherd
+2. It identifies all migration executions older than the retention period
+3. Deletes all logs associated with those old executions
+4. Creates a summary log entry for each processed execution indicating when logs were deleted
+
+**Use Cases:**
+
+- Reduce database size by cleaning up old logs
+- Comply with data retention policies
+- Customize retention based on environment (shorter in development, longer in production)
+
 ## Hook Execution Order
 
 During a successful migration:

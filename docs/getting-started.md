@@ -224,6 +224,50 @@ Available log levels:
 
 All logs are stored in the migration logs table and are associated with the current migration execution. The `$data` parameter is optional and accepts any serializable data structure.
 
+## Log Cleanup
+
+The library automatically cleans up old migration logs to prevent the database from growing indefinitely. This is handled by the `Clear_Logs` Shepherd task.
+
+**Default Behavior:**
+
+- Logs are retained for **180 days** (6 months) by default
+- The `Clear_Logs` task runs periodically via Shepherd
+- Old logs are deleted, but a summary log entry is created for each processed execution
+
+**Customizing Retention Period:**
+
+You can customize the retention period using the `stellarwp_migrations_{prefix}_log_retention_days` filter:
+
+```php
+add_filter( 'stellarwp_migrations_my_plugin_log_retention_days', function( int $retention_days ) {
+    // Retain logs for 90 days instead of the default 180 days.
+    return 90;
+} );
+```
+
+**What Gets Cleaned Up:**
+
+1. All logs for migration executions older than the retention period are deleted
+2. A summary log entry is created for each processed execution, indicating:
+   - When the logs were deleted
+   - The migration execution status at the time of cleanup
+   - The retention period that was applied
+
+**Manual Cleanup:**
+
+The cleanup task runs automatically via Shepherd. If you need to trigger it manually, you can dispatch the task programmatically:
+
+```php
+use StellarWP\Migrations\Tasks\Clear_Logs;
+use StellarWP\Shepherd\Regulator;
+
+$regulator = Config::get_container()->get( Regulator::class );
+$task      = new Clear_Logs();
+$regulator->dispatch( $task );
+```
+
+See the [Hooks Reference](./hooks.md) for more details on the `stellarwp_migrations_{prefix}_log_retention_days` filter.
+
 ## Failure Handling
 
 If a migration throws an exception during `up()`, the library automatically:
