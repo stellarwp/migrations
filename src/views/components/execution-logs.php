@@ -87,14 +87,18 @@ $rest_base_url ??= '';
 			</select>
 		</div>
 
-		<div class="stellarwp-migration-logs__execution-info">
-			<span class="stellarwp-migration-logs__execution-start"></span>
-			<span class="stellarwp-migration-logs__execution-end"></span>
+		<div class="stellarwp-migration-logs__execution-info" aria-live="polite" aria-atomic="true">
+			<span class="stellarwp-migration-logs__execution-start">
+				<span class="screen-reader-text"><?php esc_html_e( 'Execution started:', 'stellarwp-migrations' ); ?></span>
+			</span>
+			<span class="stellarwp-migration-logs__execution-end">
+				<span class="screen-reader-text"><?php esc_html_e( 'Execution ended:', 'stellarwp-migrations' ); ?></span>
+			</span>
 		</div>
 
-		<div class="stellarwp-migration-logs__container">
-			<div class="stellarwp-migration-logs__list"></div>
-			<div class="stellarwp-migration-logs__loading" style="display: none;">
+		<div class="stellarwp-migration-logs__container" aria-live="polite" aria-relevant="additions removals">
+			<div class="stellarwp-migration-logs__list" role="log" aria-label="<?php esc_attr_e( 'Migration execution logs', 'stellarwp-migrations' ); ?>"></div>
+			<div class="stellarwp-migration-logs__loading" style="display: none;" aria-hidden="true">
 				<span class="spinner is-active"></span>
 				<span><?php esc_html_e( 'Loading logs...', 'stellarwp-migrations' ); ?></span>
 			</div>

@@ -114,5 +114,5 @@ if ( $latest_execution && isset( $latest_execution['start_date_gmt'] ) && $lates
 		<?php endif; ?>
 	</div>
 
-	<div class="stellarwp-migration-card__message" style="display: none;"></div>
+	<div class="stellarwp-migration-card__message" style="display: none;" role="alert" aria-live="assertive"></div>
 </div>

@@ -48,6 +48,11 @@
 	margin: 0;
 }
 
+.stellarwp-migrations-filters__checkboxes input[type="checkbox"]:focus {
+	box-shadow: 0 0 0 2px #2271b1;
+	outline: none;
+}
+
 .stellarwp-migrations-filters__field--tags {
 	flex: 1;
 	max-width: 400px;
@@ -55,6 +60,7 @@
 }
 
 .stellarwp-migrations-filters__field--tags .select2-container {
+	/* Make sure the select2 container takes up the full width of the parent */
 	width: 100% !important;
 }
 
@@ -143,9 +149,15 @@
 	text-decoration: none;
 }
 
-.stellarwp-migration-card__label a:hover {
+.stellarwp-migration-card__label a:hover,
+.stellarwp-migration-card__label a:focus {
 	color: #135e96;
 	text-decoration: underline;
+}
+
+.stellarwp-migration-card__label a:focus {
+	box-shadow: 0 0 0 2px #2271b1;
+	outline: none;
 }
 
 .stellarwp-migration-card__tags {
@@ -412,6 +424,11 @@
 	border-color: #b32d2e;
 }
 
+.stellarwp-migration-btn--danger:focus {
+	box-shadow: 0 0 0 1px #fff, 0 0 0 3px #d63638;
+	outline: none;
+}
+
 /* Message Area */
 .stellarwp-migration-card__message {
 	border-radius: 4px;
@@ -627,6 +644,12 @@
 	width: 100%;
 }
 
+.stellarwp-migration-logs__select:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
 .stellarwp-migration-logs__execution-info {
 	color: #646970;
 	display: flex;
@@ -690,6 +713,11 @@
 	border-top: 1px solid #e2e4e7;
 	padding: 12px;
 	text-align: center;
+}
+
+.stellarwp-migration-logs__load-more-btn:focus {
+	box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2271b1;
+	outline: none;
 }
 
 /* Log Entry */
