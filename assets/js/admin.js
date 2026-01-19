@@ -8,8 +8,10 @@
  * @package StellarWP\Migrations
  */
 
-( function( domReady, apiFetch, $ ) {
+( function( domReady, apiFetch, i18n, $ ) {
 	'use strict';
+
+	const { __, sprintf } = i18n;
 
 	/**
 	 * Logs per page for pagination.
@@ -158,7 +160,7 @@
 		// Add loading state to clicked button
 		button.classList.add( 'stellarwp-migration-btn--loading' );
 		const originalText = button.textContent;
-		button.textContent = action === 'run' ? 'Running...' : 'Rolling back...';
+		button.textContent = action === 'run' ? __( 'Running...', 'stellarwp-migrations' ) : __( 'Rolling back...', 'stellarwp-migrations' );
 
 		// Build the endpoint path (relative to REST root)
 		const endpoint = restUrl + '/migrations/' + encodeURIComponent( migrationId ) + '/' + action;
@@ -173,13 +175,13 @@
 					showMessage( card, 'success', getSuccessMessage( action, data ) );
 					updateCardStatus( card, action, data );
 				} else {
-					const errorMessage = data.message || 'An error occurred';
+					const errorMessage = data.message || __( 'An error occurred', 'stellarwp-migrations' );
 					showMessage( card, 'error', errorMessage );
 				}
 			} )
 			.catch( function( error ) {
 				console.error( 'Migrations API error:', error );
-				const errorMessage = error.message || 'Network error. Please try again.';
+				const errorMessage = error.message || __( 'Network error. Please try again.', 'stellarwp-migrations' );
 				showMessage( card, 'error', errorMessage );
 			} )
 			.finally( function() {
@@ -201,10 +203,13 @@
 	 * @return {string} The success message.
 	 */
 	function getSuccessMessage( action, data ) {
+		const executionId = data.execution_id || __( 'N/A', 'stellarwp-migrations' );
 		if ( action === 'run' ) {
-			return 'Migration scheduled. Execution ID: ' + ( data.execution_id || 'N/A' );
+			/* translators: %s: execution ID */
+			return sprintf( __( 'Migration scheduled. Execution ID: %s', 'stellarwp-migrations' ), executionId );
 		}
-		return 'Rollback scheduled. Execution ID: ' + ( data.execution_id || 'N/A' );
+		/* translators: %s: execution ID */
+		return sprintf( __( 'Rollback scheduled. Execution ID: %s', 'stellarwp-migrations' ), executionId );
 	}
 
 	/**
@@ -242,7 +247,7 @@
 		if ( statusLabel ) {
 			// Update status to "scheduled"
 			statusLabel.className = 'stellarwp-migration-card__status-label stellarwp-migration-card__status-label--scheduled';
-			statusLabel.textContent = 'Scheduled';
+			statusLabel.textContent = __( 'Scheduled', 'stellarwp-migrations' );
 		}
 
 		// Update progress bar status
@@ -348,12 +353,12 @@
 		const endEl = document.querySelector( '.stellarwp-migration-logs__execution-end' );
 
 		if ( startEl ) {
-			startEl.textContent = option.dataset.start || 'Not started';
+			startEl.textContent = option.dataset.start || __( 'Not started', 'stellarwp-migrations' );
 		}
 
 		if ( endEl ) {
 			const endDate = option.dataset.end;
-			endEl.textContent = endDate || 'In progress';
+			endEl.textContent = endDate || __( 'In progress', 'stellarwp-migrations' );
 			endEl.style.display = endDate ? '' : 'none';
 		}
 	}
@@ -424,7 +429,8 @@
 
 				if ( reset ) {
 					noLogsEl.style.display = 'block';
-					noLogsEl.querySelector( 'p' ).textContent = 'Failed to load logs: ' + ( error.message || 'Unknown error' );
+					/* translators: %s: error message */
+					noLogsEl.querySelector( 'p' ).textContent = sprintf( __( 'Failed to load logs: %s', 'stellarwp-migrations' ), error.message || __( 'Unknown error', 'stellarwp-migrations' ) );
 				}
 			} )
 			.finally( function() {
@@ -513,4 +519,4 @@
 
 	// Initialize when DOM is ready using wp.domReady.
 	domReady( init );
-} )( wp.domReady, wp.apiFetch, jQuery );
+} )( wp.domReady, wp.apiFetch, wp.i18n, jQuery );

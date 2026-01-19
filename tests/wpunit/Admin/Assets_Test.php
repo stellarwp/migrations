@@ -245,6 +245,7 @@ class Assets_Test extends WPTestCase {
 		$this->assertNotNull( $script );
 		$this->assertContains( 'wp-dom-ready', $script->deps );
 		$this->assertContains( 'wp-api-fetch', $script->deps );
+		$this->assertContains( 'wp-i18n', $script->deps );
 		$this->assertContains( 'jquery', $script->deps );
 		$this->assertContains( Config::get_hook_prefix() . '-migrations-select2', $script->deps );
 	}

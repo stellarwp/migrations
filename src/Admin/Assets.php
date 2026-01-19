@@ -162,7 +162,7 @@ class Assets {
 		wp_register_script(
 			self::get_js_handle(),
 			$assets_url . 'js/admin.js',
-			[ 'wp-dom-ready', 'wp-api-fetch', 'jquery', self::get_select2_js_handle() ],
+			[ 'wp-dom-ready', 'wp-api-fetch', 'wp-i18n', 'jquery', self::get_select2_js_handle() ],
 			Provider::VERSION,
 			true
 		);
