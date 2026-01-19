@@ -19,8 +19,10 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
+$latest_execution = $migration->get_latest_execution();
+
 $total_items     = $migration->get_total_items();
-$items_processed = $migration->get_items_processed();
+$items_processed = $latest_execution ? $latest_execution->get_items_processed() : 0;
 $status_value    = $migration->get_status()->getValue();
 
 // Calculate progress percentage.

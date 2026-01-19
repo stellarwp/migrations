@@ -23,6 +23,7 @@ use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
+use StellarWP\Migrations\Models\Execution;
 use Exception;
 use InvalidArgumentException;
 use function StellarWP\Shepherd\shepherd;
@@ -82,7 +83,7 @@ class Execute extends Task_Abstract {
 		if (
 			! $migration
 			|| ! $execution
-			|| ! is_array( $execution )
+			|| ! $execution instanceof Execution
 		) {
 			throw new ShepherdTaskFailWithoutRetryException(
 				sprintf(
@@ -267,7 +268,7 @@ class Execute extends Task_Abstract {
 			Migration_Executions::update_single(
 				[
 					'id'              => $execution_id,
-					'items_processed' => min( Cast::to_int( $execution['items_total'] ), Cast::to_int( $execution['items_processed'] ) + $batch_size ),
+					'items_processed' => min( $execution->get_items_total(), $execution->get_items_processed() + $batch_size ),
 				]
 			);
 		}

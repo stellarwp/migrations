@@ -27,12 +27,14 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 
 $executions ??= [];
 
+$latest_execution = $migration->get_latest_execution();
+
 $migration_id     = $migration->get_id();
 $migration_status = $migration->get_status();
 $can_run          = $migration->can_run();
 $is_applicable    = $migration->is_applicable();
 $total_items      = $migration->get_total_items();
-$items_processed  = $migration->get_items_processed();
+$items_processed  = $latest_execution ? $latest_execution->get_items_processed() : 0;
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
@@ -41,13 +43,7 @@ $status_label = $migration_status->get_label();
 $show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $can_run;
 $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true );
 
-// Get the latest execution for timing info.
-$latest_execution = $migration->get_latest_execution();
-$started_at       = null;
-
-if ( $latest_execution && isset( $latest_execution['start_date_gmt'] ) && $latest_execution['start_date_gmt'] instanceof DateTimeInterface ) {
-	$started_at = $latest_execution['start_date_gmt'];
-}
+$started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 ?>
 <div class="stellarwp-migration-status-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
 	<div class="stellarwp-migration-status-card__content">

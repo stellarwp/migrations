@@ -15,7 +15,7 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Enums\Status;
-use DateTimeInterface;
+use StellarWP\Migrations\Models\Execution;
 
 /**
  * Base class for migrations.
@@ -261,9 +261,9 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }|null The execution data or null if none found.
+	 * @return Execution|null The execution model or null if none found.
 	 */
-	public function get_latest_execution(): ?array {
+	public function get_latest_execution(): ?Execution {
 		$executions = Migration_Executions::paginate(
 			[
 				'order'        => 'DESC',
@@ -278,19 +278,10 @@ abstract class Migration_Abstract implements Migration {
 			1
 		);
 
-		return $executions[0] ?? null;
-	}
+		if ( ! empty( $executions[0]['id'] ) ) {
+			return new Execution( $executions[0] );
+		}
 
-	/**
-	 * Get the number of items processed in the latest execution.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return int The number of items processed.
-	 */
-	public function get_items_processed(): int {
-		$latest_execution = $this->get_latest_execution();
-
-		return empty( $latest_execution['items_processed'] ) ? 0 : $latest_execution['items_processed'];
+		return null;
 	}
 }

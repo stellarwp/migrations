@@ -22,6 +22,8 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
+$execution = $migration->get_latest_execution();
+
 $migration_id     = $migration->get_id();
 $single_url       = Admin_Provider::get_single_url( $migration_id );
 $migration_label  = $migration->get_label();
@@ -30,7 +32,7 @@ $migration_status = $migration->get_status();
 $can_run          = $migration->can_run();
 $is_applicable    = $migration->is_applicable();
 $total_items      = $migration->get_total_items();
-$items_processed  = $migration->get_items_processed();
+$items_processed  = $execution ? $execution->get_items_processed() : 0;
 $migration_tags   = $migration->get_tags();
 
 $status_value = $migration_status->getValue();
