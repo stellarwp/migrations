@@ -17,6 +17,7 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\REST\Provider as REST_Provider;
 use StellarWP\Migrations\Tables\Migration_Executions;
+use StellarWP\Migrations\Utilities\Cast;
 use DateTimeInterface;
 
 /**
@@ -120,12 +121,36 @@ class UI {
 	 * @return array<string, array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }> List of execution records.
 	 */
 	private function get_migration_executions( string $migration_id ): array {
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filter the order by clause for the executions.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param string $order_by The order by clause.
+		 *
+		 * @return string The order by clause.
+		 */
+		$order_by = Cast::to_string( apply_filters( "stellarwp_migrations_{$prefix}_executions_order_by", 'created_at DESC' ) );
+
+		/**
+		 * Filter the limit for the executions.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param int $limit The limit.
+		 *
+		 * @return int The limit.
+		 */
+		$limit = Cast::to_int( apply_filters( "stellarwp_migrations_{$prefix}_executions_limit", 100 ) );
+
 		return Migration_Executions::get_all_by(
 			'migration_id',
 			$migration_id,
 			'=',
-			100,
-			'created_at DESC'
+			$limit,
+			$order_by
 		);
 	}
 
@@ -155,11 +180,25 @@ class UI {
 			}
 		}
 
-		return [
-			'tags'                => $tags,
-			'show_completed'      => ! empty( $_GET['show_completed'] ),
-			'show_non_applicable' => ! empty( $_GET['show_non_applicable'] ),
-		];
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filter the filters for the migrations list.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param array<{tags: list<string>, show_completed: bool, show_non_applicable: bool}> $filters Filters to apply.
+		 *
+		 * @return array<{tags: list<string>, show_completed: bool, show_non_applicable: bool}> Filters to apply.
+		 */
+		return apply_filters(
+			"stellarwp_migrations_{$prefix}_filters",
+			[
+				'tags'                => $tags,
+				'show_completed'      => ! empty( $_GET['show_completed'] ),
+				'show_non_applicable' => ! empty( $_GET['show_non_applicable'] ),
+			]
+		);
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
@@ -199,7 +238,23 @@ class UI {
 			}
 		)->all();
 
-		return $this->sort_migrations( $migrations );
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filter the filtered migrations.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param list<Migration>                                                              $migrations Migrations to filter.
+		 * @param array<{tags: list<string>, show_completed: bool, show_non_applicable: bool}> $filters    Filters to apply.
+		 *
+		 * @return list<Migration> Filtered migrations.
+		 */
+		return apply_filters(
+			"stellarwp_migrations_{$prefix}_filtered_migrations",
+			$this->sort_migrations( $migrations ),
+			$filters,
+		);
 	}
 
 	/**
@@ -251,7 +306,23 @@ class UI {
 			}
 		);
 
-		return $migrations;
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filter the sorted migrations.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param list<Migration>   $migrations      Sorted migrations.
+		 * @param array<string,int> $status_priority Status priority map.
+		 *
+		 * @return list<Migration> Sorted migrations.
+		 */
+		return apply_filters(
+			"stellarwp_migrations_{$prefix}_sorted_migrations",
+			$migrations,
+			$status_priority
+		);
 	}
 
 	/**
@@ -264,15 +335,29 @@ class UI {
 	 * @return array<string,int> Status value to priority map.
 	 */
 	private function get_status_priority(): array {
-		return [
-			Status::RUNNING()->getValue()        => 1,
-			Status::FAILED()->getValue()         => 2,
-			Status::PAUSED()->getValue()         => 3,
-			Status::PENDING()->getValue()        => 4,
-			Status::SCHEDULED()->getValue()      => 5,
-			Status::CANCELED()->getValue()       => 6,
-			Status::NOT_APPLICABLE()->getValue() => 7,
-			Status::COMPLETED()->getValue()      => 8,
-		];
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filter the status priority map.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param array<string,int> $status_priority Status priority map.
+		 *
+		 * @return array<string,int> Status priority map.
+		 */
+		return apply_filters(
+			"stellarwp_migrations_{$prefix}_status_priority",
+			[
+				Status::RUNNING()->getValue()        => 1,
+				Status::FAILED()->getValue()         => 2,
+				Status::PAUSED()->getValue()         => 3,
+				Status::PENDING()->getValue()        => 4,
+				Status::SCHEDULED()->getValue()      => 5,
+				Status::CANCELED()->getValue()       => 6,
+				Status::NOT_APPLICABLE()->getValue() => 7,
+				Status::COMPLETED()->getValue()      => 8,
+			]
+		);
 	}
 }
