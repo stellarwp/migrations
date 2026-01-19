@@ -26,7 +26,7 @@ use StellarWP\Migrations\Provider;
  */
 class Assets {
 	/**
-	 * Select2 version to use from CDN.
+	 * Select2 version bundled with this library.
 	 *
 	 * @since 0.0.1
 	 *
@@ -79,7 +79,7 @@ class Assets {
 	}
 
 	/**
-	 * Register Select2 from CDN.
+	 * Register the Select2 library assets.
 	 *
 	 * @since 0.0.1
 	 *

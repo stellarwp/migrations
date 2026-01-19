@@ -80,9 +80,9 @@ class Config {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return string
+	 * @return string|null The assets URL, or null if not set.
 	 */
-	public static function get_assets_url(): string {
+	public static function get_assets_url(): ?string {
 		return self::$assets_url;
 	}
 
@@ -189,6 +189,7 @@ class Config {
 	 * @return void
 	 */
 	public static function reset(): void {
+		static::$assets_url      = null;
 		static::$container       = null;
 		static::$hook_prefix     = '';
 		static::$template_engine = null;
