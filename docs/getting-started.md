@@ -24,6 +24,10 @@ Config::set_container( $container );
 // Set a unique hook prefix for your plugin.
 Config::set_hook_prefix( 'my_plugin' );
 
+// Optional: Set a custom assets URL.
+// The URL should point to the library's assets directory with a trailing slash.
+Config::set_assets_url( plugin_dir_url( __FILE__ ) . 'vendor/stellarwp/migrations/assets/' );
+
 // Register the provider.
 $container->get( Provider::class )->register();
 ```

@@ -235,11 +235,37 @@ $assets->enqueue_assets();   // Register and enqueue.
 | CSS | Select2 CSS | Admin UI styling |
 | JS | `wp-dom-ready`, `wp-api-fetch`, `jquery`, Select2 JS | AJAX interactions |
 
+The library bundles Select2 v4.0.13 locally, eliminating the need for CDN dependencies.
+
 **Asset Handles:**
 
 Asset handles are prefixed with your hook prefix:
 - CSS: `{prefix}-migrations-admin`
 - JS: `{prefix}-migrations-admin`
+- Select2 CSS: `{prefix}-migrations-select2`
+- Select2 JS: `{prefix}-migrations-select2`
+
+### Custom Assets URL
+
+By default, the library auto-detects the assets URL based on the library's installation path. If you need to serve assets from a different location (e.g., a CDN or custom path), you can configure the assets URL:
+
+```php
+use StellarWP\Migrations\Config;
+
+// Set a custom assets URL during plugin initialization.
+Config::set_assets_url( plugin_dir_url( __FILE__ ) . 'vendor/stellarwp/migrations/assets/' );
+```
+
+**Important:** The URL should point to the `assets/` directory of the migrations library and must include a trailing slash.
+
+**Getting the current assets URL:**
+
+```php
+use StellarWP\Migrations\Config;
+
+$url = Config::get_assets_url();
+// Returns the configured URL, or null if not set (auto-detection will be used).
+```
 
 ## JavaScript AJAX Actions
 
