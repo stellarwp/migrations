@@ -345,6 +345,7 @@ wp my-plugin migrations executions my_migration --format=csv
 
 ## Next Steps
 
+- [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
 - [Getting Started](./getting-started.md) - Basic usage guide
 - [Migration Contract](./migration-contract.md) - Full API reference

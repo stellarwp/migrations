@@ -18,6 +18,7 @@ use StellarWP\Schema\Columns\Integer_Column;
 use StellarWP\Schema\Columns\String_Column;
 use StellarWP\Schema\Tables\Table_Schema;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
 use DateTimeInterface;
 
 /**
@@ -27,9 +28,10 @@ use DateTimeInterface;
  *
  * @package StellarWP\Migrations\Tables
  *
- * @method static array<string, array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }> get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
- * @method static ?array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface } get_first_by( string $column, $value )
- * @method static ?array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface } get_by_id( $id )
+ * @method static array<string, Execution> get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
+ * @method static ?Execution get_first_by( string $column, $value )
+ * @method static ?Execution get_by_id( $id )
+ * @method static list<Execution> paginate( array<string, mixed> $args, int $per_page = 20, int $page = 1, list<string> $columns = [ '*' ], string $join_table = '', string $join_condition = '', list<string> $selectable_joined_columns = [], string $output = 'OBJECT' )
  */
 class Migration_Executions extends Table_Abstract {
 	/**
@@ -128,29 +130,9 @@ class Migration_Executions extends Table_Abstract {
 	 *     created_at: DateTimeInterface
 	 * } $result_array
 	 *
-	 * @return array<string, mixed> The Migration_Execution array.
-	 *
-	 * @phpstan-return array{
-	 *     id: int,
-	 *     migration_id: string,
-	 *     start_date_gmt: DateTimeInterface,
-	 *     end_date_gmt: DateTimeInterface,
-	 *     status: Status,
-	 *     items_total: int,
-	 *     items_processed: int,
-	 *     created_at: DateTimeInterface
-	 * }
+	 * @return Execution The Execution model.
 	 */
-	public static function transform_from_array( array $result_array ) {
-		return [
-			'id'              => $result_array['id'],
-			'migration_id'    => $result_array['migration_id'],
-			'start_date_gmt'  => $result_array['start_date_gmt'],
-			'end_date_gmt'    => $result_array['end_date_gmt'],
-			'status'          => Status::from( $result_array['status'] ),
-			'items_total'     => $result_array['items_total'],
-			'items_processed' => $result_array['items_processed'],
-			'created_at'      => $result_array['created_at'],
-		];
+	public static function transform_from_array( array $result_array ): Execution {
+		return new Execution( $result_array );
 	}
 }

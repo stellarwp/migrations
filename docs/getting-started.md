@@ -24,6 +24,10 @@ Config::set_container( $container );
 // Set a unique hook prefix for your plugin.
 Config::set_hook_prefix( 'my_plugin' );
 
+// Optional: Set a custom assets URL.
+// The URL should point to the library's assets directory with a trailing slash.
+Config::set_assets_url( plugin_dir_url( __FILE__ ) . 'vendor/stellarwp/migrations/assets/' );
+
 // Register the provider.
 $container->get( Provider::class )->register();
 ```
@@ -280,6 +284,7 @@ Failures during `down()` are recorded but do not trigger additional rollbacks.
 ## Next Steps
 
 - [Migration Contract](./migration-contract.md) - Full API reference
+- [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
 - [Hooks Reference](./hooks.md) - Available actions and filters

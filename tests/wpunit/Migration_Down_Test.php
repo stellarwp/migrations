@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tables\Migration_Logs;
@@ -43,9 +44,10 @@ class Migration_Down_Test extends WPTestCase {
 		tests_migrations_clear_calls_data();
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
 		// Act.
-		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		// Assert.
@@ -66,13 +68,14 @@ class Migration_Down_Test extends WPTestCase {
 		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
 		// Act.
-		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		// Assert.
-		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$rollback_logs = array_filter(
 			$logs,
@@ -152,9 +155,10 @@ class Migration_Down_Test extends WPTestCase {
 		);
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
 		// Act.
-		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		// Assert.
@@ -183,9 +187,10 @@ class Migration_Down_Test extends WPTestCase {
 		);
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
 		// Act.
-		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		// Assert.
@@ -212,9 +217,10 @@ class Migration_Down_Test extends WPTestCase {
 		Multi_Batch_Migration::$after_calls  = [];
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
 		// Act.
-		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		// Assert.

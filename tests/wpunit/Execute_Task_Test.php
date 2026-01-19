@@ -9,6 +9,7 @@ use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Shepherd\Exceptions\ShepherdTaskFailWithoutRetryException;
 use InvalidArgumentException;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Enums\Status;
 
@@ -252,9 +253,10 @@ class Execute_Task_Test extends WPTestCase {
 		$this->assertTrue( Simple_Migration::$up_called );
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
 		// Act.
-		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
 		$task->process();
 
 		// Assert.
