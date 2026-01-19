@@ -17,7 +17,6 @@ use StellarWP\Schema\Columns\ID;
 use StellarWP\Schema\Columns\Integer_Column;
 use StellarWP\Schema\Columns\String_Column;
 use StellarWP\Schema\Tables\Table_Schema;
-use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Models\Execution;
 use DateTimeInterface;
 
