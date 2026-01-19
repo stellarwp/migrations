@@ -7,6 +7,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\DB\DB;
 use StellarWP\Migrations\Enums\Log_Type;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tasks\Clear_Logs;

@@ -347,6 +347,27 @@ public function get_status(): Status {
 
 **Note:** The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history.
 
+#### `get_latest_execution(): ?Execution`
+
+Returns the most recent execution for this migration as an `Execution` model, or `null` if no executions exist.
+
+```php
+use StellarWP\Migrations\Models\Execution;
+
+$execution = $migration->get_latest_execution();
+
+if ( $execution ) {
+    // Access execution data via getter methods.
+    $status = $execution->get_status();           // Status enum
+    $items_processed = $execution->get_items_processed();
+    $items_total = $execution->get_items_total();
+    $start_date = $execution->get_start_date();   // DateTimeInterface|null
+    $end_date = $execution->get_end_date();       // DateTimeInterface|null
+}
+```
+
+The `Execution` model provides a type-safe way to access execution data. See the [Execution Model](#execution-model) section for full details.
+
 #### `to_array(): array`
 
 Converts the migration to an array representation. This is used by the CLI commands and implements `JsonSerializable`.
@@ -435,6 +456,7 @@ echo $migration->get_id(); // 'my_plugin_migration'
 | `get_down_extra_args_for_batch()`   | `[]`                                   |
 | `get_total_batches()`               | Calculated from items/batch_size       |
 | `get_status()`                      | Queries last execution or `PENDING`    |
+| `get_latest_execution()`            | Returns `Execution` model or `null`    |
 | `to_array()`                        | Array of migration properties          |
 | `get_id()`                          | Returns the migration ID               |
 
@@ -678,6 +700,104 @@ Each log entry contains:
 - `data` - Optional JSON data for additional context
 - `created_at` - Timestamp when the log was created
 
+
+---
+
+## Execution Model
+
+The `Execution` model (`StellarWP\Migrations\Models\Execution`) is a read-only Data Transfer Object (DTO) that represents a migration execution record.
+
+### Creating an Execution
+
+Executions are typically retrieved from the database via the `Migration_Executions` table class or through the `get_latest_execution()` method on a migration:
+
+```php
+use StellarWP\Migrations\Tables\Migration_Executions;
+
+// Via the table class.
+$execution = Migration_Executions::get_first_by( 'migration_id', 'my_migration' );
+$executions = Migration_Executions::get_all_by( 'migration_id', 'my_migration' );
+
+// Via the migration.
+$migration = $registry->get( 'my_migration' );
+$execution = $migration->get_latest_execution();
+```
+
+### Getter Methods
+
+The `Execution` model provides the following getter methods:
+
+| Method | Return Type | Description |
+| ------ | ----------- | ----------- |
+| `get_id()` | `int` | The unique execution ID |
+| `get_migration_id()` | `string` | The migration ID this execution belongs to |
+| `get_start_date()` | `?DateTimeInterface` | When the execution started (null if not yet started) |
+| `get_end_date()` | `?DateTimeInterface` | When the execution ended (null if still running) |
+| `get_status()` | `Status` | The current status as a Status enum |
+| `get_items_total()` | `int` | Total number of items to process |
+| `get_items_processed()` | `int` | Number of items processed so far |
+| `get_created_at()` | `DateTimeInterface` | When the execution record was created |
+
+### Usage Example
+
+```php
+use StellarWP\Migrations\Models\Execution;
+use StellarWP\Migrations\Enums\Status;
+
+$execution = $migration->get_latest_execution();
+
+if ( $execution ) {
+    // Get basic information.
+    $id = $execution->get_id();
+    $migration_id = $execution->get_migration_id();
+
+    // Check status.
+    $status = $execution->get_status();
+    if ( $status->equals( Status::COMPLETED() ) ) {
+        echo 'Migration completed successfully!';
+    }
+
+    // Calculate progress.
+    $total = $execution->get_items_total();
+    $processed = $execution->get_items_processed();
+    $percent = $total > 0 ? ( $processed / $total ) * 100 : 0;
+    echo sprintf( 'Progress: %d/%d (%.1f%%)', $processed, $total, $percent );
+
+    // Get timing information.
+    $start = $execution->get_start_date();
+    $end = $execution->get_end_date();
+
+    if ( $start ) {
+        echo 'Started: ' . $start->format( 'Y-m-d H:i:s' );
+    }
+
+    if ( $end ) {
+        echo 'Ended: ' . $end->format( 'Y-m-d H:i:s' );
+    }
+}
+```
+
+### Converting to Array
+
+The `to_array()` method converts the execution to an associative array:
+
+```php
+$data = $execution->to_array();
+
+// Returns:
+// [
+//     'id'              => 123,
+//     'migration_id'    => 'my_migration',
+//     'start_date'      => DateTimeInterface,
+//     'end_date'        => DateTimeInterface|null,
+//     'status'          => Status,
+//     'items_total'     => 100,
+//     'items_processed' => 50,
+//     'created_at'      => DateTimeInterface,
+// ]
+```
+
+**Note:** The array keys use `start_date` and `end_date` (without the `_gmt` suffix) for consistency with the getter method names.
 
 ---
 

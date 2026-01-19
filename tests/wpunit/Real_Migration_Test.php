@@ -5,6 +5,7 @@ namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Switch_Post_Meta_Key;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
@@ -133,8 +134,9 @@ class Real_Migration_Test extends WPTestCase {
 		tests_migrations_clear_calls_data();
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		$migration = $registry->get( 'tests_switch_post_meta_key' );
@@ -165,8 +167,9 @@ class Real_Migration_Test extends WPTestCase {
 		tests_migrations_clear_calls_data();
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		$calls = tests_migrations_get_calls_data();
@@ -222,9 +225,10 @@ class Real_Migration_Test extends WPTestCase {
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 'completed', $execution['status']->getValue() );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 'completed', $execution->get_status()->getValue() );
 
-		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 		$this->assertNotEmpty( $logs, 'Should have log entries' );
 
 		// Check for migration started log.
@@ -273,15 +277,16 @@ class Real_Migration_Test extends WPTestCase {
 
 		tests_migrations_clear_calls_data();
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_switch_post_meta_key', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		$down_results = Switch_Post_Meta_Key::verify_down_results();
 		$this->assertTrue( $down_results['success'] );
 
 		tests_migrations_clear_calls_data();
-		$task = new Execute( 'up', 'tests_switch_post_meta_key', 1, 1, $execution['id'] );
+		$task = new Execute( 'up', 'tests_switch_post_meta_key', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		$up_results_2 = Switch_Post_Meta_Key::verify_up_results();

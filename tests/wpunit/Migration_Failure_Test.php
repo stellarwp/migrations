@@ -7,6 +7,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tests\Migrations\Failing_Migration;
 use StellarWP\Migrations\Tests\Migrations\Failing_At_Batch_Migration;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
@@ -46,10 +47,11 @@ class Migration_Failure_Test extends WPTestCase {
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
 		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::FAILED(), $execution->get_status() );
 
 		// Verify error log was recorded.
-		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$error_logs = array_filter(
 			$logs,
@@ -83,7 +85,8 @@ class Migration_Failure_Test extends WPTestCase {
 
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
-		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$error_logs = array_filter(
 			$logs,
@@ -204,7 +207,8 @@ class Migration_Failure_Test extends WPTestCase {
 
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_at_batch_migration' );
-		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		// Check for "Rollback scheduled" warning log.
 		$rollback_scheduled = array_filter(
@@ -293,8 +297,9 @@ class Migration_Failure_Test extends WPTestCase {
 		Failing_Migration::$should_fail_down = true;
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$task = new Execute( 'down', 'tests_failing_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_failing_migration', 1, 1, $execution->get_id() );
 
 		// Act.
 		try {
