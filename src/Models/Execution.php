@@ -102,15 +102,15 @@ class Execution {
 	 * @phpstan-param array{
 	 *     id: int,
 	 *     migration_id: string,
-	 *     start_date_gmt: DateTimeInterface,
-	 *     end_date_gmt: DateTimeInterface,
+	 *     start_date_gmt: DateTimeInterface|null,
+	 *     end_date_gmt: DateTimeInterface|null,
 	 *     status: string,
 	 *     items_total: int,
 	 *     items_processed: int,
 	 *     created_at: DateTimeInterface
 	 * } $attributes
 	 */
-	public function __construct( array $attributes = [] ) {
+	public function __construct( array $attributes ) {
 		$this->id              = $attributes['id'];
 		$this->migration_id    = $attributes['migration_id'];
 		$this->start_date      = $attributes['start_date_gmt'];
