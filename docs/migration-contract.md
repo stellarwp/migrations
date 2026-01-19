@@ -677,3 +677,14 @@ Each log entry contains:
 - `message` - Human-readable log message
 - `data` - Optional JSON data for additional context
 - `created_at` - Timestamp when the log was created
+
+
+---
+
+## Next Steps
+
+- [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
+- [CLI Reference](./cli.md) - WP-CLI commands for migrations
+- [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Getting Started](./getting-started.md) - Basic usage guide
+- [Hooks Reference](./hooks.md) - Available actions and filters

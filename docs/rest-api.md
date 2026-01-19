@@ -325,6 +325,7 @@ add_action( 'init', function() {
 
 ## Next Steps
 
+- [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [Getting Started](./getting-started.md) - Basic usage guide
 - [Hooks Reference](./hooks.md) - Available actions and filters
