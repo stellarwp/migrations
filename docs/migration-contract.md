@@ -335,17 +335,18 @@ public function get_status(): Status {
 
 **Available Status Values:**
 
-| Status | Description |
-| ------ | ----------- |
-| `Status::PENDING()` | Migration has not started |
-| `Status::SCHEDULED()` | Migration has been scheduled |
-| `Status::RUNNING()` | Migration is currently running |
-| `Status::COMPLETED()` | Migration finished successfully |
-| `Status::FAILED()` | Migration failed |
-| `Status::PAUSED()` | Migration is paused |
-| `Status::CANCELED()` | Migration was canceled |
+| Status                     | Description                                     |
+| -------------------------- | ----------------------------------------------- |
+| `Status::PENDING()`        | Migration has not started                       |
+| `Status::SCHEDULED()`      | Migration has been scheduled                    |
+| `Status::RUNNING()`        | Migration is currently running                  |
+| `Status::COMPLETED()`      | Migration finished successfully                 |
+| `Status::FAILED()`         | Migration failed                                |
+| `Status::PAUSED()`         | Migration is paused                             |
+| `Status::CANCELED()`       | Migration was canceled                          |
+| `Status::NOT_APPLICABLE()` | Migration is not applicable to the current site |
 
-**Note:** The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history.
+**Note:** The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history. If `is_applicable()` returns `false`, the status will be `NOT_APPLICABLE`.
 
 #### `get_latest_execution(): ?Execution`
 

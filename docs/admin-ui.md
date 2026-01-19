@@ -271,11 +271,11 @@ $url = Config::get_assets_url();
 
 The Admin UI JavaScript handles interactions with the REST API:
 
-| Action | REST Endpoint | Description |
-|--------|--------------|-------------|
-| Run | `POST /migrations/{id}/run` | Start a migration |
-| Rollback | `POST /migrations/{id}/rollback` | Rollback a migration |
-| Load Logs | `GET /executions/{id}/logs` | Load execution logs |
+| Action    | REST Endpoint                    | Description          |
+|-----------|----------------------------------|----------------------|
+| Run       | `POST /migrations/{id}/run`      | Start a migration    |
+| Rollback  | `POST /migrations/{id}/rollback` | Rollback a migration |
+| Load Logs | `GET /executions/{id}/logs`      | Load execution logs  |
 
 All AJAX requests use `wp.apiFetch()` which automatically includes the WordPress nonce for authentication.
 
