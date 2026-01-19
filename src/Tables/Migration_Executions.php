@@ -31,7 +31,7 @@ use DateTimeInterface;
  * @method static array<string, Execution> get_all_by( string $column, $value, string $operator = '=', int $limit = 50, string $order_by = '' )
  * @method static ?Execution get_first_by( string $column, $value )
  * @method static ?Execution get_by_id( $id )
- * @method static list<array{ id: int, migration_id: string, start_date_gmt: DateTimeInterface, end_date_gmt: DateTimeInterface, status: Status, items_total: int, items_processed: int, created_at: DateTimeInterface }> paginate( array<string, mixed> $args, int $per_page = 20, int $page = 1, list<string> $columns = [ '*' ], string $join_table = '', string $join_condition = '', list<string> $selectable_joined_columns = [], string $output = 'OBJECT' )
+ * @method static list<Execution> paginate( array<string, mixed> $args, int $per_page = 20, int $page = 1, list<string> $columns = [ '*' ], string $join_table = '', string $join_condition = '', list<string> $selectable_joined_columns = [], string $output = 'OBJECT' )
  */
 class Migration_Executions extends Table_Abstract {
 	/**

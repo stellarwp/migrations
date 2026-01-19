@@ -278,8 +278,8 @@ abstract class Migration_Abstract implements Migration {
 			1
 		);
 
-		if ( ! empty( $executions[0]['id'] ) ) {
-			return new Execution( $executions[0] );
+		if ( ! empty( $executions[0] ) && $executions[0] instanceof Execution ) {
+			return $executions[0];
 		}
 
 		return null;
