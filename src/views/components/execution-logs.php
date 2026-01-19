@@ -12,16 +12,7 @@
  *
  * @var StellarWP\Migrations\Contracts\Migration $migration     Migration object.
  * @var string                                   $rest_base_url REST API base URL.
- * @var list<array{
- *     id: int,
- *     migration_id: string,
- *     start_date_gmt: DateTimeInterface,
- *     end_date_gmt: DateTimeInterface,
- *     status: StellarWP\Migrations\Enums\Status,
- *     items_total: int,
- *     items_processed: int,
- *     created_at: DateTimeInterface
- * }> $executions List of execution records.
+ * @var list<StellarWP\Migrations\Models\Execution> $executions List of execution records.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -49,19 +40,16 @@ $rest_base_url ??= '';
 			<select id="stellarwp-execution-select" class="stellarwp-migration-logs__select">
 				<?php foreach ( $executions as $index => $execution ) : ?>
 					<?php
-					$exec_id     = $execution['id'] ?? 0;
-					$exec_status = $execution['status'] ?? null;
-					$created_at  = $execution['created_at'] ?? null;
+					$exec_id     = $execution->get_id();
+					$exec_status = $execution->get_status();
+					$created_at  = $execution->get_created_at();
 
 					$status_label = '';
 					if ( $exec_status instanceof Status ) {
 						$status_label = $exec_status->get_label();
 					}
 
-					$date_label = '';
-					if ( $created_at instanceof DateTimeInterface ) {
-						$date_label = wp_date( 'M j, Y g:i a', $created_at->getTimestamp() );
-					}
+					$date_label = wp_date( 'M j, Y g:i a', $created_at->getTimestamp() );
 
 					$label = sprintf(
 						/* translators: %1$d: execution number, %2$s: date, %3$s: status */
@@ -71,8 +59,10 @@ $rest_base_url ??= '';
 						$status_label
 					);
 
-					$start_date = $execution['start_date_gmt'] instanceof DateTimeInterface ? wp_date( 'M j, Y g:i:s a', $execution['start_date_gmt']->getTimestamp() ) : '';
-					$end_date   = $execution['end_date_gmt'] instanceof DateTimeInterface ? wp_date( 'M j, Y g:i:s a', $execution['end_date_gmt']->getTimestamp() ) : '';
+					$start_date_obj = $execution->get_start_date();
+					$end_date_obj   = $execution->get_end_date();
+					$start_date     = $start_date_obj ? wp_date( 'M j, Y g:i:s a', $start_date_obj->getTimestamp() ) : '';
+					$end_date       = $end_date_obj ? wp_date( 'M j, Y g:i:s a', $end_date_obj->getTimestamp() ) : '';
 					?>
 					<option
 						value="<?php echo esc_attr( (string) $exec_id ); ?>"

@@ -249,11 +249,11 @@ abstract class Migration_Abstract implements Migration {
 
 		$latest_execution = $this->get_latest_execution();
 
-		if ( empty( $latest_execution['status'] ) || ! $latest_execution['status'] instanceof Status ) {
+		if ( null === $latest_execution ) {
 			return Status::PENDING();
 		}
 
-		return $latest_execution['status'];
+		return $latest_execution->get_status();
 	}
 
 	/**
