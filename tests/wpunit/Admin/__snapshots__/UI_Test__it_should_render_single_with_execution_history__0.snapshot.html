@@ -1,11 +1,12 @@
 <div class="wrap stellarwp-migration-single" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1" data-migration-id="tests_simple_migration">
-	<div class="stellarwp-migration-single__header">
+	<header class="stellarwp-migration-single__header">
 		<h1 class="stellarwp-migration-single__label">Simple Migration</h1>
 		<p class="stellarwp-migration-single__description">This is a simple migration that runs a single batch.</p>
-	</div>
+	</header>
 
-	<h2 class="stellarwp-migration-single__section-title">Status</h2>
-	<div class="stellarwp-migration-status-card" data-migration-id="tests_simple_migration">
+	<section class="stellarwp-migration-single__section" aria-labelledby="stellarwp-migration-status-title">
+		<h2 id="stellarwp-migration-status-title" class="stellarwp-migration-single__section-title">Status</h2>
+		<div class="stellarwp-migration-status-card" data-migration-id="tests_simple_migration">
 	<div class="stellarwp-migration-status-card__content">
 		<div class="stellarwp-migration-status-card__status">
 			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--completed">
@@ -15,7 +16,14 @@
 					</div>
 
 					<div class="stellarwp-migration-status-card__progress">
-				<div class="stellarwp-migration-progress">
+				<div
+	class="stellarwp-migration-progress"
+	role="progressbar"
+	aria-valuenow="1"
+	aria-valuemin="0"
+	aria-valuemax="1"
+	aria-label="Migration progress: 1 of 1 items processed (100% complete)"
+>
 	<div class="stellarwp-migration-progress__bar">
 		<div
 			class="stellarwp-migration-progress__fill stellarwp-migration-progress__fill--completed"
@@ -38,49 +46,53 @@
 				Not yet started			</span>
 			</div>
 
-	<div class="stellarwp-migration-card__message" style="display: none;"></div>
+	<div class="stellarwp-migration-card__message" style="display: none;" role="alert" aria-live="assertive"></div>
 </div>
+	</section>
 
-	<h2 class="stellarwp-migration-single__section-title">Configuration</h2>
-	<div class="stellarwp-migration-config-box">
+	<section class="stellarwp-migration-single__section" aria-labelledby="stellarwp-migration-config-title">
+		<h2 id="stellarwp-migration-config-title" class="stellarwp-migration-single__section-title">Configuration</h2>
+		<div class="stellarwp-migration-config-box">
 	<div class="stellarwp-migration-config-box__grid">
 		<div class="stellarwp-migration-config-box__item">
-			<span class="stellarwp-migration-config-box__label">Total Items</span>
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Total Items</span>
 			<span class="stellarwp-migration-config-box__value">1</span>
 		</div>
 
 		<div class="stellarwp-migration-config-box__item">
-			<span class="stellarwp-migration-config-box__label">Batch Size</span>
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Batch Size</span>
 			<span class="stellarwp-migration-config-box__value">1</span>
 		</div>
 
 		<div class="stellarwp-migration-config-box__item">
-			<span class="stellarwp-migration-config-box__label">Total Batches</span>
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Total Batches</span>
 			<span class="stellarwp-migration-config-box__value">1</span>
 		</div>
 
 		<div class="stellarwp-migration-config-box__item">
-			<span class="stellarwp-migration-config-box__label">Retry Attempts</span>
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Retry Attempts</span>
 			<span class="stellarwp-migration-config-box__value">0</span>
 		</div>
 
 		<div class="stellarwp-migration-config-box__item">
-			<span class="stellarwp-migration-config-box__label">Applicable</span>
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Applicable</span>
 			<span class="stellarwp-migration-config-box__value stellarwp-migration-config-box__value--yes">
 				Yes			</span>
 		</div>
 
 		<div class="stellarwp-migration-config-box__item">
-			<span class="stellarwp-migration-config-box__label">Can Run</span>
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Can Run</span>
 			<span class="stellarwp-migration-config-box__value stellarwp-migration-config-box__value--yes">
 				Yes			</span>
 		</div>
 
 			</div>
 </div>
+	</section>
 
-	<h2 class="stellarwp-migration-single__section-title">Logs</h2>
-	<div class="stellarwp-migration-logs" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1">
+	<section class="stellarwp-migration-single__section" aria-labelledby="stellarwp-migration-logs-title">
+		<h2 id="stellarwp-migration-logs-title" class="stellarwp-migration-single__section-title">Logs</h2>
+		<div class="stellarwp-migration-logs" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1">
 			<div class="stellarwp-migration-logs__selector">
 			<label for="stellarwp-execution-select" class="screen-reader-text">
 				Select Execution			</label>
@@ -91,18 +103,22 @@
 						data-end=""
 						data-status="completed"
 					>
-						#728366 - Jan 15, 2026 6:53 pm (Completed)					</option>
+						#728366 - Jan 19, 2026 3:06 pm (Completed)					</option>
 							</select>
 		</div>
 
-		<div class="stellarwp-migration-logs__execution-info">
-			<span class="stellarwp-migration-logs__execution-start"></span>
-			<span class="stellarwp-migration-logs__execution-end"></span>
+		<div class="stellarwp-migration-logs__execution-info" aria-live="polite" aria-atomic="true">
+			<span class="stellarwp-migration-logs__execution-start">
+				<span class="screen-reader-text">Execution started:</span>
+			</span>
+			<span class="stellarwp-migration-logs__execution-end">
+				<span class="screen-reader-text">Execution ended:</span>
+			</span>
 		</div>
 
-		<div class="stellarwp-migration-logs__container">
-			<div class="stellarwp-migration-logs__list"></div>
-			<div class="stellarwp-migration-logs__loading" style="display: none;">
+		<div class="stellarwp-migration-logs__container" aria-live="polite" aria-relevant="additions removals">
+			<div class="stellarwp-migration-logs__list" role="log" aria-label="Migration execution logs"></div>
+			<div class="stellarwp-migration-logs__loading" style="display: none;" aria-hidden="true">
 				<span class="spinner is-active"></span>
 				<span>Loading logs...</span>
 			</div>
@@ -115,4 +131,5 @@
 			</div>
 		</div>
 	</div>
+	</section>
 </div>
