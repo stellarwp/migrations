@@ -369,7 +369,7 @@ class Commands {
 			$executions
 		);
 
-		$this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
+		$this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date', 'end_date', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
 	}
 
 	/**
