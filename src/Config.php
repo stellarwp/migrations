@@ -23,6 +23,15 @@ use StellarWP\Migrations\Utilities\Default_Template_Engine;
  */
 class Config {
 	/**
+	 * The assets URL.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var ?string
+	 */
+	protected static ?string $assets_url = null;
+
+	/**
 	 * Container object.
 	 *
 	 * @since 0.0.1
@@ -67,6 +76,17 @@ class Config {
 	}
 
 	/**
+	 * Gets the assets URL.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 */
+	public static function get_assets_url(): string {
+		return self::$assets_url;
+	}
+
+	/**
 	 * Gets the hook prefix.
 	 *
 	 * @since 0.0.1
@@ -95,6 +115,21 @@ class Config {
 	 */
 	public static function set_container( ContainerInterface $container ) {
 		self::$container = $container;
+	}
+
+	/**
+	 * Sets the assets URL.
+	 *
+	 * The url should point to the assets directory of this library.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $assets_url The assets URL.
+	 *
+	 * @return void
+	 */
+	public static function set_assets_url( string $assets_url ): void {
+		self::$assets_url = $assets_url;
 	}
 
 	/**

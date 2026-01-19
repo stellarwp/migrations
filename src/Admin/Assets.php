@@ -26,24 +26,6 @@ use StellarWP\Migrations\Provider;
  */
 class Assets {
 	/**
-	 * Whether assets have been registered.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var bool
-	 */
-	private static bool $registered = false;
-
-	/**
-	 * Whether assets have been enqueued.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @var bool
-	 */
-	private static bool $enqueued = false;
-
-	/**
 	 * Select2 version to use from CDN.
 	 *
 	 * @since 0.0.1
@@ -104,20 +86,20 @@ class Assets {
 	 * @return void
 	 */
 	private function register_select2(): void {
-		$select2_version = self::SELECT2_VERSION;
+		$assets_url = $this->get_assets_url();
 
 		wp_register_style(
 			self::get_select2_css_handle(),
-			"https://cdn.jsdelivr.net/npm/select2@{$select2_version}/dist/css/select2.min.css",
+			$assets_url . 'css/select2.min.css',
 			[],
-			$select2_version
+			self::SELECT2_VERSION
 		);
 
 		wp_register_script(
 			self::get_select2_js_handle(),
-			"https://cdn.jsdelivr.net/npm/select2@{$select2_version}/dist/js/select2.min.js",
+			$assets_url . 'js/select2.min.js',
 			[ 'jquery' ],
-			$select2_version,
+			self::SELECT2_VERSION,
 			true
 		);
 	}
@@ -130,15 +112,25 @@ class Assets {
 	 * @return string The assets URL.
 	 */
 	private function get_assets_url(): string {
+		$assets_url = Config::get_assets_url();
+
+		if ( $assets_url ) {
+			return $assets_url;
+		}
+
 		// Get the path to the assets directory.
 		$assets_path = dirname( __DIR__, 2 ) . '/assets/';
 
 		// Convert to URL.
-		return str_replace(
+		$assets_url = str_replace(
 			wp_normalize_path( ABSPATH ),
 			trailingslashit( site_url() ),
 			wp_normalize_path( $assets_path )
 		);
+
+		Config::set_assets_url( $assets_url );
+
+		return $assets_url;
 	}
 
 	/**
@@ -152,7 +144,7 @@ class Assets {
 	 * @return void
 	 */
 	public function register_assets(): void {
-		if ( self::$registered ) {
+		if ( wp_script_is( self::get_js_handle(), 'registered' ) ) {
 			return;
 		}
 
@@ -174,8 +166,6 @@ class Assets {
 			Provider::VERSION,
 			true
 		);
-
-		self::$registered = true;
 	}
 
 	/**
@@ -189,31 +179,15 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		if ( self::$enqueued ) {
+		if ( wp_script_is( self::get_js_handle(), 'enqueued' ) ) {
 			return;
 		}
 
-		if ( ! self::$registered ) {
+		if ( ! wp_script_is( self::get_js_handle(), 'registered' ) ) {
 			$this->register_assets();
 		}
 
 		wp_enqueue_style( self::get_css_handle() );
 		wp_enqueue_script( self::get_js_handle() );
-
-		self::$enqueued = true;
-	}
-
-	/**
-	 * Reset the assets state.
-	 *
-	 * Useful for testing.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 */
-	public static function reset(): void {
-		self::$registered = false;
-		self::$enqueued   = false;
 	}
 }
