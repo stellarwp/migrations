@@ -86,7 +86,7 @@ class Migration_Failure_Test extends WPTestCase {
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
 		$this->assertInstanceOf( Execution::class, $execution );
-		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$error_logs = array_filter(
 			$logs,
@@ -208,7 +208,7 @@ class Migration_Failure_Test extends WPTestCase {
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_at_batch_migration' );
 		$this->assertInstanceOf( Execution::class, $execution );
-		$logs      = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		// Check for "Rollback scheduled" warning log.
 		$rollback_scheduled = array_filter(

@@ -192,16 +192,18 @@ class Execution_Test extends WPTestCase {
 		$end_date   = new DateTime( '2024-01-15 10:05:00' );
 		$created_at = new DateTime( '2024-01-15 09:55:00' );
 
-		$execution = $this->create_test_execution( [
-			'id'              => 789,
-			'migration_id'    => 'array_test_migration',
-			'start_date_gmt'  => $start_date,
-			'end_date_gmt'    => $end_date,
-			'status'          => Status::COMPLETED()->getValue(),
-			'items_total'     => 200,
-			'items_processed' => 200,
-			'created_at'      => $created_at,
-		] );
+		$execution = $this->create_test_execution(
+			[
+				'id'              => 789,
+				'migration_id'    => 'array_test_migration',
+				'start_date_gmt'  => $start_date,
+				'end_date_gmt'    => $end_date,
+				'status'          => Status::COMPLETED()->getValue(),
+				'items_total'     => 200,
+				'items_processed' => 200,
+				'created_at'      => $created_at,
+			] 
+		);
 
 		$result = $execution->to_array();
 
@@ -221,10 +223,12 @@ class Execution_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_handle_zero_items(): void {
-		$execution = $this->create_test_execution( [
-			'items_total'     => 0,
-			'items_processed' => 0,
-		] );
+		$execution = $this->create_test_execution(
+			[
+				'items_total'     => 0,
+				'items_processed' => 0,
+			] 
+		);
 
 		$this->assertEquals( 0, $execution->get_items_total() );
 		$this->assertEquals( 0, $execution->get_items_processed() );
@@ -234,10 +238,12 @@ class Execution_Test extends WPTestCase {
 	 * @test
 	 */
 	public function it_should_handle_partially_processed_items(): void {
-		$execution = $this->create_test_execution( [
-			'items_total'     => 100,
-			'items_processed' => 50,
-		] );
+		$execution = $this->create_test_execution(
+			[
+				'items_total'     => 100,
+				'items_processed' => 50,
+			] 
+		);
 
 		$this->assertEquals( 100, $execution->get_items_total() );
 		$this->assertEquals( 50, $execution->get_items_processed() );
