@@ -159,7 +159,7 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array<string,mixed> Parsed filters.
+	 * @return array{tags: string[], show_completed: bool, show_non_applicable: bool} Parsed filters.
 	 */
 	private function parse_filters(): array {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce not required for display filters.
@@ -187,9 +187,9 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param array<{tags: list<string>, show_completed: bool, show_non_applicable: bool}> $filters Filters to apply.
+		 * @param array{tags: string[], show_completed: bool, show_non_applicable: bool} $filters Filters to apply.
 		 *
-		 * @return array<{tags: list<string>, show_completed: bool, show_non_applicable: bool}> Filters to apply.
+		 * @return array{tags: string[], show_completed: bool, show_non_applicable: bool} Filters to apply.
 		 */
 		return apply_filters(
 			"stellarwp_migrations_{$prefix}_filters",
@@ -207,7 +207,7 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<string,mixed> $filters Filters to apply.
+	 * @param array{tags: string[], show_completed: bool, show_non_applicable: bool} $filters Filters to apply.
 	 *
 	 * @return list<Migration> Filtered migrations.
 	 */
@@ -245,8 +245,8 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param list<Migration>                                                              $migrations Migrations to filter.
-		 * @param array<{tags: list<string>, show_completed: bool, show_non_applicable: bool}> $filters    Filters to apply.
+		 * @param list<Migration>                                                        $migrations Migrations to filter.
+		 * @param array{tags: string[], show_completed: bool, show_non_applicable: bool} $filters    Filters to apply.
 		 *
 		 * @return list<Migration> Filtered migrations.
 		 */
@@ -287,8 +287,8 @@ class UI {
 				$execution_a = $a->get_latest_execution();
 				$execution_b = $b->get_latest_execution();
 
-				$date_a = $execution_a['created_at'] ?? null;
-				$date_b = $execution_b['created_at'] ?? null;
+				$date_a = $execution_a ? $execution_a->get_created_at() : null;
+				$date_b = $execution_b ? $execution_b->get_created_at() : null;
 
 				// Migrations with executions come before those without.
 				if ( $date_a === null && $date_b === null ) {
