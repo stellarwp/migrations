@@ -25,6 +25,7 @@ use StellarWP\Migrations\Enums\Status;
 use StellarWP\DB\DB;
 use StellarWP\Migrations\Exceptions\ApiMethodException;
 use StellarWP\Migrations\Traits\API_Methods;
+use StellarWP\Migrations\Models\Execution;
 use function StellarWP\Shepherd\shepherd;
 use function WP_CLI\Utils\make_progress_bar;
 
@@ -362,6 +363,11 @@ class Commands {
 			$this->log( 'No executions found.' );
 			return;
 		}
+
+		$executions = array_map(
+			static fn( Execution $execution ): array => $execution->to_array(),
+			$executions
+		);
 
 		$this->display_items_in_format( $executions, [ 'id', 'migration_id', 'start_date_gmt', 'end_date_gmt', 'status', 'items_total', 'items_processed', 'created_at' ], $format );
 	}

@@ -1,0 +1,101 @@
+<div class="wrap stellarwp-migration-single" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1" data-migration-id="tests_simple_migration">
+	<header class="stellarwp-migration-single__header">
+		<h1 class="stellarwp-migration-single__label">Simple Migration</h1>
+		<p class="stellarwp-migration-single__description">This is a simple migration that runs a single batch.</p>
+	</header>
+
+	<section class="stellarwp-migration-single__section" aria-labelledby="stellarwp-migration-status-title">
+		<h2 id="stellarwp-migration-status-title" class="stellarwp-migration-single__section-title">Status</h2>
+		<div class="stellarwp-migration-status-card" data-migration-id="tests_simple_migration">
+	<div class="stellarwp-migration-status-card__content">
+		<div class="stellarwp-migration-status-card__status">
+			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--pending">
+				Pending			</span>
+							<span class="stellarwp-migration-card__progress-text">
+					0 / 1				</span>
+					</div>
+
+					<div class="stellarwp-migration-status-card__progress">
+				<div
+	class="stellarwp-migration-progress"
+	role="progressbar"
+	aria-valuenow="0"
+	aria-valuemin="0"
+	aria-valuemax="1"
+	aria-label="Migration progress: 0 of 1 items processed (0% complete)"
+>
+	<div class="stellarwp-migration-progress__bar">
+		<div
+			class="stellarwp-migration-progress__fill stellarwp-migration-progress__fill--pending"
+			style="width: 0%;"
+		></div>
+	</div>
+</div>
+			</div>
+		
+		<div class="stellarwp-migration-card__actions">
+							<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--primary" data-action="run">
+					Run				</button>
+								</div>
+	</div>
+
+	<hr class="stellarwp-migration-card__separator" />
+
+	<div class="stellarwp-migration-status-card__timing">
+					<span class="stellarwp-migration-status-card__not-started">
+				Not yet started			</span>
+			</div>
+
+	<div class="stellarwp-migration-card__message" style="display: none;" role="alert" aria-live="assertive"></div>
+</div>
+	</section>
+
+	<section class="stellarwp-migration-single__section" aria-labelledby="stellarwp-migration-config-title">
+		<h2 id="stellarwp-migration-config-title" class="stellarwp-migration-single__section-title">Configuration</h2>
+		<div class="stellarwp-migration-config-box">
+	<div class="stellarwp-migration-config-box__grid">
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Total Items</span>
+			<span class="stellarwp-migration-config-box__value">1</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Batch Size</span>
+			<span class="stellarwp-migration-config-box__value">1</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Total Batches</span>
+			<span class="stellarwp-migration-config-box__value">1</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Retry Attempts</span>
+			<span class="stellarwp-migration-config-box__value">0</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Applicable</span>
+			<span class="stellarwp-migration-config-box__value stellarwp-migration-config-box__value--yes">
+				Yes			</span>
+		</div>
+
+		<div class="stellarwp-migration-config-box__item">
+			<span class="stellarwp-migration-config-box__label" role="heading" aria-level="3">Can Run</span>
+			<span class="stellarwp-migration-config-box__value stellarwp-migration-config-box__value--yes">
+				Yes			</span>
+		</div>
+
+			</div>
+</div>
+	</section>
+
+	<section class="stellarwp-migration-single__section" aria-labelledby="stellarwp-migration-logs-title">
+		<h2 id="stellarwp-migration-logs-title" class="stellarwp-migration-single__section-title">Logs</h2>
+		<div class="stellarwp-migration-logs" data-rest-url="http://wordpress.test/index.php?rest_route=/foobar/migrations/v1">
+			<div class="stellarwp-migration-logs__empty">
+			<p>No executions yet. Run the migration to see logs.</p>
+		</div>
+	</div>
+	</section>
+</div>

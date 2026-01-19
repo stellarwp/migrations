@@ -17,6 +17,7 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Exceptions\ApiMethodException;
+use StellarWP\Migrations\Models\Execution;
 use DateTimeInterface;
 use MyCLabs\Enum\Enum;
 
@@ -86,19 +87,14 @@ trait API_Methods {
 	public function get_logs( int $execution_id, string $types = '', string $not_types = '', int $limit = 100, int $offset = 0, string $order = 'DESC', string $order_by = 'created_at', string $search = '' ): array {
 		$execution = Migration_Executions::get_by_id( $execution_id );
 
-		if ( ! $execution || ! is_array( $execution ) ) {
+		if ( ! $execution || ! $execution instanceof Execution ) {
 			throw new ApiMethodException( "Execution with ID '{$execution_id}' not found." );
 		}
 
-		$migration_id = ! empty( $execution['migration_id'] ) ? $execution['migration_id'] : false;
-
-		if ( ! $migration_id ) {
-			throw new ApiMethodException( "Execution with ID '{$execution_id}' not found." );
-		}
+		$migration_id = $execution->get_migration_id();
 
 		$container = Config::get_container();
 		$registry  = $container->get( Registry::class );
-		/** @var string $migration_id */
 		$migration = $registry->get( $migration_id );
 
 		if ( ! $migration ) {
@@ -184,7 +180,7 @@ trait API_Methods {
 	 *
 	 * @param string $migration_id The migration ID to list executions for.
 	 *
-	 * @return array<string, array<string, mixed>>
+	 * @return array<string, Execution>
 	 */
 	public function get_executions( string $migration_id ): array {
 		return Migration_Executions::get_all_by( 'migration_id', $migration_id );

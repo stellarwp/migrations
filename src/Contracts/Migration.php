@@ -12,6 +12,7 @@ namespace StellarWP\Migrations\Contracts;
 use JsonSerializable;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
 
 /**
  * Interface for migrations.
@@ -262,4 +263,13 @@ interface Migration extends JsonSerializable {
 	 * @return Status
 	 */
 	public function get_status(): Status;
+
+	/**
+	 * Get the latest execution for this migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Execution|null The execution model or null if none found.
+	 */
+	public function get_latest_execution(): ?Execution;
 }
