@@ -4,7 +4,9 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\views
+ * @package StellarWP\Migrations
+ *
+ * @version 0.0.1
  *
  * @var list<StellarWP\Migrations\Contracts\Migration>                             $migrations    List of migrations objects.
  * @var list<string>                                                               $all_tags      All available tags.

@@ -6,7 +6,9 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\views\components
+ * @package StellarWP\Migrations
+ *
+ * @version 0.0.1
  *
  * @var StellarWP\Migrations\Contracts\Migration $migration     Migration object.
  * @var string                                   $rest_base_url REST API base URL.

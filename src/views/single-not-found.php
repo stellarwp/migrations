@@ -4,7 +4,9 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\views
+ * @package StellarWP\Migrations
+ *
+ * @version 0.0.1
  *
  * @var string $migration_id The migration ID that was not found.
  */

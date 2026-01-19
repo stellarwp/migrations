@@ -4,7 +4,9 @@
  *
  * @since 0.0.1
  *
- * @package StellarWP\Migrations\views
+ * @package StellarWP\Migrations
+ *
+ * @version 0.0.1
  *
  * @var StellarWP\Migrations\Contracts\Migration        $migration     The migration object.
  * @var list<array<string,mixed>>                       $executions    List of execution records.
