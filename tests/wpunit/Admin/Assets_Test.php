@@ -118,8 +118,8 @@ class Assets_Test extends WPTestCase {
 		$handle = Config::get_hook_prefix() . '-migrations-admin';
 
 		// Get the script URL after first registration.
-		$scripts          = wp_scripts();
-		$original_script  = $scripts->registered[ $handle ] ?? null;
+		$scripts         = wp_scripts();
+		$original_script = $scripts->registered[ $handle ] ?? null;
 		$this->assertNotNull( $original_script );
 
 		// Register assets second time.
