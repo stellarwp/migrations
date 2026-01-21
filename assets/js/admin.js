@@ -8,7 +8,7 @@
  * @package StellarWP\Migrations
  */
 
-( function( domReady, apiFetch, i18n, $ ) {
+( function( domReady, apiFetch, i18n, $, adminSettings ) {
 	'use strict';
 
 	const { __, sprintf } = i18n;
@@ -16,9 +16,11 @@
 	/**
 	 * Logs per page for pagination.
 	 *
+	 * Note: wp_localize_script converts values to strings, so we parse as int.
+	 *
 	 * @type {number}
 	 */
-	const LOGS_PER_PAGE = 50;
+	const LOGS_PER_PAGE = parseInt( adminSettings?.logsPerPage ) || 10;
 
 	/**
 	 * Current logs state for single view.
@@ -382,6 +384,7 @@
 		logsState.loading = true;
 
 		const logsContainer = document.querySelector( '.stellarwp-migration-logs' );
+		const containerEl = logsContainer.querySelector( '.stellarwp-migration-logs__container' );
 		const listEl = logsContainer.querySelector( '.stellarwp-migration-logs__list' );
 		const loadingEl = logsContainer.querySelector( '.stellarwp-migration-logs__loading' );
 		const noLogsEl = logsContainer.querySelector( '.stellarwp-migration-logs__no-logs' );
@@ -391,6 +394,7 @@
 		loadingEl.style.display = 'flex';
 		loadMoreEl.style.display = 'none';
 		noLogsEl.style.display = 'none';
+		containerEl.classList.remove( 'stellarwp-migration-logs__container--has-more' );
 
 		if ( reset ) {
 			listEl.innerHTML = '';
@@ -408,6 +412,8 @@
 						noLogsEl.style.display = 'block';
 					}
 					logsState.hasMore = false;
+					loadMoreEl.style.display = 'none';
+					containerEl.classList.remove( 'stellarwp-migration-logs__container--has-more' );
 					return;
 				}
 
@@ -420,8 +426,9 @@
 				logsState.offset += logs.length;
 				logsState.hasMore = logs.length === LOGS_PER_PAGE;
 
-				// Show/hide load more button.
+				// Show/hide load more button and update container styling.
 				loadMoreEl.style.display = logsState.hasMore ? 'block' : 'none';
+				containerEl.classList.toggle( 'stellarwp-migration-logs__container--has-more', logsState.hasMore );
 			} )
 			.catch( function( error ) {
 				console.error( 'Failed to load logs:', error );
@@ -519,4 +526,4 @@
 
 	// Initialize when DOM is ready using wp.domReady.
 	domReady( init );
-} )( wp.domReady, wp.apiFetch, wp.i18n, jQuery );
+} )( wp.domReady, wp.apiFetch, wp.i18n, jQuery, window.stellarwpMigrationsAdmin );

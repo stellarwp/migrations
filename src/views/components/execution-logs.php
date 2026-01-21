@@ -95,11 +95,11 @@ $rest_base_url ??= '';
 			<div class="stellarwp-migration-logs__no-logs" style="display: none;">
 				<p><?php esc_html_e( 'No logs for this execution.', 'stellarwp-migrations' ); ?></p>
 			</div>
-			<div class="stellarwp-migration-logs__load-more" style="display: none;">
-				<button type="button" class="button stellarwp-migration-logs__load-more-btn" aria-label="<?php esc_attr_e( 'Load More Logs', 'stellarwp-migrations' ); ?>">
-					<?php esc_html_e( 'Load More', 'stellarwp-migrations' ); ?>
-				</button>
-			</div>
+		</div>
+		<div class="stellarwp-migration-logs__load-more" style="display: none;">
+			<button type="button" class="button stellarwp-migration-logs__load-more-btn" aria-label="<?php esc_attr_e( 'Load More Logs', 'stellarwp-migrations' ); ?>">
+				<?php esc_html_e( 'Load More', 'stellarwp-migrations' ); ?>
+			</button>
 		</div>
 	<?php endif; ?>
 </div>

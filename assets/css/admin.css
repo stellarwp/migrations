@@ -680,6 +680,11 @@
 	overflow-y: auto;
 }
 
+.stellarwp-migration-logs__container--has-more {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
 .stellarwp-migration-logs__list {
 	font-family: monospace;
 	font-size: 12px;
@@ -710,7 +715,11 @@
 }
 
 .stellarwp-migration-logs__load-more {
-	border-top: 1px solid #e2e4e7;
+	background: #f6f7f7;
+	border: 1px solid #e2e4e7;
+	border-radius: 0 0 4px 4px;
+	border-top: none;
+	margin-top: -4px;
 	padding: 12px;
 	text-align: center;
 }
