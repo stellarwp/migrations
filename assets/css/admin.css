@@ -97,9 +97,9 @@
 	height: 22px;
 	line-height: 22px;
 	margin: 0;
-	padding: 0;
+	min-height: unset;
+	padding: 0 0 0 4px;
 }
-
 
 /* List Container */
 .stellarwp-migrations-list {
@@ -452,6 +452,20 @@
 
 /* Responsive */
 @media screen and (max-width: 782px) {
+	/* Filters - smaller buttons */
+	.stellarwp-migrations-filters__actions .button {
+		font-size: 12px;
+		line-height: 1.5;
+		min-height: 0;
+		padding: 4px 10px;
+	}
+
+	/* Filters - left-align checkboxes */
+	.stellarwp-migrations-filters__checkboxes {
+		margin-left: 0;
+		width: 100%;
+	}
+
 	.stellarwp-migration-card__footer {
 		align-items: stretch;
 		flex-direction: column;
