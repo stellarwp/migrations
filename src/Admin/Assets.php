@@ -189,5 +189,62 @@ class Assets {
 
 		wp_enqueue_style( self::get_css_handle() );
 		wp_enqueue_script( self::get_js_handle() );
+
+		wp_localize_script(
+			self::get_js_handle(),
+			'stellarwpMigrationsAdmin',
+			[
+				'logsPerPage' => $this->get_logs_per_page(),
+			]
+		);
+	}
+
+	/**
+	 * Get the number of logs to display per page.
+	 *
+	 * The value is determined in this order:
+	 * 1. User's screen option preference (if set)
+	 * 2. Filtered default value
+	 * 3. Default value of 10
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return int The number of logs per page.
+	 */
+	public function get_logs_per_page(): int {
+		$prefix  = Config::get_hook_prefix();
+		$default = 10;
+
+		/**
+		 * Filter the default number of logs to display per page.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param int $default The default number of logs per page.
+		 */
+		$filtered_default = (int) apply_filters(
+			"stellarwp_migrations_{$prefix}_logs_per_page",
+			$default
+		);
+
+		// Check for user's screen option preference.
+		$user_option = get_user_option( "stellarwp_migrations_{$prefix}_logs_per_page" );
+
+		if ( false !== $user_option && is_numeric( $user_option ) ) {
+			return max( 1, (int) $user_option );
+		}
+
+		return max( 1, $filtered_default );
+	}
+
+	/**
+	 * Get the screen option name for logs per page.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string The screen option name.
+	 */
+	public static function get_logs_per_page_option(): string {
+		return 'stellarwp_migrations_' . Config::get_hook_prefix() . '_logs_per_page';
 	}
 }

@@ -47,6 +47,7 @@ class Provider {
 		self::$registered = true;
 
 		add_action( 'admin_menu', [ $this, 'register_hidden_pages' ] );
+		add_filter( 'set-screen-option', [ $this, 'save_screen_option' ], 10, 3 );
 	}
 
 	/**
@@ -57,7 +58,7 @@ class Provider {
 	 * @return void
 	 */
 	public function register_hidden_pages(): void {
-		add_submenu_page(
+		$single_page_hook = add_submenu_page(
 			'',
 			__( 'Migration Details', 'stellarwp-migrations' ),
 			__( 'Migration Details', 'stellarwp-migrations' ),
@@ -65,6 +66,47 @@ class Provider {
 			self::get_single_page_slug(),
 			[ $this, 'render_single_page' ]
 		);
+
+		if ( $single_page_hook && is_string( $single_page_hook ) ) {
+			add_action( 'load-' . $single_page_hook, [ $this, 'add_screen_options' ] );
+		}
+	}
+
+	/**
+	 * Add screen options for the single migration page.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function add_screen_options(): void {
+		add_screen_option(
+			'per_page',
+			[
+				'label'   => __( 'Logs per page', 'stellarwp-migrations' ),
+				'default' => 10,
+				'option'  => Assets::get_logs_per_page_option(),
+			]
+		);
+	}
+
+	/**
+	 * Save the screen option value.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param mixed  $status The current status (false by default).
+	 * @param string $option The option name.
+	 * @param mixed  $value  The option value.
+	 *
+	 * @return mixed The value to save, or false to not save.
+	 */
+	public function save_screen_option( $status, string $option, $value ) {
+		if ( Assets::get_logs_per_page_option() === $option && is_numeric( $value ) ) {
+			return max( 1, (int) $value );
+		}
+
+		return $status;
 	}
 
 	/**
@@ -75,8 +117,7 @@ class Provider {
 	 * @return void
 	 */
 	public function render_single_page(): void {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only, no state change.
-		$migration_id = isset( $_GET['migration_id'] ) && is_string( $_GET['migration_id'] ) ? sanitize_text_field( wp_unslash( $_GET['migration_id'] ) ) : '';
+		$migration_id = sanitize_key( (string) filter_input( INPUT_GET, 'migration_id' ) );
 
 		if ( empty( $migration_id ) ) {
 			Config::get_template_engine()->template(
