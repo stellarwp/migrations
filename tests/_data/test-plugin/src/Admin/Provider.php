@@ -11,7 +11,6 @@ namespace Test_Plugin\Admin;
 
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Migrations\Admin\UI;
-use StellarWP\Migrations\Admin\Assets;
 
 /**
  * Registers admin pages for testing the migrations UI.
