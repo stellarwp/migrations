@@ -162,23 +162,7 @@ class UI {
 	 * @return array{tags: string[], show_completed: bool, show_non_applicable: bool} Parsed filters.
 	 */
 	private function parse_filters(): array {
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce not required for display filters.
-		$tags = [];
-
-		if ( isset( $_GET['tags'] ) ) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization happens in array_map.
-			$raw_tags = $_GET['tags'];
-			if ( is_array( $raw_tags ) ) {
-				$tags = array_map( static fn( $tag ): string => is_string( $tag ) ? sanitize_text_field( $tag ) : '', $raw_tags );
-				$tags = array_filter( $tags );
-			} elseif ( is_string( $raw_tags ) && strstr( $raw_tags, ',' ) ) {
-				$tags = array_map( 'sanitize_text_field', explode( ',', $raw_tags ) );
-			} elseif ( is_string( $raw_tags ) ) {
-				$tags = [ sanitize_text_field( $raw_tags ) ];
-			} else {
-				$tags = [];
-			}
-		}
+		$tags = $this->parse_tags_filter();
 
 		$prefix = Config::get_hook_prefix();
 
@@ -195,11 +179,47 @@ class UI {
 			"stellarwp_migrations_{$prefix}_filters",
 			[
 				'tags'                => $tags,
-				'show_completed'      => ! empty( $_GET['show_completed'] ),
-				'show_non_applicable' => ! empty( $_GET['show_non_applicable'] ),
+				'show_completed'      => ! empty( filter_input( INPUT_GET, 'show_completed' ) ),
+				'show_non_applicable' => ! empty( filter_input( INPUT_GET, 'show_non_applicable' ) ),
 			]
 		);
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+	}
+
+	/**
+	 * Parse the tags filter from the request.
+	 *
+	 * Supports both array format (tags[]=foo&tags[]=bar) and comma-separated string (tags=foo,bar).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string[] Array of sanitized tag strings.
+	 */
+	private function parse_tags_filter(): array {
+		// Try to get tags as an array first.
+		$raw_tags = filter_input( INPUT_GET, 'tags', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+
+		if ( is_array( $raw_tags ) ) {
+			$tags = array_map(
+				static fn( $tag ): string => is_string( $tag ) ? sanitize_text_field( $tag ) : '',
+				$raw_tags
+			);
+			return array_filter( $tags );
+		}
+
+		// Try to get tags as a string (may be comma-separated).
+		$raw_tags = filter_input( INPUT_GET, 'tags' );
+
+		if ( ! is_string( $raw_tags ) || '' === $raw_tags ) {
+			return [];
+		}
+
+		// Handle comma-separated string.
+		if ( strpos( $raw_tags, ',' ) !== false ) {
+			return array_map( 'sanitize_text_field', explode( ',', $raw_tags ) );
+		}
+
+		// Single tag value.
+		return [ sanitize_text_field( $raw_tags ) ];
 	}
 
 	/**

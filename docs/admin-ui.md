@@ -80,10 +80,7 @@ add_action( 'admin_menu', function() {
         'manage_options',
         'my-plugin-migration-single',
         function() {
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            $migration_id = isset( $_GET['migration_id'] )
-                ? sanitize_text_field( wp_unslash( $_GET['migration_id'] ) )
-                : '';
+            $migration_id = sanitize_key( (string) filter_input( INPUT_GET, 'migration_id' ) );
 
             $ui = Config::get_container()->get( UI::class );
             $ui->render_single( $migration_id );
