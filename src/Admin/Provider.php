@@ -46,7 +46,7 @@ class Provider {
 
 		self::$registered = true;
 
-		add_action( 'admin_menu', [ $this, 'register_hidden_pages' ] );
+		add_action( 'admin_menu', [ $this, 'register_hidden_page' ] );
 		add_filter( 'set-screen-option', [ $this, 'save_screen_option' ], 10, 3 );
 	}
 
@@ -57,7 +57,7 @@ class Provider {
 	 *
 	 * @return void
 	 */
-	public function register_hidden_pages(): void {
+	public function register_hidden_page(): void {
 		$single_page_hook = add_submenu_page(
 			'',
 			__( 'Migration Details', 'stellarwp-migrations' ),

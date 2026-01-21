@@ -51,9 +51,6 @@ class Provider extends Provider_Abstract {
 	 * @return void
 	 */
 	public function render_page(): void {
-		// Enqueue the migrations admin assets.
-		$this->container->get( Assets::class )->enqueue_assets();
-
 		?>
 		<div class="wrap">
 			<h1>Migrations</h1>
