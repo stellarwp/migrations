@@ -5,6 +5,7 @@ namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
@@ -54,19 +55,20 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 'tests_simple_migration', $execution['migration_id'] );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
-		$this->assertEquals( 1, $execution['items_total'] );
-		$this->assertEquals( 1, $execution['items_processed'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 'tests_simple_migration', $execution->get_migration_id() );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
+		$this->assertEquals( 1, $execution->get_items_total() );
+		$this->assertEquals( 1, $execution->get_items_processed() );
 
 		// Verify created_at timestamp.
-		$created_at = $execution['created_at'];
-		if ( $created_at instanceof \DateTime ) {
-			$created_at = $created_at->format( 'Y-m-d H:i:s' );
-		}
+		$created_at = $execution->get_created_at();
+		$this->assertInstanceOf( \DateTimeInterface::class, $created_at );
 
-		$this->assertGreaterThanOrEqual( $before, $created_at );
-		$this->assertLessThanOrEqual( $after, $created_at );
+		$created_at_string = $created_at->format( 'Y-m-d H:i:s' );
+
+		$this->assertGreaterThanOrEqual( $before, $created_at_string );
+		$this->assertLessThanOrEqual( $after, $created_at_string );
 	}
 
 	/**
@@ -85,7 +87,8 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 3, $execution['items_total'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 3, $execution->get_items_total() );
 	}
 
 	/**
@@ -104,7 +107,8 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
 	}
 
 	/**
@@ -127,15 +131,15 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertArrayHasKey( 'start_date_gmt', $execution );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$start_date = $execution['start_date_gmt'];
-		if ( $start_date instanceof \DateTime ) {
-			$start_date = $start_date->format( 'Y-m-d H:i:s' );
-		}
+		$start_date = $execution->get_start_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $start_date );
 
-		$this->assertGreaterThanOrEqual( $before, $start_date );
-		$this->assertLessThanOrEqual( $after, $start_date );
+		$start_date_string = $start_date->format( 'Y-m-d H:i:s' );
+
+		$this->assertGreaterThanOrEqual( $before, $start_date_string );
+		$this->assertLessThanOrEqual( $after, $start_date_string );
 	}
 
 	/**
@@ -154,8 +158,9 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 3, $execution['items_total'] );
-		$this->assertEquals( 3, $execution['items_processed'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 3, $execution->get_items_total() );
+		$this->assertEquals( 3, $execution->get_items_processed() );
 	}
 
 	/**
@@ -174,7 +179,8 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
 	}
 
 	/**
@@ -197,16 +203,16 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertArrayHasKey( 'end_date_gmt', $execution );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$end_date = $execution['end_date_gmt'];
-		if ( $end_date instanceof \DateTime ) {
-			$end_date = $end_date->format( 'Y-m-d H:i:s' );
-		}
+		$end_date = $execution->get_end_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $end_date );
 
-		$this->assertNotNull( $end_date );
-		$this->assertGreaterThanOrEqual( $before, $end_date );
-		$this->assertLessThanOrEqual( $after, $end_date );
+		$end_date_string = $end_date->format( 'Y-m-d H:i:s' );
+
+		$this->assertNotNull( $end_date_string );
+		$this->assertGreaterThanOrEqual( $before, $end_date_string );
+		$this->assertLessThanOrEqual( $after, $end_date_string );
 	}
 
 	/**
@@ -225,18 +231,17 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$start_date = $execution['start_date_gmt'];
-		if ( $start_date instanceof \DateTime ) {
-			$start_date = $start_date->format( 'Y-m-d H:i:s' );
-		}
+		$start_date = $execution->get_start_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $start_date );
+		$start_date_string = $start_date->format( 'Y-m-d H:i:s' );
 
-		$end_date = $execution['end_date_gmt'];
-		if ( $end_date instanceof \DateTime ) {
-			$end_date = $end_date->format( 'Y-m-d H:i:s' );
-		}
+		$end_date = $execution->get_end_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $end_date );
+		$end_date_string = $end_date->format( 'Y-m-d H:i:s' );
 
-		$this->assertLessThanOrEqual( $end_date, $start_date );
+		$this->assertLessThanOrEqual( $end_date_string, $start_date_string );
 	}
 
 	/**
@@ -256,9 +261,10 @@ class Migration_Executions_Test extends WPTestCase {
 
 		// Should have only one execution record for the entire migration.
 		$this->assertCount( 1, $executions );
-		$this->assertEquals( 3, $executions[0]['items_total'] );
-		$this->assertEquals( 3, $executions[0]['items_processed'] );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $executions[0]['status'] );
+		$this->assertInstanceOf( Execution::class, $executions[0] );
+		$this->assertEquals( 3, $executions[0]->get_items_total() );
+		$this->assertEquals( 3, $executions[0]->get_items_processed() );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $executions[0]->get_status()->getValue() );
 	}
 
 	/**
@@ -288,7 +294,8 @@ class Migration_Executions_Test extends WPTestCase {
 
 		// The execution should remain as failed even though the rollback succeeded.
 		$execution = $executions[0];
-		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
 	}
 
 	/**
@@ -321,17 +328,17 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = $executions[0];
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
 
 		// End date should be set after the automatic rollback completes.
-		$end_date = $execution['end_date_gmt'];
-		if ( $end_date instanceof \DateTime ) {
-			$end_date = $end_date->format( 'Y-m-d H:i:s' );
-		}
+		$end_date = $execution->get_end_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $end_date );
+		$end_date_string = $end_date->format( 'Y-m-d H:i:s' );
 
-		$this->assertNotNull( $end_date, 'End date should be set after rollback completes following a failure' );
-		$this->assertGreaterThanOrEqual( $before, $end_date );
-		$this->assertLessThanOrEqual( $after, $end_date );
+		$this->assertNotNull( $end_date_string, 'End date should be set after rollback completes following a failure' );
+		$this->assertGreaterThanOrEqual( $before, $end_date_string );
+		$this->assertLessThanOrEqual( $after, $end_date_string );
 	}
 
 	/**
@@ -354,17 +361,17 @@ class Migration_Executions_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
 
 		// Verify end_date was set after successful migration completion.
-		$end_date = $execution['end_date_gmt'];
-		if ( $end_date instanceof \DateTime ) {
-			$end_date = $end_date->format( 'Y-m-d H:i:s' );
-		}
+		$end_date = $execution->get_end_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $end_date );
+		$end_date_string = $end_date->format( 'Y-m-d H:i:s' );
 
-		$this->assertNotNull( $end_date, 'End date should be set when migration completes successfully' );
-		$this->assertGreaterThanOrEqual( $before, $end_date );
-		$this->assertLessThanOrEqual( $after, $end_date );
+		$this->assertNotNull( $end_date_string, 'End date should be set when migration completes successfully' );
+		$this->assertGreaterThanOrEqual( $before, $end_date_string );
+		$this->assertLessThanOrEqual( $after, $end_date_string );
 	}
 
 	/**
@@ -385,36 +392,37 @@ class Migration_Executions_Test extends WPTestCase {
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
 		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
 
 		// Verify end_date was set after successful up migration.
-		$original_end_date = $execution['end_date_gmt'];
+		$original_end_date = $execution->get_end_date();
 		$this->assertNotNull( $original_end_date );
 
 		$before = current_time( 'mysql', true );
 
 		// Act.
 		// Manually trigger a rollback.
-		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution->get_id() );
 		$task->process();
 
 		$after = current_time( 'mysql', true );
 
 		// Assert.
 		// The execution status should be FAILED after rollback completes.
-		$execution_after = Migration_Executions::get_first_by( 'id', $execution['id'] );
+		$execution_after = Migration_Executions::get_first_by( 'id', $execution->get_id() );
 		$this->assertNotNull( $execution_after );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution_after['status'], 'Status should be FAILED after rollback' );
+		$this->assertInstanceOf( Execution::class, $execution_after );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution_after->get_status()->getValue(), 'Status should be FAILED after rollback' );
 
 		// The end_date should be updated after the rollback completes.
-		$new_end_date = $execution_after['end_date_gmt'];
-		if ( $new_end_date instanceof \DateTime ) {
-			$new_end_date = $new_end_date->format( 'Y-m-d H:i:s' );
-		}
+		$new_end_date = $execution_after->get_end_date();
+		$this->assertInstanceOf( \DateTimeInterface::class, $new_end_date );
+		$new_end_date_string = $new_end_date->format( 'Y-m-d H:i:s' );
 
-		$this->assertNotNull( $new_end_date );
-		$this->assertGreaterThanOrEqual( $before, $new_end_date );
-		$this->assertLessThanOrEqual( $after, $new_end_date );
+		$this->assertNotNull( $new_end_date_string );
+		$this->assertGreaterThanOrEqual( $before, $new_end_date_string );
+		$this->assertLessThanOrEqual( $after, $new_end_date_string );
 	}
 
 	/**

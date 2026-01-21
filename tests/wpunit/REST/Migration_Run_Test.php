@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Tests\REST;
 
 use Closure;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tests\TestCases\REST_Test_Case;
@@ -88,7 +89,8 @@ class Migration_Run_Test extends REST_Test_Case {
 		$this->assertIsArray( $executions );
 
 		$execution = end( $executions );
-		$this->assertEquals( 'tests_simple_migration', $execution['migration_id'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 'tests_simple_migration', $execution->get_migration_id() );
 	}
 
 	/**

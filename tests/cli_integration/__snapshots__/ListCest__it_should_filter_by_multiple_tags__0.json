@@ -24,5 +24,19 @@
         "can_run": true,
         "is_applicable": true,
         "status": "pending"
+    },
+    {
+        "id": "tests_large_data_migration",
+        "label": "Large Data Migration",
+        "description": "Processes 100 items in batches of 10. Useful for testing progress bars and batch processing UI.",
+        "tags": [
+            "data",
+            "large",
+            "performance"
+        ],
+        "total_batches": 10,
+        "can_run": true,
+        "is_applicable": true,
+        "status": "pending"
     }
 ]

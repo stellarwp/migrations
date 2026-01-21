@@ -98,6 +98,38 @@ class Config_Test extends WPTestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function it_should_set_and_get_assets_url(): void {
+		Config::reset();
+
+		$assets_url = 'https://example.com/assets/';
+		Config::set_assets_url( $assets_url );
+
+		$this->assertEquals( $assets_url, Config::get_assets_url() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_return_null_when_assets_url_not_set(): void {
+		Config::reset();
+
+		$this->assertNull( Config::get_assets_url() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_reset_assets_url(): void {
+		Config::set_assets_url( 'https://example.com/assets/' );
+
+		Config::reset();
+
+		$this->assertNull( Config::get_assets_url() );
+	}
+
+	/**
 	 * @after
 	 */
 	public function restore_original_config(): void {
