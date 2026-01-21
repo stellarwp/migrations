@@ -179,8 +179,8 @@ class UI {
 			"stellarwp_migrations_{$prefix}_filters",
 			[
 				'tags'                => $tags,
-				'show_completed'      => ! empty( filter_input( INPUT_GET, 'show_completed' ) ),
-				'show_non_applicable' => ! empty( filter_input( INPUT_GET, 'show_non_applicable' ) ),
+				'show_completed'      => ! empty( filter_input( INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT ) ),
+				'show_non_applicable' => ! empty( filter_input( INPUT_GET, 'show_non_applicable', FILTER_SANITIZE_NUMBER_INT ) ),
 			]
 		);
 	}
@@ -196,7 +196,7 @@ class UI {
 	 */
 	private function parse_tags_filter(): array {
 		// Try to get tags as an array first.
-		$raw_tags = filter_input( INPUT_GET, 'tags', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$raw_tags = filter_input( INPUT_GET, 'tags', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
 
 		if ( is_array( $raw_tags ) ) {
 			$tags = array_map(
@@ -207,7 +207,7 @@ class UI {
 		}
 
 		// Try to get tags as a string (may be comma-separated).
-		$raw_tags = filter_input( INPUT_GET, 'tags' );
+		$raw_tags = filter_input( INPUT_GET, 'tags', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( ! is_string( $raw_tags ) || '' === $raw_tags ) {
 			return [];

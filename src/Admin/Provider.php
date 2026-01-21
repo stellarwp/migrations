@@ -117,7 +117,7 @@ class Provider {
 	 * @return void
 	 */
 	public function render_single_page(): void {
-		$migration_id = sanitize_key( (string) filter_input( INPUT_GET, 'migration_id' ) );
+		$migration_id = sanitize_key( (string) filter_input( INPUT_GET, 'migration_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
 		if ( empty( $migration_id ) ) {
 			Config::get_template_engine()->template(

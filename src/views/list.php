@@ -24,7 +24,7 @@ $filters       ??= [];
 $rest_base_url ??= '';
 
 $template     = Config::get_template_engine();
-$current_page = filter_input( INPUT_GET, 'page' );
+$current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 ?>
 <div class="wrap">
