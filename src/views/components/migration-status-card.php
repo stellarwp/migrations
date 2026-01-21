@@ -78,12 +78,12 @@ $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 
 		<div class="stellarwp-migration-card__actions">
 			<?php if ( $show_run ) : ?>
-				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--primary" data-action="run">
+				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--primary" data-action="run" aria-label="<?php esc_attr_e( 'Run Migration', 'stellarwp-migrations' ); ?>">
 					<?php esc_html_e( 'Run', 'stellarwp-migrations' ); ?>
 				</button>
 			<?php endif; ?>
 			<?php if ( $show_rollback ) : ?>
-				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--secondary" data-action="rollback">
+				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--secondary" data-action="rollback" aria-label="<?php esc_attr_e( 'Rollback Migration', 'stellarwp-migrations' ); ?>">
 					<?php esc_html_e( 'Rollback', 'stellarwp-migrations' ); ?>
 				</button>
 			<?php endif; ?>

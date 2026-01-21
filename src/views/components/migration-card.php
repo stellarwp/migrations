@@ -88,12 +88,22 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 		<?php endif; ?>
 		<div class="stellarwp-migration-card__actions">
 			<?php if ( $show_run ) : ?>
-				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--primary" data-action="run">
+				<button
+					type="button"
+					class="stellarwp-migration-btn stellarwp-migration-btn--primary"
+					data-action="run"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Run Migration %s', 'stellarwp-migrations' ), $migration_label ) ); ?>"
+				>
 					<?php esc_html_e( 'Run', 'stellarwp-migrations' ); ?>
 				</button>
 			<?php endif; ?>
 			<?php if ( $show_rollback ) : ?>
-				<button type="button" class="stellarwp-migration-btn stellarwp-migration-btn--secondary" data-action="rollback">
+				<button
+					type="button"
+					class="stellarwp-migration-btn stellarwp-migration-btn--secondary"
+					data-action="rollback"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Rollback Migration %s', 'stellarwp-migrations' ), $migration_label ) ); ?>"
+				>
 					<?php esc_html_e( 'Rollback', 'stellarwp-migrations' ); ?>
 				</button>
 			<?php endif; ?>
