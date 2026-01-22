@@ -1,5 +1,4 @@
 composer.lock
-package-lock.json
 vendor/
 tests/_support/_generated
 
