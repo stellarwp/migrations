@@ -139,7 +139,7 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param int $limit The limit.
+		 * @param int $limit The limit. Default 100.
 		 *
 		 * @return int The limit.
 		 */
