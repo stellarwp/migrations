@@ -128,7 +128,7 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param string $order_by The order by clause.
+		 * @param string $order_by The order by clause. Default `created_at DESC`.
 		 *
 		 * @return string The order by clause.
 		 */
@@ -139,7 +139,7 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param int $limit The limit.
+		 * @param int $limit The limit. Default 100.
 		 *
 		 * @return int The limit.
 		 */

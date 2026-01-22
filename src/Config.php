@@ -152,7 +152,7 @@ class Config {
 	}
 
 	/**
-	 * Set the template engine.
+	 * Sets the template engine.
 	 *
 	 * @since 0.0.1
 	 *

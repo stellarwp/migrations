@@ -220,7 +220,7 @@ class Assets {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param int $default The default number of logs per page.
+		 * @param int $default The default number of logs per page. Default 10.
 		 */
 		$filtered_default = (int) apply_filters(
 			"stellarwp_migrations_{$prefix}_logs_per_page",
