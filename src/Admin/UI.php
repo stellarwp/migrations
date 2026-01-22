@@ -128,7 +128,7 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param string $order_by The order by clause.
+		 * @param string $order_by The order by clause. Default `created_at DESC`.
 		 *
 		 * @return string The order by clause.
 		 */
