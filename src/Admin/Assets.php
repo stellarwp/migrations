@@ -223,15 +223,26 @@ class Assets {
 		 * @param int $default The default number of logs per page. Default 10.
 		 */
 		$filtered_default = (int) apply_filters(
-			"stellarwp_migrations_{$prefix}_logs_per_page",
+			"stellarwp_migrations_{$prefix}_logs_per_page_default",
 			$default
 		);
 
-		// Check for user's screen option preference.
-		$user_option = get_user_option( "stellarwp_migrations_{$prefix}_logs_per_page" );
+		/**
+		 * Filter the number of logs to display per page.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param int $user_option The number of logs per page. Default 10.
+		 *
+		 * @return int The number of logs per page.
+		 */
+		$user_option = (int) apply_filters(
+			"stellarwp_migrations_{$prefix}_logs_per_page",
+			(int) get_user_option( "stellarwp_migrations_{$prefix}_logs_per_page" )
+		);
 
-		if ( false !== $user_option && is_numeric( $user_option ) ) {
-			return max( 1, (int) $user_option );
+		if ( $user_option ) {
+			return max( 1, $user_option );
 		}
 
 		return max( 1, $filtered_default );
