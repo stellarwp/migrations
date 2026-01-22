@@ -101,6 +101,7 @@ $ui->render_list();
 ```
 
 **Features:**
+
 - Displays all registered migrations as cards
 - Shows status, progress, and action buttons for each migration
 - Supports filtering by tags
@@ -108,11 +109,13 @@ $ui->render_list();
 - Migrations are sorted by status priority (running/failed first, completed last)
 
 **Query Parameters:**
+
 - `tags[]` or `tags` - Filter migrations by tags (array or comma-separated)
 - `show_completed` - Include completed migrations (default: hidden)
 - `show_non_applicable` - Include non-applicable migrations (default: hidden)
 
 **Example URLs:**
+
 ```
 /wp-admin/admin.php?page=my-plugin-migrations
 /wp-admin/admin.php?page=my-plugin-migrations&tags[]=database&tags[]=cleanup
@@ -131,6 +134,7 @@ $ui->render_single( 'my_migration_id' );
 ```
 
 **Features:**
+
 - Shows migration label and description
 - Displays current status with progress bar
 - Shows configuration details (total items, batch size, retry attempts, etc.)
@@ -153,6 +157,7 @@ public function render_list(): void {
 ```
 
 This means:
+
 - **Guest users** see nothing (empty output)
 - **Non-admin users** (subscribers, editors, etc.) see nothing
 - **Only administrators** see the UI
@@ -237,6 +242,7 @@ The library bundles Select2 v4.0.13 locally, eliminating the need for CDN depend
 **Asset Handles:**
 
 Asset handles are prefixed with your hook prefix:
+
 - CSS: `{prefix}-migrations-admin`
 - JS: `{prefix}-migrations-admin`
 - Select2 CSS: `{prefix}-migrations-select2`
@@ -277,6 +283,7 @@ The Admin UI JavaScript handles interactions with the REST API:
 All AJAX requests use `wp.apiFetch()` which automatically includes the WordPress nonce for authentication.
 
 **UI Updates:**
+
 - Buttons show loading states during AJAX requests
 - Status and progress update after successful operations
 - Error messages are displayed in the card's message area

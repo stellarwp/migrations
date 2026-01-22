@@ -701,7 +701,6 @@ Each log entry contains:
 - `data` - Optional JSON data for additional context
 - `created_at` - Timestamp when the log was created
 
-
 ---
 
 ## Execution Model
