@@ -15,6 +15,7 @@ use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
 
 /**
  * Base class for migrations.
@@ -233,7 +234,8 @@ abstract class Migration_Abstract implements Migration {
 	/**
 	 * Get the migration status.
 	 *
-	 * Queries the database for the latest execution of this migration
+	 * Returns NOT_APPLICABLE for non-applicable migrations.
+	 * Otherwise queries the database for the latest execution
 	 * and returns its status. If no executions exist, returns PENDING.
 	 *
 	 * @since 0.0.1
@@ -241,8 +243,28 @@ abstract class Migration_Abstract implements Migration {
 	 * @return Status The current status of the migration.
 	 */
 	public function get_status(): Status {
-		/** @var array<int, array{status?: Status}> $latest_execution */
-		$latest_execution = Migration_Executions::paginate(
+		if ( ! $this->is_applicable() ) {
+			return Status::NOT_APPLICABLE();
+		}
+
+		$latest_execution = $this->get_latest_execution();
+
+		if ( null === $latest_execution ) {
+			return Status::PENDING();
+		}
+
+		return $latest_execution->get_status();
+	}
+
+	/**
+	 * Get the latest execution for this migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Execution|null The execution model or null if none found.
+	 */
+	public function get_latest_execution(): ?Execution {
+		$executions = Migration_Executions::paginate(
 			[
 				'order'        => 'DESC',
 				'orderby'      => 'created_at',
@@ -256,10 +278,10 @@ abstract class Migration_Abstract implements Migration {
 			1
 		);
 
-		if ( empty( $latest_execution[0]['status'] ) || ! $latest_execution[0]['status'] instanceof Status ) {
-			return Status::PENDING();
+		if ( ! empty( $executions[0] ) && $executions[0] instanceof Execution ) {
+			return $executions[0];
 		}
 
-		return $latest_execution[0]['status'];
+		return null;
 	}
 }

@@ -5,6 +5,7 @@ namespace StellarWP\Migrations;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
@@ -145,9 +146,9 @@ class Batched_Migration_Test extends WPTestCase {
 
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
-		$this->assertNotNull( $execution );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$started_logs = array_filter(
 			$logs,
@@ -177,9 +178,9 @@ class Batched_Migration_Test extends WPTestCase {
 
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
-		$this->assertNotNull( $execution );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$completed_logs = array_filter(
 			$logs,
@@ -209,11 +210,11 @@ class Batched_Migration_Test extends WPTestCase {
 
 		// Assert.
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
-		$this->assertNotNull( $execution );
-		$this->assertEquals( Status::COMPLETED()->getValue(), $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
 
 		// Verify there's a single "completed successfully" log entry at the end.
-		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution['id'] );
+		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$completed_successfully_logs = array_filter(
 			$logs,
@@ -246,8 +247,9 @@ class Batched_Migration_Test extends WPTestCase {
 		Multi_Batch_Migration::$after_calls  = [];
 
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_multi_batch_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
 
-		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution['id'] );
+		$task = new Execute( 'down', 'tests_multi_batch_migration', 1, 1, $execution->get_id() );
 		shepherd()->dispatch( $task );
 
 		$this->assertCount( 3, Multi_Batch_Migration::$down_batches );

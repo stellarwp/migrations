@@ -29,7 +29,7 @@
   total_batches: 1
   can_run: true
   is_applicable: false
-  status: pending
+  status: not-applicable
 - 
   id: tests_failing_migration
   label: Failing Migration
@@ -37,6 +37,52 @@
   tags:
     - test
     - error
+  total_batches: 1
+  can_run: true
+  is_applicable: true
+  status: pending
+- 
+  id: tests_tagged_migration
+  label: Tagged Migration
+  description: A migration with tags for testing tag-based filtering.
+  tags:
+    - schema
+    - important
+    - v1.0
+  total_batches: 1
+  can_run: true
+  is_applicable: true
+  status: pending
+- 
+  id: tests_counter_migration
+  label: Counter Migration
+  description: Increments a counter option by 1 each batch until reaching 10. Rollback decrements back to 0.
+  tags:
+    - counter
+    - options
+  total_batches: 10
+  can_run: true
+  is_applicable: true
+  status: pending
+- 
+  id: tests_large_data_migration
+  label: Large Data Migration
+  description: Processes 100 items in batches of 10. Useful for testing progress bars and batch processing UI.
+  tags:
+    - data
+    - large
+    - performance
+  total_batches: 10
+  can_run: true
+  is_applicable: true
+  status: pending
+- 
+  id: tests_settings_migration
+  label: Settings Format Migration
+  description: Converts plugin settings from the legacy format to the new structured format. This is a quick, single-batch operation.
+  tags:
+    - settings
+    - configuration
   total_batches: 1
   can_run: true
   is_applicable: true

@@ -1,11 +1,17 @@
 *                 text
-.*                export-ignore
 composer.lock     text -diff
-phpstan.*         export-ignore
-phpunit.*         export-ignore
-tests             export-ignore
+
+# Dev-only files - excluded from distribution
+.*                export-ignore
+.github           export-ignore
 codeception.*     export-ignore
-phpcs.xml         export-ignore
-phpstan.neon.dist export-ignore
 docs              export-ignore
 migrations.php    export-ignore
+node_modules      export-ignore
+package.json      export-ignore
+package-lock.json export-ignore
+phpcs.xml         export-ignore
+phpstan.*         export-ignore
+phpstan.neon.dist export-ignore
+phpunit.*         export-ignore
+tests             export-ignore

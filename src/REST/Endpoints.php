@@ -25,6 +25,7 @@ use StellarWP\Migrations\Utilities\Cast;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Exceptions\ApiMethodException;
 use StellarWP\DB\DB;
+use StellarWP\Migrations\Models\Execution;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -173,6 +174,11 @@ class Endpoints {
 		}
 
 		$items = $this->get_executions( $migration_id );
+
+		$items = array_map(
+			static fn( Execution $execution ): array => $execution->to_array(),
+			$items
+		);
 
 		$items = $this->normalize_items( $items, 'json' );
 

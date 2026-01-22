@@ -21,6 +21,7 @@ use MyCLabs\Enum\Enum;
  * @method static self CANCELED()
  * @method static self COMPLETED()
  * @method static self FAILED()
+ * @method static self NOT_APPLICABLE()
  * @method static self PAUSED()
  * @method static self PENDING()
  * @method static self RUNNING()
@@ -47,6 +48,15 @@ class Status extends Enum {
 	 * @since 0.0.1
 	 */
 	private const FAILED = 'failed';
+
+	/**
+	 * Data migration status 'Not Applicable'.
+	 *
+	 * Used for migrations that are not applicable to the current site.
+	 *
+	 * @since 0.0.1
+	 */
+	private const NOT_APPLICABLE = 'not-applicable';
 
 	/**
 	 * Data migration status 'Paused'.
@@ -93,6 +103,8 @@ class Status extends Enum {
 				return _x( 'Completed', 'Migration status', 'stellarwp-migrations' );
 			case self::FAILED:
 				return _x( 'Failed', 'Migration status', 'stellarwp-migrations' );
+			case self::NOT_APPLICABLE:
+				return _x( 'N/A', 'Migration status', 'stellarwp-migrations' );
 			case self::PAUSED:
 				return _x( 'Paused', 'Migration status', 'stellarwp-migrations' );
 			case self::CANCELED:

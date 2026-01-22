@@ -3,9 +3,12 @@
   "description": "StellarWP Migrations library",
   "private": true,
   "scripts": {
-    "check:spelling": "bunx cspell lint -c .cspell.json --no-progress --no-must-find-files --dot '**'"
+    "check:spelling": "bunx cspell lint -c .cspell.json --no-progress --no-must-find-files --dot '**'",
+    "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore vendor",
+    "fix:md": "markdownlint '**/*.md' --ignore node_modules --ignore vendor --fix"
   },
   "devDependencies": {
-    "cspell": "^8"
+    "cspell": "^8",
+    "markdownlint-cli": "^0.43"
   }
 }

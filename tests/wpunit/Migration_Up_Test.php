@@ -7,6 +7,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
+use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
 
@@ -77,8 +78,9 @@ class Migration_Up_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 'tests_simple_migration', $execution['migration_id'] );
-		$this->assertContains( $execution['status']->getValue(), [ 'scheduled', 'running', 'completed' ] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 'tests_simple_migration', $execution->get_migration_id() );
+		$this->assertContains( $execution->get_status()->getValue(), [ 'scheduled', 'running', 'completed' ] );
 	}
 
 	/**
@@ -96,7 +98,8 @@ class Migration_Up_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
 
 		$this->assertNotNull( $execution );
-		$this->assertEquals( 'completed', $execution['status'] );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( 'completed', $execution->get_status()->getValue() );
 	}
 
 	/**
