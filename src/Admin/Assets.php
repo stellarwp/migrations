@@ -13,6 +13,7 @@ namespace StellarWP\Migrations\Admin;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Provider;
+use StellarWP\Migrations\Utilities\Cast;
 
 /**
  * Admin Assets.
@@ -236,9 +237,11 @@ class Assets {
 		 *
 		 * @return int The number of logs per page.
 		 */
-		$user_option = (int) apply_filters(
-			"stellarwp_migrations_{$prefix}_logs_per_page",
-			(int) get_user_option( "stellarwp_migrations_{$prefix}_logs_per_page" )
+		$user_option = Cast::to_int(
+			apply_filters(
+				"stellarwp_migrations_{$prefix}_logs_per_page",
+				Cast::to_int( get_user_option( self::get_logs_per_page_option() ) )
+			)
 		);
 
 		if ( $user_option ) {
