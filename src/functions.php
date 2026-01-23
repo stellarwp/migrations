@@ -23,7 +23,7 @@ use StellarWP\Migrations\Config;
  */
 function migrations(): Provider {
 	if ( ! Provider::is_registered() ) {
-		throw new RuntimeException( 'Migrations is not registered.' );
+		throw new RuntimeException( 'Migrations library is not yet registered!' );
 	}
 
 	/** @var Provider|null $migrations */
