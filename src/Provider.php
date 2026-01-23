@@ -199,7 +199,6 @@ class Provider extends Provider_Abstract {
 	public function schedule_migrations(): void {
 		$prefix = Config::get_hook_prefix();
 
-
 		/**
 		 * Filters whether migrations should be automatically scheduled for this prefix.
 		 *
@@ -212,13 +211,6 @@ class Provider extends Provider_Abstract {
 		if ( ! apply_filters( "stellarwp_migrations_{$prefix}_automatic_schedule", true ) ) {
 			return;
 		}
-
-		/**
-		 * Fires before the migrations are scheduled.
-		 *
-		 * @since 0.0.1
-		 */
-		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
 
 		$migrations_registry = $this->container->get( Registry::class );
 
@@ -253,13 +245,6 @@ class Provider extends Provider_Abstract {
 				]
 			);
 		}
-
-		/**
-		 * Fires after the migrations are scheduled.
-		 *
-		 * @since 0.0.1
-		 */
-		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
 	}
 
 	/**

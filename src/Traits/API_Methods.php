@@ -333,6 +333,15 @@ trait API_Methods {
 		$execution_id      = DB::last_insert_id();
 		$extra_args_method = 'get_' . $operation->getValue() . '_extra_args_for_batch';
 
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Fires before the migrations are scheduled.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
+
 		for ( $batch_number = $from_batch; $batch_number <= $to_batch; $batch_number++ ) {
 			$extra_args = $migration->{$extra_args_method}( $batch_number, $batch_size );
 
@@ -347,6 +356,13 @@ trait API_Methods {
 				)
 			);
 		}
+
+		/**
+		 * Fires after the migrations are scheduled.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
 
 		return [
 			'execution_id' => $execution_id,
