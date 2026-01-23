@@ -192,9 +192,13 @@ if ( $migration->is_applicable() && $migration->can_run() ) {
 When you call `schedule()`, the following happens:
 
 1. An execution record is created in the database with status `SCHEDULED`
-2. For each batch in the specified range, an `Execute` task is dispatched via Shepherd
-3. The tasks are processed asynchronously in the background
-4. Each batch updates the execution record with progress
+2. The `stellarwp_migrations_{prefix}_pre_schedule_migration` action fires
+3. For each batch in the specified range, an `Execute` task is dispatched via Shepherd
+4. The `stellarwp_migrations_{prefix}_post_schedule_migration` action fires
+5. The tasks are processed asynchronously in the background
+6. Each batch updates the execution record with progress
+
+See the [Hooks Reference](./hooks.md#stellarwp_migrations_prefix_pre_schedule_migration) for details on the hook parameters.
 
 ## Tracking Execution
 
