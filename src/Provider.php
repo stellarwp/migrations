@@ -9,16 +9,12 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations;
 
-use Exception;
-use StellarWP\DB\DB;
-use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Utilities\Logger;
 use StellarWP\Shepherd\Abstracts\Provider_Abstract;
 use StellarWP\Shepherd\Provider as Shepherd_Provider;
 use StellarWP\Shepherd\Config as Shepherd_Config;
 use StellarWP\Migrations\Config;
-use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Tasks\Clear_Logs;
 use StellarWP\Migrations\Tables\Provider as Tables_Provider;
 use StellarWP\Migrations\CLI\Provider as CLI_Provider;
@@ -28,6 +24,8 @@ use StellarWP\Migrations\Admin\UI;
 use StellarWP\Migrations\Admin\Assets;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
+use StellarWP\Migrations\Exceptions\ApiMethodException;
+use StellarWP\Migrations\Traits\API_Methods;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -38,6 +36,7 @@ use function StellarWP\Shepherd\shepherd;
  * @package StellarWP\Migrations
  */
 class Provider extends Provider_Abstract {
+	use API_Methods;
 
 	/**
 	 * Whether the provider has been registered.
@@ -104,6 +103,8 @@ class Provider extends Provider_Abstract {
 		}
 
 		self::$registered = true;
+
+		require_once __DIR__ . '/functions.php';
 
 		add_action( "stellarwp_migrations_{$prefix}_tables_registered", [ $this, 'on_migrations_schema_up' ] );
 
@@ -191,7 +192,7 @@ class Provider extends Provider_Abstract {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @throws Exception If the migration execution cannot be inserted.
+	 * @throws ApiMethodException If the migration execution cannot be inserted.
 	 *
 	 * @return void
 	 */
@@ -238,46 +239,19 @@ class Provider extends Provider_Abstract {
 				continue; // skip the automatic scheduling for this migration.
 			}
 
-			$insert_status = Migration_Executions::insert(
-				[
-					'migration_id'    => $migration_id,
-					'status'          => Status::SCHEDULED()->getValue(),
-					'items_total'     => $migration->get_total_items(),
-					'items_processed' => 0,
-				]
-			);
-
-			if ( ! $insert_status ) {
-				throw new Exception(
-					sprintf(
-						// translators: %1$s is the migration ID.
-						__( 'Failed to insert migration execution for migration "%1$s"', 'stellarwp-migrations' ),
-						$migration_id
-					)
-				);
-			}
-
-			$execution_id = DB::last_insert_id();
-			$batch_number = 1;
-			$batch_size   = $migration->get_default_batch_size();
-
-			/** @var array{0: string, 1: string, 2: int, 3: int, 4: int, ...} $args */
-			$args = [ Operation::UP()->getValue(), $migration_id, $batch_number, $batch_size, $execution_id, ...$migration->get_up_extra_args_for_batch( $batch_number, $batch_size ) ];
+			$result = $this->schedule( $migration, Operation::UP() );
 
 			// Log the migration scheduling.
-
-			$logger = new Logger( $execution_id );
+			$logger = new Logger( $result['execution_id'] );
 			$logger->info(
 				sprintf( 'Migration "%s" scheduled for execution.', $migration_id ),
 				[
-					'batch'       => $batch_number,
-					'batch_size'  => $batch_size,
+					'batch'       => $result['from_batch'],
+					'batch_size'  => $result['batch_size'],
 					'items_total' => $migration->get_total_items(),
-					'extra_args'  => $migration->get_up_extra_args_for_batch( $batch_number, $batch_size ),
+					'extra_args'  => $migration->get_up_extra_args_for_batch( $result['from_batch'], $result['batch_size'] ),
 				]
 			);
-
-			shepherd()->dispatch( new Execute( ...$args ) );
 		}
 
 		/**

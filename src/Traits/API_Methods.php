@@ -11,15 +11,21 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Traits;
 
+use StellarWP\DB\DB;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
+use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Exceptions\ApiMethodException;
 use StellarWP\Migrations\Models\Execution;
+use StellarWP\Migrations\Tasks\Execute;
 use DateTimeInterface;
 use MyCLabs\Enum\Enum;
+
+use function StellarWP\Shepherd\shepherd;
 
 /**
  * API Methods Trait for Migrations.
@@ -271,5 +277,82 @@ trait API_Methods {
 		}
 
 		return $normalized;
+	}
+
+	/**
+	 * Schedule a migration for execution.
+	 *
+	 * Creates an execution record and dispatches batch tasks via Shepherd.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param Migration $migration    The migration instance to schedule.
+	 * @param Operation $operation    The operation to run (UP or DOWN).
+	 * @param int       $from_batch   The starting batch number. Default 1.
+	 * @param int|null  $to_batch     The ending batch number. Default null (same as from_batch).
+	 * @param int|null  $batch_size   The batch size. Default null (uses migration default).
+	 *
+	 * @throws ApiMethodException If the execution record cannot be inserted.
+	 *
+	 * @return array{execution_id: int, from_batch: int, to_batch: int, batch_size: int} The scheduling details.
+	 */
+	public function schedule(
+		Migration $migration,
+		Operation $operation,
+		int $from_batch = 1,
+		?int $to_batch = null,
+		?int $batch_size = null
+	): array {
+		$batch_size    = $batch_size ?? $migration->get_default_batch_size();
+		$total_batches = $migration->get_total_batches( $batch_size, $operation );
+		$to_batch      = $to_batch ?? $from_batch;
+
+		// Ensure batch bounds are valid.
+		$from_batch = max( 1, $from_batch );
+		$to_batch   = min( $to_batch, $total_batches );
+
+		$insert_status = Migration_Executions::insert(
+			[
+				'migration_id'    => $migration->get_id(),
+				'status'          => Status::SCHEDULED()->getValue(),
+				'items_total'     => $migration->get_total_items(),
+				'items_processed' => 0,
+			]
+		);
+
+		if ( ! $insert_status ) {
+			throw new ApiMethodException(
+				sprintf(
+					/* translators: %s is the migration ID */
+					__( 'Failed to insert migration execution for migration "%s"', 'stellarwp-migrations' ),
+					$migration->get_id()
+				)
+			);
+		}
+
+		$execution_id        = DB::last_insert_id();
+		$extra_args_method   = 'get_' . $operation->getValue() . '_extra_args_for_batch';
+
+		for ( $batch_number = $from_batch; $batch_number <= $to_batch; $batch_number++ ) {
+			$extra_args = $migration->{$extra_args_method}( $batch_number, $batch_size );
+
+			shepherd()->dispatch(
+				new Execute(
+					$operation->getValue(),
+					$migration->get_id(),
+					$batch_number,
+					$batch_size,
+					$execution_id,
+					...$extra_args
+				)
+			);
+		}
+
+		return [
+			'execution_id' => $execution_id,
+			'from_batch'   => $from_batch,
+			'to_batch'     => $to_batch,
+			'batch_size'   => $batch_size,
+		];
 	}
 }
