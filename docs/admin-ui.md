@@ -395,8 +395,9 @@ The Admin UI uses CSS classes prefixed with `stellarwp-migration-` for easy cust
 
 ## Next Steps
 
-- [REST API Reference](./rest-api.md) - REST API endpoints used by the Admin UI
-- [CLI Reference](./cli.md) - WP-CLI commands for migrations
-- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Getting Started](./getting-started.md) - Basic usage guide
+- [Migration Contract](./migration-contract.md) - Full API reference
+- [CLI Reference](./cli.md) - WP-CLI commands for migrations
+- [REST API Reference](./rest-api.md) - REST API endpoints used by the Admin UI
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations
 - [Hooks Reference](./hooks.md) - Available actions and filters

@@ -224,9 +224,9 @@ $items_processed = $execution->get_items_processed(); // Items processed so far
 
 ## Next Steps
 
+- [Getting Started](./getting-started.md) - Basic usage guide
+- [Migration Contract](./migration-contract.md) - Full API reference
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
-- [Getting Started](./getting-started.md) - Basic usage guide
-- [Migration Contract](./migration-contract.md) - Full API reference
 - [Hooks Reference](./hooks.md) - Available actions and filters

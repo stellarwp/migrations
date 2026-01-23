@@ -327,9 +327,9 @@ During a failure:
 
 ## Next Steps
 
+- [Getting Started](./getting-started.md) - Basic usage guide
+- [Migration Contract](./migration-contract.md) - Full API reference
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
-- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
-- [Getting Started](./getting-started.md) - Basic usage guide
-- [Migration Contract](./migration-contract.md) - Full API reference
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations

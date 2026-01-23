@@ -803,9 +803,9 @@ $data = $execution->to_array();
 
 ## Next Steps
 
+- [Getting Started](./getting-started.md) - Basic usage guide
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
-- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
-- [Getting Started](./getting-started.md) - Basic usage guide
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations
 - [Hooks Reference](./hooks.md) - Available actions and filters
