@@ -34,6 +34,43 @@ add_action( "stellarwp_migrations_{prefix}_post_schedule_migrations", function()
 } );
 ```
 
+#### `stellarwp_migrations_{prefix}_pre_schedule_migration`
+
+Fires before a single migration is scheduled via `migrations()->schedule()`.
+
+```php
+add_action(
+    "stellarwp_migrations_{prefix}_pre_schedule_migration",
+    function( $migration, $operation, $from_batch, $to_batch ) {
+        // $migration: Migration instance being scheduled.
+        // $operation: Operation enum (UP or DOWN).
+        // $from_batch: Starting batch number (int).
+        // $to_batch: Ending batch number (int).
+    },
+    10,
+    4
+);
+```
+
+#### `stellarwp_migrations_{prefix}_post_schedule_migration`
+
+Fires after a single migration is scheduled via `migrations()->schedule()`.
+
+```php
+add_action(
+    "stellarwp_migrations_{prefix}_post_schedule_migration",
+    function( $migration, $operation, $execution_id, $from_batch, $to_batch ) {
+        // $migration: Migration instance that was scheduled.
+        // $operation: Operation enum (UP or DOWN).
+        // $execution_id: The execution record ID (int).
+        // $from_batch: Starting batch number (int).
+        // $to_batch: Ending batch number (int).
+    },
+    10,
+    5
+);
+```
+
 ### Batch Processing
 
 #### `stellarwp_migrations_{prefix}_before_{method}_batch_processed`
@@ -234,21 +271,39 @@ add_filter( 'stellarwp_migrations_{prefix}_log_retention_days', function( int $r
 
 ## Hook Execution Order
 
-During a successful migration:
+### Automatic Scheduling (via Provider)
+
+During automatic migration scheduling on shutdown:
 
 1. `stellarwp_migrations_{prefix}_schedule_migrations`
 1. **Filter:** `stellarwp_migrations_{prefix}_automatic_schedule` - If returns `false`, stop here.
 1. `stellarwp_migrations_{prefix}_pre_schedule_migrations`
-1. For each migration:
-   - `Migration::before_up()`
-   - `stellarwp_migrations_{prefix}_before_up_batch_processed`
-   - `stellarwp_migrations_{prefix}_before_batch_processed`
-   - `Migration::up()`
-   - `stellarwp_migrations_{prefix}_post_up_batch_processed`
-   - `stellarwp_migrations_{prefix}_post_batch_processed`
-   - `Migration::after_up()`
-   - (Repeat for additional batches until `is_up_done()` returns `true`)
+1. For each migration that needs to run:
+   - Migration batches are dispatched to Shepherd
 1. `stellarwp_migrations_{prefix}_post_schedule_migrations`
+
+### Programmatic Scheduling (via `migrations()->schedule()`)
+
+When scheduling a migration programmatically:
+
+1. `stellarwp_migrations_{prefix}_pre_schedule_migration` (with migration, operation, from_batch, to_batch)
+1. Migration batches are dispatched to Shepherd
+1. `stellarwp_migrations_{prefix}_post_schedule_migration` (with migration, operation, execution_id, from_batch, to_batch)
+
+### Batch Execution
+
+During batch execution (for both automatic and programmatic scheduling):
+
+For each batch:
+
+- `Migration::before_up()` (or `before_down()`)
+- `stellarwp_migrations_{prefix}_before_up_batch_processed`
+- `stellarwp_migrations_{prefix}_before_batch_processed`
+- `Migration::up()` (or `down()`)
+- `stellarwp_migrations_{prefix}_post_up_batch_processed`
+- `stellarwp_migrations_{prefix}_post_batch_processed`
+- `Migration::after_up()` (or `after_down()`)
+- (Repeat for additional batches until `is_up_done()` returns `true`)
 
 During a successful rollback:
 
@@ -272,8 +327,9 @@ During a failure:
 
 ## Next Steps
 
+- [Getting Started](./getting-started.md) - Basic usage guide
+- [Migration Contract](./migration-contract.md) - Full API reference
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
-- [Getting Started](./getting-started.md) - Basic usage guide
-- [Migration Contract](./migration-contract.md) - Full API reference
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations

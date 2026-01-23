@@ -8,5 +8,8 @@
     "allowed_elements": ["br", "details", "summary", "sup", "sub"]
   },
   "MD040": false,
-  "MD041": false
+  "MD041": false,
+  "MD060": {
+    "style": "aligned"
+  }
 }

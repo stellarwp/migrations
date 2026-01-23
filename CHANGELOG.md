@@ -4,6 +4,6 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [0.0.1] 2025-XX-XX
 
-* Feature - Initial release of Migrations.
+- Feature - Initial release of Migrations.
 
 [0.0.1]: https://github.com/stellarwp/migrations/releases/tag/0.0.1

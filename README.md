@@ -168,11 +168,14 @@ See [CLI Reference](./docs/cli.md) for full command documentation.
 
 ## Documentation
 
-- [Getting Started](./docs/getting-started.md) - Installation and basic usage.
-- [Migration Contract](./docs/migration-contract.md) - Full API reference.
-- [CLI Reference](./docs/cli.md) - WP-CLI commands and usage.
-- [Hooks Reference](./docs/hooks.md) - Available actions and filters.
-- [Tests](./docs/test.md) - Test setup instructions.
+- [Getting Started](./docs/getting-started.md) - Installation and basic usage
+- [Migration Contract](./docs/migration-contract.md) - Full API reference
+- [Admin UI Reference](./docs/admin-ui.md) - Admin interface for managing migrations
+- [CLI Reference](./docs/cli.md) - WP-CLI commands and usage
+- [REST API Reference](./docs/rest-api.md) - REST API endpoints for programmatic access
+- [Programmatic Scheduling](./docs/programmatic-scheduling.md) - How to programmatically schedule migrations
+- [Hooks Reference](./docs/hooks.md) - Available actions and filters
+- [Tests](./docs/test.md) - Test setup instructions
 
 ## Contributing
 
