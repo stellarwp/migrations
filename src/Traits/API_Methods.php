@@ -364,6 +364,6 @@ trait API_Methods {
 	 * @return Registry The migrations registry.
 	 */
 	public function get_registry(): Registry {
-		return $this->container->get( Registry::class );
+		return Config::get_container()->get( Registry::class );
 	}
 }
