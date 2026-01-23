@@ -327,5 +327,6 @@ add_action( 'init', function() {
 
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Getting Started](./getting-started.md) - Basic usage guide
 - [Hooks Reference](./hooks.md) - Available actions and filters
