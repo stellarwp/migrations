@@ -303,9 +303,9 @@ trait API_Methods {
 		?int $to_batch = null,
 		?int $batch_size = null
 	): array {
-		$batch_size    = $batch_size ?? $migration->get_default_batch_size();
+		$batch_size  ??= $migration->get_default_batch_size();
 		$total_batches = $migration->get_total_batches( $batch_size, $operation );
-		$to_batch      = $to_batch ?? $from_batch;
+		$to_batch    ??= $from_batch;
 
 		// Ensure batch bounds are valid.
 		$from_batch = max( 1, $from_batch );
@@ -330,8 +330,8 @@ trait API_Methods {
 			);
 		}
 
-		$execution_id        = DB::last_insert_id();
-		$extra_args_method   = 'get_' . $operation->getValue() . '_extra_args_for_batch';
+		$execution_id      = DB::last_insert_id();
+		$extra_args_method = 'get_' . $operation->getValue() . '_extra_args_for_batch';
 
 		for ( $batch_number = $from_batch; $batch_number <= $to_batch; $batch_number++ ) {
 			$extra_args = $migration->{$extra_args_method}( $batch_number, $batch_size );
