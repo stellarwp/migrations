@@ -5,10 +5,11 @@
   "scripts": {
     "check:spelling": "bunx cspell lint -c .cspell.json --no-progress --no-must-find-files --dot '**'",
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore vendor",
-    "fix:md": "markdownlint '**/*.md' --ignore node_modules --ignore vendor --fix"
+    "fix:md": "prettier --write '**/*.md' '!node_modules/**' '!vendor/**' && markdownlint '**/*.md' --ignore node_modules --ignore vendor --fix"
   },
   "devDependencies": {
     "cspell": "^8",
-    "markdownlint-cli": "^0.43"
+    "markdownlint-cli": "^0.47.0",
+    "prettier": "^3.8.1"
   }
 }

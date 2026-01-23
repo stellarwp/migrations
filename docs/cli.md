@@ -30,10 +30,10 @@ wp {prefix} migrations list [--tags=<tags>] [--format=<format>]
 
 **Options:**
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--tags=<tags>` | Comma-separated list of tags to filter by | (all migrations) |
-| `--format=<format>` | Output format: `table`, `json`, `csv`, `yaml` | `table` |
+| Option              | Description                                   | Default          |
+| ------------------- | --------------------------------------------- | ---------------- |
+| `--tags=<tags>`     | Comma-separated list of tags to filter by     | (all migrations) |
+| `--format=<format>` | Output format: `table`, `json`, `csv`, `yaml` | `table`          |
 
 **Output Columns:**
 
@@ -71,18 +71,18 @@ wp {prefix} migrations run <migration_id> [--from-batch=<batch>] [--to-batch=<ba
 
 **Arguments:**
 
-| Argument | Description | Required |
-|----------|-------------|----------|
-| `<migration_id>` | The unique ID of the migration to run | Yes |
+| Argument         | Description                           | Required |
+| ---------------- | ------------------------------------- | -------- |
+| `<migration_id>` | The unique ID of the migration to run | Yes      |
 
 **Options:**
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--from-batch=<batch>` | Batch number to start from | `1` |
-| `--to-batch=<batch>` | Batch number to end at | (last batch) |
-| `--batch-size=<size>` | Number of items per batch (must be at least 1) | (migration default) |
-| `--dry-run` | Preview what would be run without executing | (disabled) |
+| Option                 | Description                                    | Default             |
+| ---------------------- | ---------------------------------------------- | ------------------- |
+| `--from-batch=<batch>` | Batch number to start from                     | `1`                 |
+| `--to-batch=<batch>`   | Batch number to end at                         | (last batch)        |
+| `--batch-size=<size>`  | Number of items per batch (must be at least 1) | (migration default) |
+| `--dry-run`            | Preview what would be run without executing    | (disabled)          |
 
 **Examples:**
 
@@ -118,18 +118,18 @@ wp {prefix} migrations rollback <migration_id> [--from-batch=<batch>] [--to-batc
 
 **Arguments:**
 
-| Argument | Description | Required |
-|----------|-------------|----------|
-| `<migration_id>` | The unique ID of the migration to rollback | Yes |
+| Argument         | Description                                | Required |
+| ---------------- | ------------------------------------------ | -------- |
+| `<migration_id>` | The unique ID of the migration to rollback | Yes      |
 
 **Options:**
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--from-batch=<batch>` | Batch number to start from | `1` |
-| `--to-batch=<batch>` | Batch number to end at | (last batch) |
-| `--batch-size=<size>` | Number of items per batch (must be at least 1) | (migration default) |
-| `--dry-run` | Preview what would be rolled back without executing | (disabled) |
+| Option                 | Description                                         | Default             |
+| ---------------------- | --------------------------------------------------- | ------------------- |
+| `--from-batch=<batch>` | Batch number to start from                          | `1`                 |
+| `--to-batch=<batch>`   | Batch number to end at                              | (last batch)        |
+| `--batch-size=<size>`  | Number of items per batch (must be at least 1)      | (migration default) |
+| `--dry-run`            | Preview what would be rolled back without executing | (disabled)          |
 
 **Examples:**
 
@@ -156,14 +156,14 @@ wp {prefix} migrations executions <migration_id> [--format=<format>]
 
 **Arguments:**
 
-| Argument | Description | Required |
-|----------|-------------|----------|
-| `<migration_id>` | The unique ID of the migration | Yes |
+| Argument         | Description                    | Required |
+| ---------------- | ------------------------------ | -------- |
+| `<migration_id>` | The unique ID of the migration | Yes      |
 
 **Options:**
 
-| Option | Description | Default |
-|--------|-------------|---------|
+| Option              | Description                                   | Default |
+| ------------------- | --------------------------------------------- | ------- |
 | `--format=<format>` | Output format: `table`, `json`, `csv`, `yaml` | `table` |
 
 **Output Columns:**
@@ -199,22 +199,22 @@ wp {prefix} migrations logs <execution_id> [--type=<type>] [--not-type=<types>] 
 
 **Arguments:**
 
-| Argument | Description | Required |
-|----------|-------------|----------|
-| `<execution_id>` | The execution ID (from `executions` command) | Yes |
+| Argument         | Description                                  | Required |
+| ---------------- | -------------------------------------------- | -------- |
+| `<execution_id>` | The execution ID (from `executions` command) | Yes      |
 
 **Options:**
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--type=<types>` | Filter by log type(s): `info`, `warning`, `error`, `debug`. Comma-separated for multiple. | (all types) |
-| `--not-type=<types>` | Exclude log type(s). Comma-separated for multiple. | (none) |
-| `--search=<term>` | Filter logs by search term in message | (no filter) |
-| `--limit=<limit>` | Maximum number of results | `100` |
-| `--offset=<offset>` | Skip first N results | `0` |
-| `--order=<order>` | Sort order: `ASC` or `DESC` | `DESC` |
-| `--order-by=<column>` | Column to sort by | `created_at` |
-| `--format=<format>` | Output format: `table`, `json`, `csv`, `yaml` | `table` |
+| Option                | Description                                                                               | Default      |
+| --------------------- | ----------------------------------------------------------------------------------------- | ------------ |
+| `--type=<types>`      | Filter by log type(s): `info`, `warning`, `error`, `debug`. Comma-separated for multiple. | (all types)  |
+| `--not-type=<types>`  | Exclude log type(s). Comma-separated for multiple.                                        | (none)       |
+| `--search=<term>`     | Filter logs by search term in message                                                     | (no filter)  |
+| `--limit=<limit>`     | Maximum number of results                                                                 | `100`        |
+| `--offset=<offset>`   | Skip first N results                                                                      | `0`          |
+| `--order=<order>`     | Sort order: `ASC` or `DESC`                                                               | `DESC`       |
+| `--order-by=<column>` | Column to sort by                                                                         | `created_at` |
+| `--format=<format>`   | Output format: `table`, `json`, `csv`, `yaml`                                             | `table`      |
 
 **Output Columns:**
 
@@ -309,10 +309,10 @@ With this filter active, migrations will only run when explicitly triggered via 
 
 ## Exit Codes
 
-| Code | Description |
-|------|-------------|
-| `0` | Success |
-| `1` | Error (invalid arguments, migration not found, etc.) |
+| Code | Description                                          |
+| ---- | ---------------------------------------------------- |
+| `0`  | Success                                              |
+| `1`  | Error (invalid arguments, migration not found, etc.) |
 
 ---
 

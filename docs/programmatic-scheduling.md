@@ -47,13 +47,13 @@ public function schedule(
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `$migration` | `Migration` | required | The migration instance to schedule |
-| `$operation` | `Operation` | required | `Operation::UP()` to run or `Operation::DOWN()` to rollback |
-| `$from_batch` | `int` | `1` | The starting batch number |
-| `$to_batch` | `int\|null` | `null` | The ending batch number (defaults to same as `$from_batch`) |
-| `$batch_size` | `int\|null` | `null` | Items per batch (defaults to migration's default batch size) |
+| Parameter     | Type        | Default  | Description                                                  |
+| ------------- | ----------- | -------- | ------------------------------------------------------------ |
+| `$migration`  | `Migration` | required | The migration instance to schedule                           |
+| `$operation`  | `Operation` | required | `Operation::UP()` to run or `Operation::DOWN()` to rollback  |
+| `$from_batch` | `int`       | `1`      | The starting batch number                                    |
+| `$to_batch`   | `int\|null` | `null`   | The ending batch number (defaults to same as `$from_batch`)  |
+| `$batch_size` | `int\|null` | `null`   | Items per batch (defaults to migration's default batch size) |
 
 ### Return Value
 

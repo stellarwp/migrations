@@ -275,15 +275,15 @@ public function run( string $migration ): array {
 
 ```markdown
 tests/
-├── wpunit/         # Unit tests (fast, isolated)
-│   ├── Tasks/
-│   ├── Loggers/
-│   └── ...
-├── integration/    # Integration tests (slower, uses DB)
-│   ├── Tasks/
-│   ├── Regulator/
-│   └── ...
-└── _support/       # Test helpers and fixtures
+├── wpunit/ # Unit tests (fast, isolated)
+│ ├── Tasks/
+│ ├── Loggers/
+│ └── ...
+├── integration/ # Integration tests (slower, uses DB)
+│ ├── Tasks/
+│ ├── Regulator/
+│ └── ...
+└── \_support/ # Test helpers and fixtures
 ```
 
 ### Writing Good Tests
