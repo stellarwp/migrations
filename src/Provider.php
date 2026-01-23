@@ -212,6 +212,13 @@ class Provider extends Provider_Abstract {
 			return;
 		}
 
+		/**
+		 * Fires before all migrations are automatically scheduled.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
+
 		$migrations_registry = $this->container->get( Registry::class );
 
 		/** @var Migration $migration */
@@ -245,6 +252,13 @@ class Provider extends Provider_Abstract {
 				]
 			);
 		}
+
+		/**
+		 * Fires after all migrations are automatically scheduled.
+		 *
+		 * @since 0.0.1
+		 */
+		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
 	}
 
 	/**
