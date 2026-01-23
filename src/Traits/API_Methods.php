@@ -355,4 +355,15 @@ trait API_Methods {
 			'batch_size'   => $batch_size,
 		];
 	}
+
+	/**
+	 * Get the migrations registry.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Registry The migrations registry.
+	 */
+	public function get_registry(): Registry {
+		return $this->container->get( Registry::class );
+	}
 }

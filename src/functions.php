@@ -26,6 +26,7 @@ function migrations(): Provider {
 		throw new RuntimeException( 'Migrations is not registered.' );
 	}
 
+	/** @var Provider|null $migrations */
 	static $migrations = null;
 
 	if ( null !== $migrations ) {
