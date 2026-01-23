@@ -10,7 +10,6 @@ declare( strict_types=1 );
 namespace StellarWP\Migrations;
 
 use RuntimeException;
-use StellarWP\Migrations\Config;
 
 /**
  * Get the Migrations's Provider instance.
