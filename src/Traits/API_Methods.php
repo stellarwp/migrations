@@ -304,7 +304,7 @@ trait API_Methods {
 		?int $batch_size = null
 	): array {
 		$batch_size  ??= $migration->get_default_batch_size();
-		$total_batches = $migration->get_total_batches( $batch_size, $operation );
+		$total_batches = max( 1, $migration->get_total_batches( $batch_size, $operation ) );
 		$to_batch    ??= $from_batch;
 
 		// Ensure batch bounds are valid.
