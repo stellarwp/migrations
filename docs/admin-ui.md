@@ -189,16 +189,16 @@ interface Template_Engine {
 
 The UI calls the template engine with these template names:
 
-| Template Name | Description |
-|--------------|-------------|
-| `list` | Main list view |
-| `single` | Single migration detail view |
-| `single-not-found` | Error view when migration not found |
-| `components/migration-card` | Individual migration card |
-| `components/status-card` | Status display with progress |
-| `components/config-box` | Configuration details |
-| `components/logs` | Execution logs viewer |
-| `components/progress-bar` | Progress bar |
+| Template Name               | Description                         |
+| --------------------------- | ----------------------------------- |
+| `list`                      | Main list view                      |
+| `single`                    | Single migration detail view        |
+| `single-not-found`          | Error view when migration not found |
+| `components/migration-card` | Individual migration card           |
+| `components/status-card`    | Status display with progress        |
+| `components/config-box`     | Configuration details               |
+| `components/logs`           | Execution logs viewer               |
+| `components/progress-bar`   | Progress bar                        |
 
 ## Default Template Engine
 
@@ -232,10 +232,10 @@ $assets->enqueue_assets();   // Register and enqueue.
 
 **Included Assets:**
 
-| Asset | Dependencies | Description |
-|-------|--------------|-------------|
-| CSS | Select2 CSS | Admin UI styling |
-| JS | `wp-dom-ready`, `wp-api-fetch`, `jquery`, Select2 JS | AJAX interactions |
+| Asset | Dependencies                                         | Description       |
+| ----- | ---------------------------------------------------- | ----------------- |
+| CSS   | Select2 CSS                                          | Admin UI styling  |
+| JS    | `wp-dom-ready`, `wp-api-fetch`, `jquery`, Select2 JS | AJAX interactions |
 
 The library bundles Select2 v4.0.13 locally, eliminating the need for CDN dependencies.
 
@@ -275,7 +275,7 @@ $url = Config::get_assets_url();
 The Admin UI JavaScript handles interactions with the REST API:
 
 | Action    | REST Endpoint                    | Description          |
-|-----------|----------------------------------|----------------------|
+| --------- | -------------------------------- | -------------------- |
 | Run       | `POST /migrations/{id}/run`      | Start a migration    |
 | Rollback  | `POST /migrations/{id}/rollback` | Rollback a migration |
 | Load Logs | `GET /executions/{id}/logs`      | Load execution logs  |
@@ -293,15 +293,15 @@ All AJAX requests use `wp.apiFetch()` which automatically includes the WordPress
 
 The UI displays different action buttons based on the migration's current status:
 
-| Status | Available Actions |
-|--------|------------------|
-| Pending | Run |
-| Scheduled | (none - waiting for execution) |
-| Running | (displays progress) |
-| Paused | Resume, Cancel |
-| Completed | Rollback |
-| Failed | Retry, Rollback |
-| Canceled | Run, Rollback |
+| Status         | Available Actions                |
+| -------------- | -------------------------------- |
+| Pending        | Run                              |
+| Scheduled      | (none - waiting for execution)   |
+| Running        | (displays progress)              |
+| Paused         | Resume, Cancel                   |
+| Completed      | Rollback                         |
+| Failed         | Retry, Rollback                  |
+| Canceled       | Run, Rollback                    |
 | Not Applicable | (none - migration doesn't apply) |
 
 ## Custom Integration Example
@@ -357,25 +357,38 @@ The Admin UI uses CSS classes prefixed with `stellarwp-migration-` for easy cust
 
 ```css
 /* Migration card container */
-.stellarwp-migration-card { }
+.stellarwp-migration-card {
+}
 
 /* Status labels */
-.stellarwp-migration-card__status-label { }
-.stellarwp-migration-card__status-label--pending { }
-.stellarwp-migration-card__status-label--running { }
-.stellarwp-migration-card__status-label--completed { }
-.stellarwp-migration-card__status-label--failed { }
+.stellarwp-migration-card__status-label {
+}
+.stellarwp-migration-card__status-label--pending {
+}
+.stellarwp-migration-card__status-label--running {
+}
+.stellarwp-migration-card__status-label--completed {
+}
+.stellarwp-migration-card__status-label--failed {
+}
 
 /* Progress bar */
-.stellarwp-migration-progress { }
-.stellarwp-migration-progress__bar { }
-.stellarwp-migration-progress__fill { }
+.stellarwp-migration-progress {
+}
+.stellarwp-migration-progress__bar {
+}
+.stellarwp-migration-progress__fill {
+}
 
 /* Action buttons */
-.stellarwp-migration-btn { }
-.stellarwp-migration-btn--primary { }
-.stellarwp-migration-btn--secondary { }
-.stellarwp-migration-btn--danger { }
+.stellarwp-migration-btn {
+}
+.stellarwp-migration-btn--primary {
+}
+.stellarwp-migration-btn--secondary {
+}
+.stellarwp-migration-btn--danger {
+}
 ```
 
 ---
@@ -384,5 +397,6 @@ The Admin UI uses CSS classes prefixed with `stellarwp-migration-` for easy cust
 
 - [REST API Reference](./rest-api.md) - REST API endpoints used by the Admin UI
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Getting Started](./getting-started.md) - Basic usage guide
 - [Hooks Reference](./hooks.md) - Available actions and filters

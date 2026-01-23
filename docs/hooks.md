@@ -240,27 +240,27 @@ During a successful migration:
 1. **Filter:** `stellarwp_migrations_{prefix}_automatic_schedule` - If returns `false`, stop here.
 1. `stellarwp_migrations_{prefix}_pre_schedule_migrations`
 1. For each migration:
-   - `Migration::before_up()`
-   - `stellarwp_migrations_{prefix}_before_up_batch_processed`
-   - `stellarwp_migrations_{prefix}_before_batch_processed`
-   - `Migration::up()`
-   - `stellarwp_migrations_{prefix}_post_up_batch_processed`
-   - `stellarwp_migrations_{prefix}_post_batch_processed`
-   - `Migration::after_up()`
-   - (Repeat for additional batches until `is_up_done()` returns `true`)
+    - `Migration::before_up()`
+    - `stellarwp_migrations_{prefix}_before_up_batch_processed`
+    - `stellarwp_migrations_{prefix}_before_batch_processed`
+    - `Migration::up()`
+    - `stellarwp_migrations_{prefix}_post_up_batch_processed`
+    - `stellarwp_migrations_{prefix}_post_batch_processed`
+    - `Migration::after_up()`
+    - (Repeat for additional batches until `is_up_done()` returns `true`)
 1. `stellarwp_migrations_{prefix}_post_schedule_migrations`
 
 During a successful rollback:
 
 1. For each batch:
-   - `Migration::before_down()`
-   - `stellarwp_migrations_{prefix}_before_down_batch_processed`
-   - `stellarwp_migrations_{prefix}_before_batch_processed`
-   - `Migration::down()`
-   - `stellarwp_migrations_{prefix}_post_down_batch_processed`
-   - `stellarwp_migrations_{prefix}_post_batch_processed`
-   - `Migration::after_down()`
-   - (Repeat for additional batches until `is_down_done()` returns `true`)
+    - `Migration::before_down()`
+    - `stellarwp_migrations_{prefix}_before_down_batch_processed`
+    - `stellarwp_migrations_{prefix}_before_batch_processed`
+    - `Migration::down()`
+    - `stellarwp_migrations_{prefix}_post_down_batch_processed`
+    - `stellarwp_migrations_{prefix}_post_batch_processed`
+    - `Migration::after_down()`
+    - (Repeat for additional batches until `is_down_done()` returns `true`)
 
 During a failure:
 
@@ -275,5 +275,6 @@ During a failure:
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Getting Started](./getting-started.md) - Basic usage guide
 - [Migration Contract](./migration-contract.md) - Full API reference

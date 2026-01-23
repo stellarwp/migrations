@@ -253,9 +253,9 @@ add_filter( 'stellarwp_migrations_my_plugin_log_retention_days', function( int $
 
 1. All logs for migration executions older than the retention period are deleted
 2. A summary log entry is created for each processed execution, indicating:
-   - When the logs were deleted
-   - The migration execution status at the time of cleanup
-   - The retention period that was applied
+    - When the logs were deleted
+    - The migration execution status at the time of cleanup
+    - The retention period that was applied
 
 **Manual Cleanup:**
 
@@ -287,4 +287,5 @@ Failures during `down()` are recorded but do not trigger additional rollbacks.
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Hooks Reference](./hooks.md) - Available actions and filters

@@ -17,16 +17,11 @@ use WP_Error;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
-use StellarWP\Migrations\Tasks\Execute;
 use StellarWP\Migrations\Enums\Operation;
-use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Traits\API_Methods;
 use StellarWP\Migrations\Utilities\Cast;
-use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Exceptions\ApiMethodException;
-use StellarWP\DB\DB;
 use StellarWP\Migrations\Models\Execution;
-use function StellarWP\Shepherd\shepherd;
 
 /**
  * REST API Endpoints for Migrations.
@@ -221,47 +216,25 @@ class Endpoints {
 		$from_batch = Cast::to_int( $request->get_param( 'from-batch' ) ?? 1 );
 		$to_batch   = Cast::to_int( $request->get_param( 'to-batch' ) ?? $total_batches );
 
-		$from_batch = max( 1, $from_batch );
-		$to_batch   = min( $to_batch, $total_batches );
-
 		if ( $from_batch > $to_batch ) {
 			return $this->error( __( 'from-batch cannot be greater than to-batch.', 'stellarwp-migrations' ) );
 		}
 
-		$insert_status = Migration_Executions::insert(
-			[
-				'migration_id'    => $migration_id,
-				'status'          => Status::SCHEDULED()->getValue(),
-				'items_total'     => $migration->get_total_items(),
-				'items_processed' => 0,
-			]
-		);
-
-		if ( ! $insert_status ) {
-			return $this->error(
-				sprintf(
-					/* translators: %s is the migration ID */
-					__( 'Failed to insert migration execution for migration "%s"', 'stellarwp-migrations' ),
-					$migration_id
-				)
-			);
-		}
-
-		$execution_id = DB::last_insert_id();
-
-		for ( $i = $from_batch; $i <= $to_batch; $i++ ) {
-			shepherd()->dispatch( new Execute( $operation->getValue(), $migration_id, $i, $batch_size, $execution_id, ...$migration->{'get_' . $operation->getValue() . '_extra_args_for_batch'}( $i, $batch_size ) ) );
+		try {
+			$result = $this->schedule( $migration, $operation, $from_batch, $to_batch, $batch_size );
+		} catch ( ApiMethodException $e ) {
+			return $this->error( $e->getMessage() );
 		}
 
 		return new WP_REST_Response(
 			[
 				'success'      => true,
 				'message'      => __( 'Migration scheduled for execution.', 'stellarwp-migrations' ),
-				'execution_id' => $execution_id,
+				'execution_id' => $result['execution_id'],
 				'operation'    => $operation->getValue(),
-				'from_batch'   => $from_batch,
-				'to_batch'     => $to_batch,
-				'batch_size'   => $batch_size,
+				'from_batch'   => $result['from_batch'],
+				'to_batch'     => $result['to_batch'],
+				'batch_size'   => $result['batch_size'],
 			],
 			200
 		);
