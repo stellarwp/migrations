@@ -336,11 +336,16 @@ trait API_Methods {
 		$prefix = Config::get_hook_prefix();
 
 		/**
-		 * Fires before the migrations are scheduled.
+		 * Fires before a migration is scheduled.
 		 *
 		 * @since 0.0.1
+		 *
+		 * @param Migration $migration  The migration instance being scheduled.
+		 * @param Operation $operation  The operation to run (UP or DOWN).
+		 * @param int       $from_batch The starting batch number.
+		 * @param int       $to_batch   The ending batch number.
 		 */
-		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migrations" );
+		do_action( "stellarwp_migrations_{$prefix}_pre_schedule_migration", $migration, $operation, $from_batch, $to_batch );
 
 		for ( $batch_number = $from_batch; $batch_number <= $to_batch; $batch_number++ ) {
 			$extra_args = $migration->{$extra_args_method}( $batch_number, $batch_size );
@@ -358,11 +363,17 @@ trait API_Methods {
 		}
 
 		/**
-		 * Fires after the migrations are scheduled.
+		 * Fires after a migration is scheduled.
 		 *
 		 * @since 0.0.1
+		 *
+		 * @param Migration $migration    The migration instance that was scheduled.
+		 * @param Operation $operation    The operation to run (UP or DOWN).
+		 * @param int       $execution_id The execution record ID.
+		 * @param int       $from_batch   The starting batch number.
+		 * @param int       $to_batch     The ending batch number.
 		 */
-		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migrations" );
+		do_action( "stellarwp_migrations_{$prefix}_post_schedule_migration", $migration, $operation, $execution_id, $from_batch, $to_batch );
 
 		return [
 			'execution_id' => $execution_id,
