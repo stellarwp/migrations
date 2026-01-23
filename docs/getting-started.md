@@ -287,4 +287,5 @@ Failures during `down()` are recorded but do not trigger additional rollbacks.
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Hooks Reference](./hooks.md) - Available actions and filters

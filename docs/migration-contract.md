@@ -393,10 +393,10 @@ The `Migration` interface extends `JsonSerializable`, so migrations can be direc
 
 The `Operation` enum (`StellarWP\Migrations\Enums\Operation`) represents the migration direction:
 
-| Value | Description |
-| ----- | ----------- |
-| `Operation::UP()` | Migration operation (forward) |
-| `Operation::DOWN()` | Rollback operation (reverse) |
+| Value               | Description                   |
+| ------------------- | ----------------------------- |
+| `Operation::UP()`   | Migration operation (forward) |
+| `Operation::DOWN()` | Rollback operation (reverse)  |
 
 Usage:
 
@@ -444,22 +444,22 @@ echo $migration->get_id(); // 'my_plugin_migration'
 
 `Migration_Abstract` provides default implementations for the following methods:
 
-| Method                              | Default Value                          |
-| ----------------------------------- | -------------------------------------- |
-| `before_up()`                       | No-op                                  |
-| `after_up()`                        | No-op                                  |
-| `before_down()`                     | No-op                                  |
-| `after_down()`                      | No-op                                  |
-| `can_run()`                         | `true`                                 |
-| `get_number_of_retries_per_batch()` | `0`                                    |
-| `get_tags()`                        | `[]`                                   |
-| `get_up_extra_args_for_batch()`     | `[]`                                   |
-| `get_down_extra_args_for_batch()`   | `[]`                                   |
-| `get_total_batches()`               | Calculated from items/batch_size       |
-| `get_status()`                      | Queries last execution or `PENDING`    |
-| `get_latest_execution()`            | Returns `Execution` model or `null`    |
-| `to_array()`                        | Array of migration properties          |
-| `get_id()`                          | Returns the migration ID               |
+| Method                              | Default Value                       |
+| ----------------------------------- | ----------------------------------- |
+| `before_up()`                       | No-op                               |
+| `after_up()`                        | No-op                               |
+| `before_down()`                     | No-op                               |
+| `after_down()`                      | No-op                               |
+| `can_run()`                         | `true`                              |
+| `get_number_of_retries_per_batch()` | `0`                                 |
+| `get_tags()`                        | `[]`                                |
+| `get_up_extra_args_for_batch()`     | `[]`                                |
+| `get_down_extra_args_for_batch()`   | `[]`                                |
+| `get_total_batches()`               | Calculated from items/batch_size    |
+| `get_status()`                      | Queries last execution or `PENDING` |
+| `get_latest_execution()`            | Returns `Execution` model or `null` |
+| `to_array()`                        | Array of migration properties       |
+| `get_id()`                          | Returns the migration ID            |
 
 Extend this class to avoid implementing these methods when not needed.
 
@@ -727,16 +727,16 @@ $execution = $migration->get_latest_execution();
 
 The `Execution` model provides the following getter methods:
 
-| Method | Return Type | Description |
-| ------ | ----------- | ----------- |
-| `get_id()` | `int` | The unique execution ID |
-| `get_migration_id()` | `string` | The migration ID this execution belongs to |
-| `get_start_date()` | `?DateTimeInterface` | When the execution started (null if not yet started) |
-| `get_end_date()` | `?DateTimeInterface` | When the execution ended (null if still running) |
-| `get_status()` | `Status` | The current status as a Status enum |
-| `get_items_total()` | `int` | Total number of items to process |
-| `get_items_processed()` | `int` | Number of items processed so far |
-| `get_created_at()` | `DateTimeInterface` | When the execution record was created |
+| Method                  | Return Type          | Description                                          |
+| ----------------------- | -------------------- | ---------------------------------------------------- |
+| `get_id()`              | `int`                | The unique execution ID                              |
+| `get_migration_id()`    | `string`             | The migration ID this execution belongs to           |
+| `get_start_date()`      | `?DateTimeInterface` | When the execution started (null if not yet started) |
+| `get_end_date()`        | `?DateTimeInterface` | When the execution ended (null if still running)     |
+| `get_status()`          | `Status`             | The current status as a Status enum                  |
+| `get_items_total()`     | `int`                | Total number of items to process                     |
+| `get_items_processed()` | `int`                | Number of items processed so far                     |
+| `get_created_at()`      | `DateTimeInterface`  | When the execution record was created                |
 
 ### Usage Example
 
@@ -806,5 +806,6 @@ $data = $execution->to_array();
 - [Admin UI Reference](./admin-ui.md) - Admin interface for managing migrations
 - [CLI Reference](./cli.md) - WP-CLI commands for migrations
 - [REST API Reference](./rest-api.md) - REST API endpoints for programmatic access
+- [Programmatic Scheduling](./programmatic-scheduling.md) - How to programmatically schedule migrations.
 - [Getting Started](./getting-started.md) - Basic usage guide
 - [Hooks Reference](./hooks.md) - Available actions and filters
