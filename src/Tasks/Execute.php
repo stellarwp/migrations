@@ -416,14 +416,34 @@ class Execute extends Task_Abstract {
 
 		// Rollback completion.
 		if ( 'down' === $method ) {
-			$logger->info(
-				'Migration rollback completed.',
-				[
-					'total_batches' => $batch,
-				]
-			);
+			$execution = Migration_Executions::get_first_by( 'id', $execution_id );
 
-			$completion_status = Status::FAILED()->getValue();
+			// Check if this was an automatic rollback (triggered by failure) or manual (requested) rollback.
+			if (
+				$execution
+				&& $execution instanceof Execution
+				&& Status::FAILED()->equals( $execution->get_status() )
+			) {
+				// Automatic rollback - keep FAILED status.
+				$logger->info(
+					'Migration rollback completed after a failure.',
+					[
+						'total_batches' => $batch,
+					]
+				);
+
+				$completion_status = Status::FAILED()->getValue();
+			} else {
+				// Manual rollback - set REVERTED status.
+				$logger->info(
+					'Requested migration rollback completed.',
+					[
+						'total_batches' => $batch,
+					]
+				);
+
+				$completion_status = Status::REVERTED()->getValue();
+			}
 		} else {
 			// Successful migration completion.
 			$logger->info(

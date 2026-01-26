@@ -40,7 +40,7 @@ $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
 
 // Determine which buttons to show based on status.
-$show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $can_run;
+$show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run;
 $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true );
 
 $started_at = $latest_execution ? $latest_execution->get_start_date() : null;

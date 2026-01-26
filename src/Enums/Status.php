@@ -24,6 +24,7 @@ use MyCLabs\Enum\Enum;
  * @method static self NOT_APPLICABLE()
  * @method static self PAUSED()
  * @method static self PENDING()
+ * @method static self REVERTED()
  * @method static self RUNNING()
  * @method static self SCHEDULED()
  */
@@ -80,6 +81,15 @@ class Status extends Enum {
 	private const PENDING = 'pending';
 
 	/**
+	 * Data migration status 'Reverted'.
+	 *
+	 * Used for migrations that have been manually rolled back successfully.
+	 *
+	 * @since TBD
+	 */
+	private const REVERTED = 'reverted';
+
+	/**
 	 * Data migration status 'Running'.
 	 *
 	 * @since 0.0.1
@@ -111,6 +121,8 @@ class Status extends Enum {
 				return _x( 'Canceled', 'Migration status', 'stellarwp-migrations' );
 			case self::SCHEDULED:
 				return _x( 'Scheduled', 'Migration status', 'stellarwp-migrations' );
+			case self::REVERTED:
+				return _x( 'Reverted', 'Migration status', 'stellarwp-migrations' );
 			default:
 				return _x( 'Unknown', 'Migration status', 'stellarwp-migrations' );
 		}
