@@ -149,11 +149,23 @@ $ui->render_single( 'my_migration_id' );
 
 Sets additional query parameters to preserve in the filter form when it's submitted. This is useful when the migrations UI is nested within another admin page that requires certain query parameters to be maintained.
 
+**Accepted Parameter Types:**
+
+Only the following value types are accepted:
+
+- `string` - Text values
+- `int` - Integer values
+- `bool` - Boolean values (true/false)
+
+Any other types will trigger a `_doing_it_wrong` notice.
+
 ```php
 $ui = Config::get_container()->get( UI::class );
 $ui->set_additional_params( [
-    'section-advanced' => 'migrations',
-    'tab'              => 'tools',
+    'section-advanced' => 'migrations', // string
+    'tab'              => 'tools',      // string
+    'page_num'         => 1,            // int
+    'active'           => true,         // bool
 ] );
 $ui->render_list();
 ```
@@ -329,15 +341,17 @@ When integrating the migrations UI into existing admin pages, you often need to 
 
 ### Using `set_additional_params()`
 
-The recommended approach is to use the `set_additional_params()` method:
+The recommended approach is to use the `set_additional_params()` method. Only string, int, and bool values are accepted:
 
 ```php
 $ui = Config::get_container()->get( UI::class );
 
 // When nested in a settings page that uses query parameters.
 $ui->set_additional_params( [
-    'page'             => 'my-settings-page',
-    'section-advanced' => 'migrations',
+    'page'             => 'my-settings-page', // string
+    'section-advanced' => 'migrations',       // string
+    'view_count'       => 10,                 // int
+    'show_archived'    => false,              // bool
 ] );
 
 $ui->render_list();

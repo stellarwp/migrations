@@ -85,7 +85,7 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<string,string|int|bool> $params Additional query parameters.
+	 * @param array<string,string|int|bool> $params Additional query parameters. Only string, int, and bool values are accepted.
 	 *
 	 * @return void
 	 */
@@ -101,7 +101,6 @@ class UI {
 					),
 					'0.0.1'
 				);
-				unset( $params[ $key ] );
 			}
 		}
 
