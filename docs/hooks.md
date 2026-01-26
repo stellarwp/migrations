@@ -269,6 +269,28 @@ add_filter( 'stellarwp_migrations_{prefix}_log_retention_days', function( int $r
 - Comply with data retention policies
 - Customize retention based on environment (shorter in development, longer in production)
 
+### `stellarwp_migrations_{prefix}_template_path`
+
+Filters the template path for the default template engine. Allows customization of where template files are loaded from.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_template_path', function( string $path, string $name ) {
+    // Load templates from a custom directory.
+    if ( $name === 'list' ) {
+        return get_stylesheet_directory() . '/migrations-templates/' . $name . '.php';
+    }
+
+    return $path;
+}, 10, 2 );
+```
+
+**Parameters:**
+
+- `$path` (string) - The full path to the template file.
+- `$name` (string) - The template name (e.g., 'list', 'components/progress-bar').
+
+**Note:** This filter only applies when using the `Default_Template_Engine` class. If you provide a custom template engine implementation, this filter will not be used.
+
 ## Hook Execution Order
 
 ### Automatic Scheduling (via Provider)

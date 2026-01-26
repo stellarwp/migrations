@@ -32,6 +32,15 @@ use StellarWP\Migrations\Models\Execution;
  */
 class UI {
 	/**
+	 * Additional query parameters to preserve in filter form.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var array<string,string|int|bool>
+	 */
+	protected array $additional_params = [];
+
+	/**
 	 * Render the migrations list page.
 	 *
 	 * @since 0.0.1
@@ -62,12 +71,43 @@ class UI {
 		Config::get_template_engine()->template(
 			'list',
 			[
-				'migrations'    => $filtered_migrations,
-				'all_tags'      => $all_tags,
-				'filters'       => $filters,
-				'rest_base_url' => rest_url( REST_Provider::get_namespace() ),
+				'additional_params' => $this->additional_params,
+				'all_tags'          => $all_tags,
+				'filters'           => $filters,
+				'migrations'        => $filtered_migrations,
+				'rest_base_url'     => rest_url( REST_Provider::get_namespace() ),
 			]
 		);
+	}
+
+	/**
+	 * Set additional query parameters to preserve in the filter form.
+	 *
+	 * Only string, int, and bool values are accepted. Any other types will trigger a _doing_it_wrong notice.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<string,string|int|bool> $params Additional query parameters. Only string, int, and bool values are accepted.
+	 *
+	 * @return void
+	 */
+	public function set_additional_params( array $params ): void {
+		foreach ( $params as $key => $value ) {
+			if ( ! is_string( $value ) && ! is_int( $value ) && ! is_bool( $value ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+						'Additional parameter values must be string, int, or bool. %s given for key "%s".',
+						esc_html( gettype( $value ) ),
+						esc_html( $key )
+					),
+					'0.0.1'
+				);
+				unset( $params[ $key ] );
+			}
+		}
+
+		$this->additional_params = $params;
 	}
 
 	/**
