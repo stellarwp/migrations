@@ -58,7 +58,7 @@
   },
   "scripts": {
     "test:analysis": [
-      "phpstan analyse -c phpstan.neon.dist --memory-limit=512M"
+      "phpstan analyse -c phpstan.neon.dist --memory-limit=1G"
     ],
     "compatibility:php-7.4": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 7.4",
     "compatibility:php-8.0": "phpcs ./src -s --standard=PHPCompatibilityWP --runtime-set testVersion 8.0",

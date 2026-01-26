@@ -12,12 +12,13 @@
  * @var list<string>                                                               $all_tags           All available tags.
  * @var array{tags: list<string>, show_completed: bool, show_non_applicable: bool} $filters            Current filter values.
  * @var string                                                                     $rest_base_url      REST API base URL.
- * @var array<string,string>                                                       $additional_params  Additional query parameters to preserve.
+ * @var array<string,string|int|bool>                                              $additional_params  Additional query parameters to preserve.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
+use StellarWP\Migrations\Utilities\Cast;
 
 $migrations        ??= [];
 $all_tags          ??= [];
@@ -36,7 +37,7 @@ $current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CH
 		<?php endif; ?>
 
 		<?php foreach ( $additional_params as $key => $value ) : ?>
-			<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>" />
+			<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( Cast::to_string( $value ) ); ?>" />
 		<?php endforeach; ?>
 
 		<div class="stellarwp-migrations-filters__row">

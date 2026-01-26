@@ -36,7 +36,7 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @var array<string,string>
+	 * @var array<string,string|int|bool>
 	 */
 	protected array $additional_params = [];
 
@@ -85,11 +85,26 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array<string,string> $params Additional query parameters.
+	 * @param array<string,string|int|bool> $params Additional query parameters.
 	 *
 	 * @return void
 	 */
 	public function set_additional_params( array $params ): void {
+		foreach ( $params as $key => $value ) {
+			if ( ! is_string( $value ) && ! is_int( $value ) && ! is_bool( $value ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+						'Additional parameter values must be string, int, or bool. %s given for key "%s".',
+						esc_html( gettype( $value ) ),
+						esc_html( $key )
+					),
+					'0.0.1'
+				);
+				unset( $params[ $key ] );
+			}
+		}
+
 		$this->additional_params = $params;
 	}
 
