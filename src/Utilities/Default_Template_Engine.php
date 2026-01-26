@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace StellarWP\Migrations\Utilities;
 
+use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Template_Engine;
 
 /**
@@ -69,7 +70,22 @@ class Default_Template_Engine implements Template_Engine {
 	 *
 	 * @return string Full path to the template file.
 	 */
-	private function get_template_path( string $name ): string {
-		return dirname( __DIR__ ) . '/views/' . $name . '.php';
+	protected function get_template_path( string $name ): string {
+		$path   = dirname( __DIR__ ) . '/views/' . $name . '.php';
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filters the template path.
+		 *
+		 * Allows customization of where template files are loaded from.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param string $path The full path to the template file.
+		 * @param string $name The template name.
+		 *
+		 * @return string The full path to the template file.
+		 */
+		return (string) apply_filters( "stellarwp_migrations_{$prefix}_template_path", $path, $name );
 	}
 }

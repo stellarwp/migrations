@@ -143,6 +143,25 @@ $ui->render_single( 'my_migration_id' );
 
 **Renders a "not found" view if the migration ID doesn't exist.**
 
+---
+
+### `set_additional_params( array $params )`
+
+Sets additional query parameters to preserve in the filter form when it's submitted. This is useful when the migrations UI is nested within another admin page that requires certain query parameters to be maintained.
+
+```php
+$ui = Config::get_container()->get( UI::class );
+$ui->set_additional_params( [
+    'section-advanced' => 'migrations',
+    'tab'              => 'tools',
+] );
+$ui->render_list();
+```
+
+**Use Case:**
+
+When integrating the migrations UI into existing admin pages (like WordPress settings pages or custom admin screens), you often need to preserve certain query parameters so the page context remains correct after filter submissions. This method ensures those parameters are included as hidden fields in the filter form.
+
 ## Security
 
 The Admin UI includes built-in security checks. Both `render_list()` and `render_single()` verify that the current user has the `manage_options` capability before rendering any content:
@@ -303,6 +322,28 @@ The UI displays different action buttons based on the migration's current status
 | Failed         | Retry, Rollback                  |
 | Canceled       | Run, Rollback                    |
 | Not Applicable | (none - migration doesn't apply) |
+
+## Preserving Query Parameters
+
+When integrating the migrations UI into existing admin pages, you often need to preserve certain query parameters so the page context remains correct after filter form submissions.
+
+### Using `set_additional_params()`
+
+The recommended approach is to use the `set_additional_params()` method:
+
+```php
+$ui = Config::get_container()->get( UI::class );
+
+// When nested in a settings page that uses query parameters.
+$ui->set_additional_params( [
+    'page'             => 'my-settings-page',
+    'section-advanced' => 'migrations',
+] );
+
+$ui->render_list();
+```
+
+This ensures that when users filter migrations, they stay on the same settings page and section.
 
 ## Custom Integration Example
 

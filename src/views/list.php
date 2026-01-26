@@ -8,20 +8,22 @@
  *
  * @version 0.0.1
  *
- * @var list<StellarWP\Migrations\Contracts\Migration>                             $migrations    List of migrations objects.
- * @var list<string>                                                               $all_tags      All available tags.
- * @var array{tags: list<string>, show_completed: bool, show_non_applicable: bool} $filters       Current filter values.
- * @var string                                                                     $rest_base_url REST API base URL.
+ * @var list<StellarWP\Migrations\Contracts\Migration>                             $migrations         List of migrations objects.
+ * @var list<string>                                                               $all_tags           All available tags.
+ * @var array{tags: list<string>, show_completed: bool, show_non_applicable: bool} $filters            Current filter values.
+ * @var string                                                                     $rest_base_url      REST API base URL.
+ * @var array<string,string>                                                       $additional_params  Additional query parameters to preserve.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
 
-$migrations    ??= [];
-$all_tags      ??= [];
-$filters       ??= [];
-$rest_base_url ??= '';
+$migrations        ??= [];
+$all_tags          ??= [];
+$filters           ??= [];
+$rest_base_url     ??= '';
+$additional_params ??= [];
 
 $template     = Config::get_template_engine();
 $current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
@@ -32,6 +34,10 @@ $current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CH
 		<?php if ( is_string( $current_page ) && '' !== $current_page ) : ?>
 			<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( $current_page ) ); ?>" />
 		<?php endif; ?>
+
+		<?php foreach ( $additional_params as $key => $value ) : ?>
+			<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>" />
+		<?php endforeach; ?>
 
 		<div class="stellarwp-migrations-filters__row">
 			<?php if ( ! empty( $all_tags ) ) : ?>

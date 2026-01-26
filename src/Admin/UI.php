@@ -32,6 +32,15 @@ use StellarWP\Migrations\Models\Execution;
  */
 class UI {
 	/**
+	 * Additional query parameters to preserve in filter form.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var array<string,string>
+	 */
+	protected array $additional_params = [];
+
+	/**
 	 * Render the migrations list page.
 	 *
 	 * @since 0.0.1
@@ -62,12 +71,26 @@ class UI {
 		Config::get_template_engine()->template(
 			'list',
 			[
-				'migrations'    => $filtered_migrations,
-				'all_tags'      => $all_tags,
-				'filters'       => $filters,
-				'rest_base_url' => rest_url( REST_Provider::get_namespace() ),
+				'additional_params' => $this->additional_params,
+				'all_tags'          => $all_tags,
+				'filters'           => $filters,
+				'migrations'        => $filtered_migrations,
+				'rest_base_url'     => rest_url( REST_Provider::get_namespace() ),
 			]
 		);
+	}
+
+	/**
+	 * Set additional query parameters to preserve in the filter form.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array<string,string> $params Additional query parameters.
+	 *
+	 * @return void
+	 */
+	public function set_additional_params( array $params ): void {
+		$this->additional_params = $params;
 	}
 
 	/**
