@@ -157,7 +157,7 @@ Only the following value types are accepted:
 - `int` - Integer values
 - `bool` - Boolean values (true/false)
 
-Any other types will trigger a `_doing_it_wrong` notice.
+Any other types will be filtered out and trigger a `_doing_it_wrong` notice.
 
 ```php
 $ui = Config::get_container()->get( UI::class );

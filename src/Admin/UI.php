@@ -83,6 +83,8 @@ class UI {
 	/**
 	 * Set additional query parameters to preserve in the filter form.
 	 *
+	 * Only string, int, and bool values are accepted. Any other types will trigger a _doing_it_wrong notice.
+	 *
 	 * @since 0.0.1
 	 *
 	 * @param array<string,string|int|bool> $params Additional query parameters. Only string, int, and bool values are accepted.
@@ -101,6 +103,7 @@ class UI {
 					),
 					'0.0.1'
 				);
+				unset( $params[ $key ] );
 			}
 		}
 
