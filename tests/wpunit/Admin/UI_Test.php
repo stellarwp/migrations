@@ -23,6 +23,7 @@ use StellarWP\Migrations\Tests\Migrations\Multi_Batch_Migration;
 use StellarWP\Migrations\Tests\Migrations\Not_Applicable_Migration;
 use StellarWP\Migrations\Tests\Migrations\Simple_Migration;
 use StellarWP\Migrations\Tests\Migrations\Tagged_Migration;
+use StellarWP\Migrations\Tests\Traits\With_Uopz;
 use StellarWP\Migrations\Utilities\Default_Template_Engine;
 use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
 
@@ -35,6 +36,7 @@ use tad\Codeception\SnapshotAssertions\SnapshotAssertions;
  */
 class UI_Test extends WPTestCase {
 	use SnapshotAssertions;
+	use With_Uopz;
 
 	/**
 	 * The UI instance.
@@ -334,5 +336,158 @@ class UI_Test extends WPTestCase {
 		$current       = preg_replace( $value_pattern, 'value="EXECUTION_ID"', $current );
 
 		return [ $current, $expected ];
+	}
+
+	/**
+	 * Data provider for set_additional_params tests.
+	 *
+	 * @since TBD
+	 *
+	 * @return array<string, array{params: array<string, mixed>, expected: array<string, string|int|bool>, should_error: bool}> Test cases.
+	 */
+	public function data_provider_set_additional_params(): array {
+		return [
+			'string values'                   => [
+				'params'       => [
+					'key1' => 'value1',
+					'key2' => 'value2',
+				],
+				'expected'     => [
+					'key1' => 'value1',
+					'key2' => 'value2',
+				],
+				'should_error' => false,
+			],
+			'int values'                      => [
+				'params'       => [
+					'page'  => 1,
+					'limit' => 100,
+				],
+				'expected'     => [
+					'page'  => 1,
+					'limit' => 100,
+				],
+				'should_error' => false,
+			],
+			'bool values'                     => [
+				'params'       => [
+					'active'  => true,
+					'enabled' => false,
+				],
+				'expected'     => [
+					'active'  => true,
+					'enabled' => false,
+				],
+				'should_error' => false,
+			],
+			'mixed valid types'               => [
+				'params'       => [
+					'name'    => 'test',
+					'page'    => 5,
+					'enabled' => true,
+				],
+				'expected'     => [
+					'name'    => 'test',
+					'page'    => 5,
+					'enabled' => true,
+				],
+				'should_error' => false,
+			],
+			'array value should be filtered'  => [
+				'params'       => [
+					'valid'   => 'string',
+					'invalid' => [ 'array', 'value' ],
+				],
+				'expected'     => [
+					'valid' => 'string',
+				],
+				'should_error' => true,
+			],
+			'object value should be filtered' => [
+				'params'       => [
+					'valid'   => 123,
+					'invalid' => (object) [ 'foo' => 'bar' ],
+				],
+				'expected'     => [
+					'valid' => 123,
+				],
+				'should_error' => true,
+			],
+			'null value should be filtered'   => [
+				'params'       => [
+					'valid'   => true,
+					'invalid' => null,
+				],
+				'expected'     => [
+					'valid' => true,
+				],
+				'should_error' => true,
+			],
+			'float value should be filtered'  => [
+				'params'       => [
+					'valid'   => 'value',
+					'invalid' => 3.14,
+				],
+				'expected'     => [
+					'valid' => 'value',
+				],
+				'should_error' => true,
+			],
+			'empty array'                     => [
+				'params'       => [],
+				'expected'     => [],
+				'should_error' => false,
+			],
+		];
+	}
+
+	/**
+	 * @test
+	 *
+	 * @dataProvider data_provider_set_additional_params
+	 *
+	 * @param array<string, mixed>           $params       Parameters to set.
+	 * @param array<string, string|int|bool> $expected     Expected valid parameters.
+	 * @param bool                           $should_error Whether _doing_it_wrong should be triggered.
+	 *
+	 * @return void
+	 */
+	public function it_should_set_additional_params_correctly( array $params, array $expected, bool $should_error ): void {
+		// Arrange.
+		$ui = new UI();
+
+		if ( $should_error ) {
+			$this->setExpectedIncorrectUsage( 'StellarWP\Migrations\Admin\UI::set_additional_params' );
+		}
+
+		// Act.
+		$ui->set_additional_params( $params );
+
+		// Assert.
+		$actual = uopz_get_property( $ui, 'additional_params' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_trigger_doing_it_wrong_with_correct_message(): void {
+		// Arrange.
+
+		$ui     = new UI();
+		$params = [
+			'valid'   => 'string',
+			'invalid' => [ 'array' ],
+		];
+
+		// Act.
+
+		$this->setExpectedIncorrectUsage( 'StellarWP\Migrations\Admin\UI::set_additional_params' );
+		$ui->set_additional_params( $params );
+
+		// Assert.
+
+		// The setExpectedIncorrectUsage will handle the assertion.
 	}
 }
