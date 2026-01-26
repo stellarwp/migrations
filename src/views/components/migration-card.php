@@ -1,4 +1,6 @@
 <?php
+
+use StellarWP\Migrations\Enums\Operation;
 /**
  * Migration Card Component Template.
  *
@@ -24,16 +26,17 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 
 $execution = $migration->get_latest_execution();
 
-$migration_id     = $migration->get_id();
-$single_url       = Admin_Provider::get_single_url( $migration_id );
-$migration_label  = $migration->get_label();
-$description      = $migration->get_description();
-$migration_status = $migration->get_status();
-$can_run          = $migration->can_run();
-$is_applicable    = $migration->is_applicable();
-$total_items      = $migration->get_total_items();
-$items_processed  = $execution ? $execution->get_items_processed() : 0;
-$migration_tags   = $migration->get_tags();
+$migration_id             = $migration->get_id();
+$single_url               = Admin_Provider::get_single_url( $migration_id );
+$migration_label          = $migration->get_label();
+$description              = $migration->get_description();
+$migration_status         = $migration->get_status();
+$can_run                  = $migration->can_run();
+$is_applicable            = $migration->is_applicable();
+$total_items              = $migration->get_total_items();
+$total_items_for_rollback = $migration->get_total_items( Operation::DOWN() );
+$items_processed          = $execution ? $execution->get_items_processed() : 0;
+$migration_tags           = $migration->get_tags();
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
@@ -41,7 +44,7 @@ $status_label = $migration_status->get_label();
 // Determine which buttons to show based on status.
 // Note: Non-applicable migrations should not show any action buttons.
 $show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run;
-$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true );
+$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $total_items_for_rollback > 0;
 ?>
 <div class="stellarwp-migration-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
 	<div class="stellarwp-migration-card__header">

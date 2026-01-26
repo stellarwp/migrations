@@ -1,4 +1,6 @@
 <?php
+
+use StellarWP\Migrations\Enums\Operation;
 /**
  * Migration Status Card Component Template.
  *
@@ -29,19 +31,20 @@ $executions ??= [];
 
 $latest_execution = $migration->get_latest_execution();
 
-$migration_id     = $migration->get_id();
-$migration_status = $migration->get_status();
-$can_run          = $migration->can_run();
-$is_applicable    = $migration->is_applicable();
-$total_items      = $migration->get_total_items();
-$items_processed  = $latest_execution ? $latest_execution->get_items_processed() : 0;
+$migration_id             = $migration->get_id();
+$migration_status         = $migration->get_status();
+$can_run                  = $migration->can_run();
+$is_applicable            = $migration->is_applicable();
+$total_items              = $migration->get_total_items();
+$total_items_for_rollback = $migration->get_total_items( Operation::DOWN() );
+$items_processed          = $latest_execution ? $latest_execution->get_items_processed() : 0;
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
 
 // Determine which buttons to show based on status.
 $show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run;
-$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true );
+$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $total_items_for_rollback > 0;
 
 $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 ?>
