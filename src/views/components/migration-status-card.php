@@ -1,6 +1,4 @@
 <?php
-
-use StellarWP\Migrations\Enums\Operation;
 /**
  * Migration Status Card Component Template.
  *
@@ -21,6 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Enums\Status;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
