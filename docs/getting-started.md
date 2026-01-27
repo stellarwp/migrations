@@ -277,7 +277,15 @@ See the [Hooks Reference](./hooks.md) for more details on the `stellarwp_migrati
 If a migration throws an exception during `up()`, the library automatically:
 
 1. Records the failure in the migration events table.
-2. Dispatches a rollback task to execute `down()`.
+2. Sets the execution status to `FAILED`.
+3. Dispatches an automatic rollback task to execute `down()`.
+
+After the automatic rollback completes, the status remains `FAILED` to indicate that the migration did not succeed. This is different from a manual rollback, which sets the status to `REVERTED`.
+
+**Status Distinction:**
+
+- **FAILED** - Migration failed during execution and was automatically rolled back
+- **REVERTED** - A completed migration was manually rolled back (via CLI, REST API, or Admin UI)
 
 Failures during `down()` are recorded but do not trigger additional rollbacks.
 

@@ -126,7 +126,7 @@ curl -X POST "https://example.com/wp-json/my-plugin/migrations/v1/migrations/ren
 
 ### Rollback a Migration
 
-Schedules a migration rollback.
+Schedules a manual migration rollback. After successful completion, the execution status will be set to `REVERTED`.
 
 ```
 POST /wp-json/{prefix}/migrations/v1/migrations/{migration_id}/rollback
@@ -159,6 +159,8 @@ POST /wp-json/{prefix}/migrations/v1/migrations/{migration_id}/rollback
  "batch_size": 100
 }
 ```
+
+**Note:** When the rollback completes successfully, the execution status will be `REVERTED`. This is different from automatic rollbacks triggered by failures, which keep the `FAILED` status.
 
 **Example:**
 

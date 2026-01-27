@@ -144,6 +144,8 @@ $migration = $registry->get( 'migrate-post-meta' );
 $result = migrations()->schedule( $migration, Operation::DOWN() );
 ```
 
+**Note:** When a manual rollback completes successfully, the execution status will be set to `REVERTED`. This is different from automatic rollbacks triggered by migration failures, which keep the `FAILED` status.
+
 ### Error Handling
 
 ```php

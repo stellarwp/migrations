@@ -11,7 +11,8 @@ A batched database migrations library for WordPress plugins powered by [Shepherd
 ## Features
 
 - **Batched execution** - Process large datasets incrementally without timeouts.
-- **Automatic rollback** - Failed migrations trigger automatic rollback via `down()`.
+- **Automatic rollback** - Failed migrations trigger automatic rollback via `down()` (status: `FAILED`).
+- **Manual rollback** - Completed migrations can be manually rolled back (status: `REVERTED`).
 - **Activity logging** - All migration activity is logged to a database table.
 - **Automatic log cleanup** - Old logs are automatically cleaned up after a configurable retention period.
 - **Extensible hooks** - Actions and filters for custom behavior at each stage.
