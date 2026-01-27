@@ -17,7 +17,7 @@ use StellarWP\Migrations\Enums\Operation;
 
 use function StellarWP\Migrations\migrations;
 
-// Get the migration instance from the registry
+// Get the migration instance from the registry.
 $registry  = migrations()->get_registry();
 $migration = $registry->get( 'my-migration-id' );
 
@@ -84,7 +84,7 @@ use function StellarWP\Migrations\migrations;
 $registry  = migrations()->get_registry();
 $migration = $registry->get( 'migrate-post-meta' );
 
-// Schedule batch 1 only
+// Schedule batch 1 only.
 $result = migrations()->schedule( $migration, Operation::UP() );
 ```
 
@@ -98,12 +98,12 @@ use function StellarWP\Migrations\migrations;
 $registry  = migrations()->get_registry();
 $migration = $registry->get( 'migrate-post-meta' );
 
-// Schedule batches 1 through 5
+// Schedule batches 1 through 5.
 $result = migrations()->schedule(
     $migration,
     Operation::UP(),
-    1,  // from_batch
-    5   // to_batch
+    1,  // from_batch.
+    5   // to_batch.
 );
 ```
 
@@ -117,16 +117,16 @@ use function StellarWP\Migrations\migrations;
 $registry  = migrations()->get_registry();
 $migration = $registry->get( 'migrate-post-meta' );
 
-// Schedule all batches with a custom batch size of 50 items
+// Schedule all batches with a custom batch size of 50 items.
 $batch_size    = 50;
 $total_batches = $migration->get_total_batches( $batch_size, Operation::UP() );
 
 $result = migrations()->schedule(
     $migration,
     Operation::UP(),
-    1,             // from_batch
-    $total_batches, // to_batch (all batches)
-    $batch_size    // custom batch size
+    1,             // from_batch.
+    $total_batches, // to_batch (all batches).
+    $batch_size    // custom batch size.
 );
 ```
 
@@ -160,7 +160,7 @@ $migration = $registry->get( 'migrate-post-meta' );
 try {
     $result = migrations()->schedule( $migration, Operation::UP() );
 
-    // Log success
+    // Log success.
     error_log( sprintf(
         'Migration scheduled. Execution ID: %d, Batches: %d-%d',
         $result['execution_id'],
@@ -168,7 +168,7 @@ try {
         $result['to_batch']
     ) );
 } catch ( ApiMethodException $e ) {
-    // Handle scheduling failure
+    // Handle scheduling failure.
     error_log( 'Failed to schedule migration: ' . $e->getMessage() );
 }
 ```
@@ -183,7 +183,7 @@ use function StellarWP\Migrations\migrations;
 $registry  = migrations()->get_registry();
 $migration = $registry->get( 'migrate-post-meta' );
 
-// Only schedule if the migration is applicable and can run
+// Only schedule if the migration is applicable and can run.
 if ( $migration->is_applicable() && $migration->can_run() ) {
     $result = migrations()->schedule( $migration, Operation::UP() );
 }
