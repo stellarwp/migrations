@@ -335,17 +335,17 @@ public function get_status(): Status {
 
 **Available Status Values:**
 
-| Status                     | Description                                                           |
-| -------------------------- | --------------------------------------------------------------------- |
-| `Status::PENDING()`        | Migration has not started                                             |
-| `Status::SCHEDULED()`      | Migration has been scheduled                                          |
-| `Status::RUNNING()`        | Migration is currently running                                        |
-| `Status::COMPLETED()`      | Migration finished successfully                                       |
-| `Status::FAILED()`         | Migration failed (includes automatic rollback)                        |
-| `Status::REVERTED()`       | Migration was manually rolled back successfully                       |
-| `Status::PAUSED()`         | Migration is paused                                                   |
-| `Status::CANCELED()`       | Migration was canceled                                                |
-| `Status::NOT_APPLICABLE()` | Migration is not applicable to the current site                       |
+| Status                     | Description                                     |
+| -------------------------- | ----------------------------------------------- |
+| `Status::PENDING()`        | Migration has not started                       |
+| `Status::SCHEDULED()`      | Migration has been scheduled                    |
+| `Status::RUNNING()`        | Migration is currently running                  |
+| `Status::COMPLETED()`      | Migration finished successfully                 |
+| `Status::FAILED()`         | Migration failed (includes automatic rollback)  |
+| `Status::REVERTED()`       | Migration was manually rolled back successfully |
+| `Status::PAUSED()`         | Migration is paused                             |
+| `Status::CANCELED()`       | Migration was canceled                          |
+| `Status::NOT_APPLICABLE()` | Migration is not applicable to the current site |
 
 **Status Behavior Notes:**
 
