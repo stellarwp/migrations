@@ -104,7 +104,7 @@ class Provider {
 	public function set_page_title(): void {
 			global $title;
 
-		if ( ! isset( $title ) || empty( $title ) ) {
+		if ( empty( $title ) ) {
 			$title = __( 'Migration Details', 'stellarwp-migrations' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- It's intended to override the global title.
 		}
 	}
