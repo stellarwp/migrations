@@ -105,7 +105,7 @@ class Provider {
 			global $title;
 
 		if ( ! isset( $title ) || empty( $title ) ) {
-				$title = __( 'Migration Details', 'stellarwp-migrations' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- It's intended to override the global title.
+			$title = __( 'Migration Details', 'stellarwp-migrations' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- It's intended to override the global title.
 		}
 	}
 
