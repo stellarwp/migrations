@@ -43,7 +43,7 @@ $status_label = $migration_status->get_label();
 
 // Determine which buttons to show based on status.
 // Note: Non-applicable migrations should not show any action buttons.
-$show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run;
+$show_run      = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run && $total_items > 0;
 $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $total_items_for_rollback > 0;
 ?>
 <div class="stellarwp-migration-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">

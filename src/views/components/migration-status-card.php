@@ -43,7 +43,7 @@ $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
 
 // Determine which buttons to show based on status.
-$show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run;
+$show_run      = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run && $total_items > 0;
 $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $total_items_for_rollback > 0;
 
 $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
