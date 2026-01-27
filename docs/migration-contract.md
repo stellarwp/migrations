@@ -341,12 +341,17 @@ public function get_status(): Status {
 | `Status::SCHEDULED()`      | Migration has been scheduled                    |
 | `Status::RUNNING()`        | Migration is currently running                  |
 | `Status::COMPLETED()`      | Migration finished successfully                 |
-| `Status::FAILED()`         | Migration failed                                |
+| `Status::FAILED()`         | Migration failed (includes automatic rollback)  |
+| `Status::REVERTED()`       | Migration was manually rolled back successfully |
 | `Status::PAUSED()`         | Migration is paused                             |
 | `Status::CANCELED()`       | Migration was canceled                          |
 | `Status::NOT_APPLICABLE()` | Migration is not applicable to the current site |
 
-**Note:** The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history. If `is_applicable()` returns `false`, the status will be `NOT_APPLICABLE`.
+**Status Behavior Notes:**
+
+- **Automatic Rollback**: When a migration fails during `up()`, an automatic rollback is triggered. After the rollback completes, the status remains `FAILED` to indicate the migration did not succeed.
+- **Manual Rollback**: When you manually trigger a rollback (via CLI, REST API, or Admin UI) on a completed migration, the status becomes `REVERTED` after successful rollback.
+- The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history. If `is_applicable()` returns `false`, the status will be `NOT_APPLICABLE`.
 
 #### `get_latest_execution(): ?Execution`
 

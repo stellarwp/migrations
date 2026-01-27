@@ -13,10 +13,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Enums\Status;
-use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
@@ -24,24 +25,27 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 
 $execution = $migration->get_latest_execution();
 
-$migration_id     = $migration->get_id();
-$single_url       = Admin_Provider::get_single_url( $migration_id );
-$migration_label  = $migration->get_label();
-$description      = $migration->get_description();
-$migration_status = $migration->get_status();
-$can_run          = $migration->can_run();
-$is_applicable    = $migration->is_applicable();
-$total_items      = $migration->get_total_items();
-$items_processed  = $execution ? $execution->get_items_processed() : 0;
-$migration_tags   = $migration->get_tags();
+$migration_id             = $migration->get_id();
+$single_url               = Admin_Provider::get_single_url( $migration_id );
+$migration_label          = $migration->get_label();
+$description              = $migration->get_description();
+$migration_status         = $migration->get_status();
+$can_run                  = $migration->can_run();
+$is_applicable            = $migration->is_applicable();
+$total_items              = $migration->get_total_items();
+$total_items_for_rollback = $migration->get_total_items( Operation::DOWN() );
+$items_processed          = $execution ? $execution->get_items_processed() : 0;
+$migration_tags           = $migration->get_tags();
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
 
+$run_migration_label = $migration_status->equals( Status::COMPLETED() ) ? __( 'Run again', 'stellarwp-migrations' ) : __( 'Run', 'stellarwp-migrations' );
+
 // Determine which buttons to show based on status.
 // Note: Non-applicable migrations should not show any action buttons.
-$show_run      = $is_applicable && in_array( $status_value, [ Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $can_run;
-$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true );
+$show_run      = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run && $total_items > 0;
+$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $total_items_for_rollback > 0;
 ?>
 <div class="stellarwp-migration-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
 	<div class="stellarwp-migration-card__header">
@@ -95,7 +99,7 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 					<?php // translators: %s: migration label. ?>
 					aria-label="<?php echo esc_attr( sprintf( __( 'Run Migration %s', 'stellarwp-migrations' ), $migration_label ) ); ?>"
 				>
-					<?php esc_html_e( 'Run', 'stellarwp-migrations' ); ?>
+					<?php echo esc_html( $run_migration_label ); ?>
 				</button>
 			<?php endif; ?>
 			<?php if ( $show_rollback ) : ?>

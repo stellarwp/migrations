@@ -172,10 +172,21 @@ wp {prefix} migrations executions <migration_id> [--format=<format>]
 - `migration_id` - The migration identifier
 - `start_date_gmt` - When the execution started
 - `end_date_gmt` - When the execution completed
-- `status` - Execution status (SCHEDULED, RUNNING, COMPLETED, FAILED)
+- `status` - Execution status (SCHEDULED, RUNNING, COMPLETED, FAILED, REVERTED, CANCELED, PAUSED, PENDING, NOT_APPLICABLE)
 - `items_total` - Total items to process
 - `items_processed` - Items processed so far
 - `created_at` - When the execution was created
+
+**Status Values:**
+
+- **COMPLETED** - Migration finished successfully
+- **FAILED** - Migration failed and was automatically rolled back
+- **REVERTED** - Migration was manually rolled back successfully
+- **RUNNING** - Migration is currently executing
+- **SCHEDULED/PENDING** - Migration is queued to run
+- **CANCELED** - Migration was canceled before completion
+- **PAUSED** - Migration execution is paused
+- **NOT_APPLICABLE** - Migration doesn't apply to this site
 
 **Examples:**
 

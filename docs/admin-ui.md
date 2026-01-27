@@ -330,10 +330,17 @@ The UI displays different action buttons based on the migration's current status
 | Scheduled      | (none - waiting for execution)   |
 | Running        | (displays progress)              |
 | Paused         | Resume, Cancel                   |
-| Completed      | Rollback                         |
-| Failed         | Retry, Rollback                  |
+| Completed      | Run Again, Rollback              |
+| Failed         | Run, Rollback                    |
+| Reverted       | Run                              |
 | Canceled       | Run, Rollback                    |
 | Not Applicable | (none - migration doesn't apply) |
+
+**Status Notes:**
+
+- **Failed** status indicates the migration failed and was automatically rolled back. You can retry the migration or manually rollback any partial changes.
+- **Reverted** status indicates a completed migration was manually rolled back successfully. You can run the migration again if needed.
+- The "Run Again" button is shown for completed migrations to allow re-running if necessary.
 
 ## Preserving Query Parameters
 

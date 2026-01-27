@@ -284,6 +284,146 @@ class Execute_Task_Test extends WPTestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function it_should_set_reverted_status_on_manual_rollback(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		// Run up migration first.
+		do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+
+		$this->assertTrue( Simple_Migration::$up_called );
+
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
+
+		// Act.
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
+		$task->process();
+
+		// Assert.
+		$this->assertTrue( Simple_Migration::$down_called );
+
+		$execution = Migration_Executions::get_first_by( 'id', $execution->get_id() );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::REVERTED()->getValue(), $execution->get_status()->getValue() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_keep_failed_status_on_automatic_rollback(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		// Simulate that migration was run.
+		Simple_Migration::$up_called = true;
+
+		// Create an execution with FAILED status to simulate automatic rollback.
+		Migration_Executions::insert(
+			[
+				'migration_id' => 'tests_simple_migration',
+				'status'       => Status::FAILED()->getValue(),
+			]
+		);
+
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
+
+		// Act.
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
+		$task->process();
+
+		// Assert.
+		$this->assertTrue( Simple_Migration::$down_called );
+
+		$execution = Migration_Executions::get_first_by( 'id', $execution->get_id() );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_set_reverted_status_on_manual_rollback_from_running_status(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		// Simulate that migration was run.
+		Simple_Migration::$up_called = true;
+
+		// Create an execution with RUNNING status to simulate manual rollback during execution.
+		Migration_Executions::insert(
+			[
+				'migration_id' => 'tests_simple_migration',
+				'status'       => Status::RUNNING()->getValue(),
+			]
+		);
+
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::RUNNING()->getValue(), $execution->get_status()->getValue() );
+
+		// Act.
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
+		$task->process();
+
+		// Assert.
+		$this->assertTrue( Simple_Migration::$down_called );
+
+		$execution = Migration_Executions::get_first_by( 'id', $execution->get_id() );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::REVERTED()->getValue(), $execution->get_status()->getValue() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_set_reverted_status_on_manual_rollback_from_pending_status(): void {
+		// Arrange.
+		$registry = Config::get_container()->get( Registry::class );
+
+		$registry->register( 'tests_simple_migration', Simple_Migration::class );
+
+		// Simulate that migration was run.
+		Simple_Migration::$up_called = true;
+
+		// Create an execution with PENDING status to simulate manual rollback before execution.
+		Migration_Executions::insert(
+			[
+				'migration_id' => 'tests_simple_migration',
+				'status'       => Status::PENDING()->getValue(),
+			]
+		);
+
+		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::PENDING()->getValue(), $execution->get_status()->getValue() );
+
+		// Act.
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
+		$task->process();
+
+		// Assert.
+		$this->assertTrue( Simple_Migration::$down_called );
+
+		$execution = Migration_Executions::get_first_by( 'id', $execution->get_id() );
+		$this->assertInstanceOf( Execution::class, $execution );
+		$this->assertEquals( Status::REVERTED()->getValue(), $execution->get_status()->getValue() );
+	}
+
+	/**
 	 * @after
 	 */
 	public function cleanup(): void {

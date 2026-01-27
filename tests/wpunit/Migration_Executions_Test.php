@@ -409,11 +409,11 @@ class Migration_Executions_Test extends WPTestCase {
 		$after = current_time( 'mysql', true );
 
 		// Assert.
-		// The execution status should be FAILED after rollback completes.
+		// The execution status should be REVERTED after manual rollback completes.
 		$execution_after = Migration_Executions::get_first_by( 'id', $execution->get_id() );
 		$this->assertNotNull( $execution_after );
 		$this->assertInstanceOf( Execution::class, $execution_after );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution_after->get_status()->getValue(), 'Status should be FAILED after rollback' );
+		$this->assertEquals( Status::REVERTED()->getValue(), $execution_after->get_status()->getValue(), 'Status should be REVERTED after manual rollback' );
 
 		// The end_date should be updated after the rollback completes.
 		$new_end_date = $execution_after->get_end_date();

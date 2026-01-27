@@ -69,6 +69,7 @@ class Provider {
 
 		if ( $single_page_hook && is_string( $single_page_hook ) ) {
 			add_action( 'load-' . $single_page_hook, [ $this, 'add_screen_options' ] );
+			add_action( 'load-' . $single_page_hook, [ $this, 'set_page_title' ] );
 		}
 	}
 
@@ -88,6 +89,24 @@ class Provider {
 				'option'  => Assets::get_logs_per_page_option(),
 			]
 		);
+	}
+
+	/**
+	 * Set the page title for the single migration page.
+	 *
+	 * Prevents WordPress from passing null to strip_tags() when rendering
+	 * the admin header for hidden submenu pages.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function set_page_title(): void {
+		global $title;
+
+		if ( empty( $title ) ) {
+			$title = __( 'Migration Details', 'stellarwp-migrations' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- It's intended to override the global title.
+		}
 	}
 
 	/**
