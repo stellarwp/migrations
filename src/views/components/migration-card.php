@@ -58,7 +58,7 @@ $status_label = $migration_status->get_label();
 			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--<?php echo esc_attr( $status_value ); ?>">
 				<?php echo esc_html( $status_label ); ?>
 			</span>
-			<?php if ( $total_items > 0 && ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
+			<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 				<span class="stellarwp-migration-card__progress-text">
 					<?php
 					printf(
@@ -71,7 +71,7 @@ $status_label = $migration_status->get_label();
 				</span>
 			<?php endif; ?>
 		</div>
-		<?php if ( $total_items > 0 && ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
+		<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 			<?php
 			Config::get_template_engine()->template(
 				'components/progress-bar',
