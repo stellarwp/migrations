@@ -69,7 +69,7 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--<?php echo esc_attr( $status_value ); ?>">
 				<?php echo esc_html( $status_label ); ?>
 			</span>
-			<?php if ( $total_items > 0 ) : ?>
+			<?php if ( $total_items > 0 && ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 				<span class="stellarwp-migration-card__progress-text">
 					<?php
 					printf(
@@ -82,7 +82,7 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 				</span>
 			<?php endif; ?>
 		</div>
-		<?php if ( $total_items > 0 ) : ?>
+		<?php if ( $total_items > 0 && ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 			<?php
 			Config::get_template_engine()->template(
 				'components/progress-bar',
@@ -99,6 +99,14 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 					<?php // translators: %s: migration label. ?>
 					aria-label="<?php echo esc_attr( sprintf( __( 'Run Migration %s', 'stellarwp-migrations' ), $migration_label ) ); ?>"
 				>
+					<?php
+					Config::get_template_engine()->template(
+						'icons/start',
+						[
+							'is_aria_hidden' => true,
+						]
+					);
+					?>
 					<?php echo esc_html( $run_migration_label ); ?>
 				</button>
 			<?php endif; ?>
