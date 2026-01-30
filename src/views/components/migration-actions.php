@@ -39,6 +39,9 @@ $show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED(
 $run_migration_label = $migration_status->equals( Status::COMPLETED() )
 	? __( 'Run again', 'stellarwp-migrations' )
 	: __( 'Start', 'stellarwp-migrations' );
+$run_migration_icon  = $migration_status->equals( Status::COMPLETED() )
+	? 'retry'
+	: 'start';
 
 $run_aria_label = $migration_label
 	? sprintf(
@@ -67,7 +70,7 @@ $rollback_aria_label = $migration_label
 		>
 			<?php
 			Config::get_template_engine()->template(
-				'icons/start',
+				'icons/' . $run_migration_icon,
 				[
 					'is_aria_hidden' => true,
 				]
@@ -76,6 +79,7 @@ $rollback_aria_label = $migration_label
 			<?php echo esc_html( $run_migration_label ); ?>
 		</button>
 	<?php endif; ?>
+
 	<?php if ( $show_rollback ) : ?>
 		<button
 			type="button"
@@ -84,6 +88,14 @@ $rollback_aria_label = $migration_label
 			<?php // translators: %s: migration label. ?>
 			aria-label="<?php echo esc_attr( $rollback_aria_label ); ?>"
 		>
+			<?php
+			Config::get_template_engine()->template(
+				'icons/rollback',
+				[
+					'is_aria_hidden' => true,
+				]
+			);
+			?>
 			<?php esc_html_e( 'Rollback', 'stellarwp-migrations' ); ?>
 		</button>
 	<?php endif; ?>
