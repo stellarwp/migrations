@@ -40,7 +40,7 @@ $migration_tags           = $migration->get_tags();
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
 
-$run_migration_label = $migration_status->equals( Status::COMPLETED() ) ? __( 'Run again', 'stellarwp-migrations' ) : __( 'Run', 'stellarwp-migrations' );
+$run_migration_label = $migration_status->equals( Status::COMPLETED() ) ? __( 'Run again', 'stellarwp-migrations' ) : __( 'Start', 'stellarwp-migrations' );
 
 // Determine which buttons to show based on status.
 // Note: Non-applicable migrations should not show any action buttons.
