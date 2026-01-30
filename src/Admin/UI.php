@@ -416,8 +416,8 @@ class UI {
 				Status::SCHEDULED()->getValue()      => 5,
 				Status::CANCELED()->getValue()       => 6,
 				Status::REVERTED()->getValue()       => 7,
-				Status::NOT_APPLICABLE()->getValue() => 8,
-				Status::COMPLETED()->getValue()      => 9,
+				Status::COMPLETED()->getValue()      => 8,
+				Status::NOT_APPLICABLE()->getValue() => 9,
 			]
 		);
 	}
