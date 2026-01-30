@@ -6,10 +6,9 @@
  * Used on the single migration detail page.
  *
  * @since 0.0.1
+ * @version 0.0.1
  *
  * @package StellarWP\Migrations
- *
- * @version 0.0.1
  *
  * @var StellarWP\Migrations\Contracts\Migration $migration  Migration object.
  * @var list<array<string,mixed>>                $executions List of execution records.
@@ -19,6 +18,7 @@ defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Status;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
@@ -30,8 +30,6 @@ $latest_execution = $migration->get_latest_execution();
 
 $migration_id     = $migration->get_id();
 $migration_status = $migration->get_status();
-$total_items      = $migration->get_total_items();
-$items_processed  = $latest_execution ? $latest_execution->get_items_processed() : 0;
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
@@ -44,21 +42,18 @@ $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--<?php echo esc_attr( $status_value ); ?>">
 				<?php echo esc_html( $status_label ); ?>
 			</span>
-			<?php if ( $total_items > 0 ) : ?>
-				<span class="stellarwp-migration-card__progress-text">
-					<?php
-					printf(
-						/* translators: %1$d: items processed, %2$d: total items */
-						esc_html__( '%1$d / %2$d', 'stellarwp-migrations' ),
-						absint( $items_processed ),
-						absint( $total_items )
-					);
-					?>
-				</span>
+
+			<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
+				<?php
+				Config::get_template_engine()->template(
+					'components/progress-text',
+					[ 'migration' => $migration ]
+				);
+				?>
 			<?php endif; ?>
 		</div>
 
-		<?php if ( $total_items > 0 ) : ?>
+		<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 			<div class="stellarwp-migration-status-card__progress">
 				<?php
 				Config::get_template_engine()->template(

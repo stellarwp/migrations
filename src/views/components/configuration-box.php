@@ -5,10 +5,9 @@
  * Displays migration configuration details.
  *
  * @since 0.0.1
+ * @version 0.0.1
  *
  * @package StellarWP\Migrations
- *
- * @version 0.0.1
  *
  * @var StellarWP\Migrations\Contracts\Migration $migration Migration object.
  */
