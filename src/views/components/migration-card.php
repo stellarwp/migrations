@@ -30,6 +30,8 @@ $migration_tags   = $migration->get_tags();
 
 $status_value = $migration_status->getValue();
 $status_label = $migration_status->get_label();
+
+$template = Config::get_template_engine();
 ?>
 <div class="stellarwp-migration-card" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
 	<div class="stellarwp-migration-card__header">
@@ -56,7 +58,7 @@ $status_label = $migration_status->get_label();
 
 			<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 				<?php
-				Config::get_template_engine()->template(
+				$template->template(
 					'components/progress-text',
 					[ 'migration' => $migration ]
 				);
@@ -66,7 +68,7 @@ $status_label = $migration_status->get_label();
 
 		<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 			<?php
-			Config::get_template_engine()->template(
+			$template->template(
 				'components/progress-bar',
 				[ 'migration' => $migration ]
 			);
@@ -74,7 +76,7 @@ $status_label = $migration_status->get_label();
 		<?php endif; ?>
 
 		<?php
-		Config::get_template_engine()->template(
+		$template->template(
 			'components/migration-actions',
 			[
 				'migration' => $migration,

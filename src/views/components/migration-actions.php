@@ -33,8 +33,36 @@ $total_items_for_rollback = $migration->get_total_items( Operation::DOWN() );
 $status_value = $migration_status->getValue();
 
 // Determine which buttons to show based on status.
-$show_run      = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::PENDING()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue(), Status::REVERTED()->getValue() ], true ) && $can_run && $total_items > 0;
-$show_rollback = $is_applicable && in_array( $status_value, [ Status::COMPLETED()->getValue(), Status::CANCELED()->getValue(), Status::FAILED()->getValue() ], true ) && $total_items_for_rollback > 0;
+$show_run = (
+	$is_applicable
+	&& $can_run
+	&& in_array(
+		$status_value,
+		[
+			Status::COMPLETED()->getValue(),
+			Status::PENDING()->getValue(),
+			Status::CANCELED()->getValue(),
+			Status::FAILED()->getValue(),
+			Status::REVERTED()->getValue(),
+		],
+		true
+	)
+	&& $total_items > 0
+);
+
+$show_rollback = (
+	$is_applicable
+	&& in_array(
+		$status_value,
+		[
+			Status::COMPLETED()->getValue(),
+			Status::CANCELED()->getValue(),
+			Status::FAILED()->getValue(),
+		],
+		true
+	)
+	&& $total_items_for_rollback > 0
+);
 
 $run_migration_label = $migration_status->equals( Status::COMPLETED() )
 	? __( 'Run again', 'stellarwp-migrations' )
@@ -65,7 +93,6 @@ $rollback_aria_label = $migration_label
 			type="button"
 			class="stellarwp-migration-btn stellarwp-migration-btn--primary"
 			data-action="run"
-			<?php // translators: %s: migration label. ?>
 			aria-label="<?php echo esc_attr( $run_aria_label ); ?>"
 		>
 			<?php
