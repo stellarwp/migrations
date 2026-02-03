@@ -16,66 +16,26 @@ defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
-use StellarWP\Migrations\Enums\Operation;
-use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Utilities\Migration_UI;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
-$migration_label          = $migration->get_label();
-$migration_status         = $migration->get_status();
-$can_run                  = $migration->can_run();
-$is_applicable            = $migration->is_applicable();
-$total_items              = $migration->get_total_items();
-$total_items_for_rollback = $migration->get_total_items( Operation::DOWN() );
+$migration_ui = new Migration_UI( $migration );
 
-$status_value = $migration_status->getValue();
-
-// Determine which buttons to show based on status.
-$show_run = (
-	$is_applicable
-	&& $can_run
-	&& in_array(
-		$status_value,
-		[
-			Status::COMPLETED()->getValue(),
-			Status::PENDING()->getValue(),
-			Status::CANCELED()->getValue(),
-			Status::FAILED()->getValue(),
-			Status::REVERTED()->getValue(),
-		],
-		true
-	)
-	&& $total_items > 0
-);
-
-$show_rollback = (
-	$is_applicable
-	&& in_array(
-		$status_value,
-		[
-			Status::COMPLETED()->getValue(),
-			Status::CANCELED()->getValue(),
-			Status::FAILED()->getValue(),
-		],
-		true
-	)
-	&& $total_items_for_rollback > 0
-);
-
-$run_migration_label = $migration_status->equals( Status::COMPLETED() )
-	? __( 'Run again', 'stellarwp-migrations' )
-	: __( 'Start', 'stellarwp-migrations' );
-$run_migration_icon  = $migration_status->equals( Status::COMPLETED() )
-	? 'retry'
-	: 'start';
+$migration_label     = $migration->get_label();
+$show_run            = $migration_ui->show_run();
+$show_rollback       = $migration_ui->show_rollback();
+$run_migration_label = $migration_ui->get_run_action_label();
+$run_migration_icon  = $migration_ui->get_run_action_icon();
 
 $run_aria_label = $migration_label
 	? sprintf(
-		/* translators: %s: migration label. */
-		__( 'Run Migration %s', 'stellarwp-migrations' ),
-		$migration_label
+		/* translators: Migration action label and migration label. */
+		__( '%1$s Migration %2$s', 'stellarwp-migrations' ),
+		$run_migration_label,
+		$migration_label,
 	)
 	: __( 'Run Migration', 'stellarwp-migrations' );
 
