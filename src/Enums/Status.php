@@ -114,7 +114,7 @@ class Status extends Enum {
 			case self::FAILED:
 				return _x( 'Failed', 'Migration status', 'stellarwp-migrations' );
 			case self::NOT_APPLICABLE:
-				return _x( 'N/A', 'Migration status', 'stellarwp-migrations' );
+				return _x( 'Not applicable', 'Migration status', 'stellarwp-migrations' );
 			case self::PAUSED:
 				return _x( 'Paused', 'Migration status', 'stellarwp-migrations' );
 			case self::CANCELED:

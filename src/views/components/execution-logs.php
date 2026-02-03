@@ -5,10 +5,9 @@
  * Displays logs for migration executions with load more functionality.
  *
  * @since 0.0.1
+ * @version 0.0.1
  *
  * @package StellarWP\Migrations
- *
- * @version 0.0.1
  *
  * @var StellarWP\Migrations\Contracts\Migration $migration     Migration object.
  * @var string                                   $rest_base_url REST API base URL.

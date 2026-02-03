@@ -3,10 +3,9 @@
  * Single Migration Not Found Template.
  *
  * @since 0.0.1
+ * @version 0.0.1
  *
  * @package StellarWP\Migrations
- *
- * @version 0.0.1
  *
  * @var string $migration_id The migration ID that was not found.
  */
