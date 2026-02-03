@@ -16,16 +16,19 @@ defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Enums\Status;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
-$migration_label  = $migration->get_label();
-$migration_status = $migration->get_status();
-$can_run          = $migration->can_run();
-$is_applicable    = $migration->is_applicable();
+$migration_label          = $migration->get_label();
+$migration_status         = $migration->get_status();
+$can_run                  = $migration->can_run();
+$is_applicable            = $migration->is_applicable();
+$total_items              = $migration->get_total_items();
+$total_items_for_rollback = $migration->get_total_items( Operation::DOWN() );
 
 $status_value = $migration_status->getValue();
 
@@ -44,6 +47,7 @@ $show_run = (
 		],
 		true
 	)
+	&& $total_items > 0
 );
 
 $show_rollback = (
@@ -57,6 +61,7 @@ $show_rollback = (
 		],
 		true
 	)
+	&& $total_items_for_rollback > 0
 );
 
 $run_migration_label = $migration_status->equals( Status::COMPLETED() )
