@@ -119,11 +119,7 @@ class Execute extends Task_Abstract {
 
 		// Update the execution status to running and record the start date.
 
-		if (
-				! $is_rollback // Rollback does not change the execution status.
-				&& 1 === $batch
-			) {
-
+		if ( ! $execution->get_start_date() ) { // Start date is not set, so this is the first batch (regular or rollback).
 				Migration_Executions::update_single(
 					[
 						'id'             => $execution_id,

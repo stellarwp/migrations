@@ -315,7 +315,7 @@ trait API_Methods {
 			[
 				'migration_id'    => $migration->get_id(),
 				'status'          => Status::SCHEDULED()->getValue(),
-				'items_total'     => $migration->get_total_items(),
+				'items_total'     => $migration->get_total_items( $operation ),
 				'items_processed' => 0,
 			]
 		);

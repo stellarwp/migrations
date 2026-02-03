@@ -312,6 +312,10 @@
 	background: #d63638;
 }
 
+.stellarwp-migration-progress__fill--reverted {
+	background: #0d9488;
+}
+
 .stellarwp-migration-progress__fill--paused {
 	background: #f0b849;
 }
