@@ -234,26 +234,26 @@ abstract class Migration_Abstract implements Migration {
 	/**
 	 * Get the migration status.
 	 *
-	 * Queries the database for the latest execution and returns its status.
-	 * If no executions exist, checks if the migration is applicable.
-	 * Returns NOT_APPLICABLE for non-applicable migrations or PENDING if applicable.
+	 * Returns NOT_APPLICABLE for non-applicable migrations.
+	 * Otherwise queries the database for the latest execution
+	 * and returns its status. If no executions exist, returns PENDING.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return Status The current status of the migration.
 	 */
 	public function get_status(): Status {
-		$latest_execution = $this->get_latest_execution();
-
-		if ( null !== $latest_execution ) {
-			return $latest_execution->get_status();
-		}
-
 		if ( ! $this->is_applicable() ) {
 			return Status::NOT_APPLICABLE();
 		}
 
-		return Status::PENDING();
+		$latest_execution = $this->get_latest_execution();
+
+		if ( null === $latest_execution ) {
+			return Status::PENDING();
+		}
+
+		return $latest_execution->get_status();
 	}
 
 	/**

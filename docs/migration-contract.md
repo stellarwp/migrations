@@ -322,15 +322,14 @@ You typically don't need to override this method unless you have custom batching
 
 Returns the current status of the migration based on its most recent execution. Used by the CLI and for reporting.
 
-The default implementation in `Migration_Abstract` queries the `Migration_Executions` table to find the latest execution for this migration and returns its status. If no executions exist, it checks if the migration is applicable. If not applicable, it returns `Status::NOT_APPLICABLE()`. Otherwise, it returns `Status::PENDING()`.
+The default implementation in `Migration_Abstract` queries the `Migration_Executions` table to find the latest execution for this migration and returns its status. If no executions exist, it returns `Status::PENDING()`.
 
 ```php
 use StellarWP\Migrations\Enums\Status;
 
 public function get_status(): Status {
-    // The default implementation queries the last execution first.
-    // If no executions exist, checks is_applicable().
-    // Returns Status::NOT_APPLICABLE() if not applicable, otherwise Status::PENDING().
+    // The default implementation queries the last execution.
+    // Returns Status::PENDING() if no executions exist.
 }
 ```
 
@@ -352,7 +351,7 @@ public function get_status(): Status {
 
 - **Automatic Rollback**: When a migration fails during `up()`, an automatic rollback is triggered. After the rollback completes, the status remains `FAILED` to indicate the migration did not succeed.
 - **Manual Rollback**: When you manually trigger a rollback (via CLI, REST API, or Admin UI) on a completed migration, the status becomes `REVERTED` after successful rollback.
-- The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history. The method first checks for existing executions. If no executions exist and `is_applicable()` returns `false`, the status will be `NOT_APPLICABLE`. If no executions exist and the migration is applicable, the status will be `PENDING`.
+- The `get_status()` method requires the migration ID to be set (via the constructor) to query the execution history. If `is_applicable()` returns `false`, the status will be `NOT_APPLICABLE`.
 
 #### `get_latest_execution(): ?Execution`
 
