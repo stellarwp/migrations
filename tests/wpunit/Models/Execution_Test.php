@@ -36,15 +36,15 @@ class Execution_Test extends WPTestCase {
 		$created_at = new DateTime( '2024-01-15 09:55:00' );
 
 		$attributes = [
-			'id'                   => 123,
-			'migration_id'         => 'test_migration',
-			'start_date_gmt'       => $start_date,
-			'end_date_gmt'         => $end_date,
-			'status'               => Status::COMPLETED()->getValue(),
-			'items_total'          => 100,
-			'items_processed'      => 100,
-			'parent_execution_id'  => null,
-			'created_at'           => $created_at,
+			'id'                  => 123,
+			'migration_id'        => 'test_migration',
+			'start_date_gmt'      => $start_date,
+			'end_date_gmt'        => $end_date,
+			'status'              => Status::COMPLETED()->getValue(),
+			'items_total'         => 100,
+			'items_processed'     => 100,
+			'parent_execution_id' => null,
+			'created_at'          => $created_at,
 		];
 
 		$execution = new Execution( $attributes );
@@ -195,15 +195,15 @@ class Execution_Test extends WPTestCase {
 
 		$execution = $this->create_test_execution(
 			[
-				'id'                   => 789,
-				'migration_id'         => 'array_test_migration',
-				'start_date_gmt'       => $start_date,
-				'end_date_gmt'         => $end_date,
-				'status'               => Status::COMPLETED()->getValue(),
-				'items_total'          => 200,
-				'items_processed'      => 200,
-				'parent_execution_id'  => null,
-				'created_at'           => $created_at,
+				'id'                  => 789,
+				'migration_id'        => 'array_test_migration',
+				'start_date_gmt'      => $start_date,
+				'end_date_gmt'        => $end_date,
+				'status'              => Status::COMPLETED()->getValue(),
+				'items_total'         => 200,
+				'items_processed'     => 200,
+				'parent_execution_id' => null,
+				'created_at'          => $created_at,
 			] 
 		);
 
@@ -279,15 +279,15 @@ class Execution_Test extends WPTestCase {
 	 */
 	private function create_test_execution( array $overrides = [] ): Execution {
 		$defaults = [
-			'id'                   => 1,
-			'migration_id'         => 'test_migration',
-			'start_date_gmt'       => new DateTime( '2024-01-15 10:00:00' ),
-			'end_date_gmt'         => new DateTime( '2024-01-15 10:05:00' ),
-			'status'               => Status::COMPLETED()->getValue(),
-			'items_total'          => 100,
-			'items_processed'      => 100,
-			'parent_execution_id'  => null,
-			'created_at'           => new DateTime( '2024-01-15 09:55:00' ),
+			'id'                  => 1,
+			'migration_id'        => 'test_migration',
+			'start_date_gmt'      => new DateTime( '2024-01-15 10:00:00' ),
+			'end_date_gmt'        => new DateTime( '2024-01-15 10:05:00' ),
+			'status'              => Status::COMPLETED()->getValue(),
+			'items_total'         => 100,
+			'items_processed'     => 100,
+			'parent_execution_id' => null,
+			'created_at'          => new DateTime( '2024-01-15 09:55:00' ),
 		];
 
 		return new Execution( array_merge( $defaults, $overrides ) );

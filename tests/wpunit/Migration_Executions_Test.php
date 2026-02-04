@@ -378,7 +378,7 @@ class Migration_Executions_Test extends WPTestCase {
 
 		$this->assertCount( 2, $executions, 'Should have failed execution and rollback execution' );
 
-		$failed_execution  = null;
+		$failed_execution   = null;
 		$rollback_execution = null;
 		foreach ( $executions as $exec ) {
 			if ( ! $exec instanceof Execution ) {
