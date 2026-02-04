@@ -286,11 +286,12 @@ trait API_Methods {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param Migration $migration    The migration instance to schedule.
-	 * @param Operation $operation    The operation to run (UP or DOWN).
-	 * @param int       $from_batch   The starting batch number. Default 1.
-	 * @param int|null  $to_batch     The ending batch number. Default null (same as from_batch).
-	 * @param int|null  $batch_size   The batch size. Default null (uses migration default).
+	 * @param Migration $migration           The migration instance to schedule.
+	 * @param Operation $operation           The operation to run (UP or DOWN).
+	 * @param int       $from_batch          The starting batch number. Default 1.
+	 * @param int|null  $to_batch            The ending batch number. Default null (same as from_batch).
+	 * @param int|null  $batch_size          The batch size. Default null (uses migration default).
+	 * @param int|null  $parent_execution_id The parent execution ID when scheduling an automatic rollback. Default null.
 	 *
 	 * @throws ApiMethodException If the execution record cannot be inserted.
 	 *
@@ -301,7 +302,8 @@ trait API_Methods {
 		Operation $operation,
 		int $from_batch = 1,
 		?int $to_batch = null,
-		?int $batch_size = null
+		?int $batch_size = null,
+		?int $parent_execution_id = null
 	): array {
 		$batch_size  ??= $migration->get_default_batch_size();
 		$total_batches = max( 1, $migration->get_total_batches( $batch_size, $operation ) );
@@ -311,14 +313,18 @@ trait API_Methods {
 		$from_batch = max( 1, $from_batch );
 		$to_batch   = min( $to_batch, $total_batches );
 
-		$insert_status = Migration_Executions::insert(
-			[
-				'migration_id'    => $migration->get_id(),
-				'status'          => Status::SCHEDULED()->getValue(),
-				'items_total'     => $migration->get_total_items(),
-				'items_processed' => 0,
-			]
-		);
+		$insert_data = [
+			'migration_id'    => $migration->get_id(),
+			'status'          => Status::SCHEDULED()->getValue(),
+			'items_total'     => $migration->get_total_items( $operation ),
+			'items_processed' => 0,
+		];
+
+		if ( null !== $parent_execution_id ) {
+			$insert_data['parent_execution_id'] = $parent_execution_id;
+		}
+
+		$insert_status = Migration_Executions::insert( $insert_data );
 
 		if ( ! $insert_status ) {
 			throw new ApiMethodException(
@@ -381,6 +387,63 @@ trait API_Methods {
 			'to_batch'     => $to_batch,
 			'batch_size'   => $batch_size,
 		];
+	}
+
+	/**
+	 * Schedule a rollback after a failed migration (creates a new execution linked to the failed one and dispatches the first batch).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param Migration $migration           The migration instance.
+	 * @param int       $parent_execution_id The ID of the failed execution to link to.
+	 * @param int       $items_total         The total items from the failed execution.
+	 * @param int       $batch_size          The batch size for the rollback.
+	 *
+	 * @throws ApiMethodException If the execution record cannot be inserted.
+	 *
+	 * @return int The new rollback execution ID.
+	 */
+	public function schedule_rollback_after_failure(
+		Migration $migration,
+		int $parent_execution_id,
+		int $items_total,
+		int $batch_size
+	): int {
+		$insert_status = Migration_Executions::insert(
+			[
+				'migration_id'        => $migration->get_id(),
+				'status'              => Status::SCHEDULED()->getValue(),
+				'items_total'         => $items_total,
+				'items_processed'     => 0,
+				'parent_execution_id' => $parent_execution_id,
+			]
+		);
+
+		if ( ! $insert_status ) {
+			throw new ApiMethodException(
+				sprintf(
+					/* translators: %s is the migration ID */
+					__( 'Failed to insert rollback execution for migration "%s"', 'stellarwp-migrations' ),
+					$migration->get_id()
+				)
+			);
+		}
+
+		$rollback_execution_id = (int) DB::last_insert_id();
+		$extra_args            = $migration->get_down_extra_args_for_batch( 1, $batch_size );
+
+		shepherd()->dispatch(
+			new Execute(
+				'down',
+				$migration->get_id(),
+				1,
+				$batch_size,
+				$rollback_execution_id,
+				...$extra_args
+			)
+		);
+
+		return $rollback_execution_id;
 	}
 
 	/**
