@@ -428,7 +428,7 @@ class Commands {
 			$operation_label      = $operation->get_label();
 
 			WP_CLI::log( "Dry run: Would {$operation_label} migration '{$migration_id}'." );
-			WP_CLI::log( "  - Total items: {$migration->get_total_items( $operation )}" );
+			WP_CLI::log( "  - Total items: {$migration->get_total_items()}" );
 			WP_CLI::log( "  - Batch size: {$batch_size}" );
 			WP_CLI::log( "  - From batch: {$from_batch}" );
 			WP_CLI::log( "  - To batch: {$to_batch}" );
@@ -441,7 +441,7 @@ class Commands {
 			[
 				'migration_id'    => $migration_id,
 				'status'          => Status::SCHEDULED()->getValue(),
-				'items_total'     => $migration->get_total_items( $operation ),
+				'items_total'     => $migration->get_total_items(),
 				'items_processed' => 0,
 			]
 		);
