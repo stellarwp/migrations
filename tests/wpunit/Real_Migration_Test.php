@@ -9,6 +9,7 @@ use StellarWP\Migrations\Models\Execution;
 use StellarWP\Migrations\Tables\Migration_Logs;
 use StellarWP\Migrations\Tables\Migration_Executions;
 use StellarWP\Migrations\Tasks\Execute;
+use StellarWP\Migrations\Enums\Status;
 use function StellarWP\Shepherd\shepherd;
 
 /**
@@ -226,7 +227,7 @@ class Real_Migration_Test extends WPTestCase {
 		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_switch_post_meta_key' );
 		$this->assertNotNull( $execution );
 		$this->assertInstanceOf( Execution::class, $execution );
-		$this->assertEquals( 'completed', $execution->get_status()->getValue() );
+		$this->assertEquals( Status::COMPLETED()->getValue(), $execution->get_status()->getValue() );
 
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 		$this->assertNotEmpty( $logs, 'Should have log entries' );

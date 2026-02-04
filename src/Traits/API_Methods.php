@@ -313,22 +313,10 @@ trait API_Methods {
 		$from_batch = max( 1, $from_batch );
 		$to_batch   = min( $to_batch, $total_batches );
 
-		$total_items = $migration->get_total_items( $operation );
-
-		if ( $total_items === 0 ) {
-			throw new ApiMethodException(
-				sprintf(
-					/* translators: %s is the migration ID */
-					__( 'Migration "%s" has no items to process', 'stellarwp-migrations' ),
-					$migration->get_id()
-				)
-			);
-		}
-
 		$insert_data = [
 			'migration_id'    => $migration->get_id(),
 			'status'          => Status::SCHEDULED()->getValue(),
-			'items_total'     => $total_items,
+			'items_total'     => $migration->get_total_items( $operation ),
 			'items_processed' => 0,
 		];
 

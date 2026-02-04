@@ -394,7 +394,7 @@ class Migration_Executions_Test extends WPTestCase {
 		$this->assertNotNull( $failed_execution );
 		$this->assertNotNull( $rollback_execution );
 		$this->assertEquals( $failed_execution->get_id(), $rollback_execution->get_parent_execution_id(), 'Rollback execution should link to the failed execution' );
-		$this->assertEquals( Status::FAILED()->getValue(), $rollback_execution->get_status()->getValue(), 'Rollback execution should end with FAILED status after automatic rollback' );
+		$this->assertEquals( Status::REVERTED()->getValue(), $rollback_execution->get_status()->getValue(), 'Rollback execution should end with REVERTED status after automatic rollback' );
 	}
 
 	/**
