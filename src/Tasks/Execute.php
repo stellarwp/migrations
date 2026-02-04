@@ -121,7 +121,6 @@ class Execute extends Task_Abstract {
 		// Update the execution status to running and record the start date.
 
 		if ( 1 === $batch ) {
-
 				Migration_Executions::update_single(
 					[
 						'id'             => $execution_id,
@@ -233,19 +232,25 @@ class Execute extends Task_Abstract {
 				]
 			);
 
-			// Start the rollback automatically.
+			// Start the rollback automatically, if applicable.
 
-			if ( ! $is_rollback ) {
-				$logger->warning(
-					'Rollback scheduled.',
-					[
-						'reason' => $e->getMessage(),
-					]
-				);
+			if ( $is_rollback ) {
+				$items_to_rollback = $migration->get_total_items( Operation::DOWN() );
 
-				// Schedule the rollback via API (creates execution with parent_execution_id and dispatches first batch).
-				$provider = $container->get( Provider::class );
-				$provider->schedule( $migration, Operation::DOWN(), 1, 1, $batch_size, $execution_id );
+				if ( $items_to_rollback > 0 ) {
+					$logger->warning(
+						'Automatic rollback scheduled.',
+						[
+							'reason' => $e->getMessage(),
+						]
+					);
+
+					// Schedule the rollback via API (creates execution with parent_execution_id and dispatches first batch).
+					$provider = $container->get( Provider::class );
+					$provider->schedule( $migration, Operation::DOWN(), 1, 1, $batch_size, $execution_id );
+				} else {
+					$logger->warning( 'Automatic rollback not scheduled because this migration does not support rollbacks.' );
+				}
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
