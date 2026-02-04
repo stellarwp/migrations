@@ -103,6 +103,8 @@ class Migration_Executions extends Table_Abstract {
 				( new Integer_Column( 'items_total' ) ),
 				// Items processed so far.
 				( new Integer_Column( 'items_processed' ) ),
+				// Set when this execution is an automatic rollback; links to the original (failed) execution id.
+				( new Integer_Column( 'parent_execution_id' ) )->set_nullable( true )->set_is_index( true ),
 				// Created at is set when the execution is created (e.g. scheduled). Useful for tracking the execution lifecycle.
 				new Created_At( 'created_at' ),
 			]
@@ -126,6 +128,7 @@ class Migration_Executions extends Table_Abstract {
 	 *     status: string,
 	 *     items_total: int,
 	 *     items_processed: int,
+	 *     parent_execution_id: int|null,
 	 *     created_at: DateTimeInterface
 	 * } $result_array
 	 *

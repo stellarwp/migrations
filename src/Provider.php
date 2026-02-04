@@ -247,7 +247,7 @@ class Provider extends Provider_Abstract {
 				[
 					'batch'       => $result['from_batch'],
 					'batch_size'  => $result['batch_size'],
-					'items_total' => $migration->get_total_items(),
+					'items_total' => $migration->get_total_items( Operation::UP() ),
 					'extra_args'  => $migration->get_up_extra_args_for_batch( $result['from_batch'], $result['batch_size'] ),
 				]
 			);
