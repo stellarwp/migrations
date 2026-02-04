@@ -35,7 +35,7 @@
   "require": {
     "php": ">=7.4",
     "myclabs/php-enum": "^1.8",
-    "stellarwp/shepherd": "dev-fix/no-table-ready-while-installing"
+    "stellarwp/shepherd": "^0.2"
   },
   "require-dev": {
     "stellarwp/coding-standards": "^2.1",
