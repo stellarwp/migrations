@@ -234,7 +234,7 @@ class Execute extends Task_Abstract {
 
 			// Start the rollback automatically, if applicable.
 
-			if ( $is_rollback ) {
+			if ( ! $is_rollback ) {
 				$items_to_rollback = $migration->get_total_items( Operation::DOWN() );
 
 				if ( $items_to_rollback > 0 ) {
