@@ -7,14 +7,21 @@
  *
  * @package StellarWP\Migrations
  *
- * @var StellarWP\Migrations\Contracts\Migration $migration Migration object.
+ * @var StellarWP\Migrations\Contracts\Migration    $migration    Migration object.
+ * @var StellarWP\Migrations\Utilities\Migration_UI $migration_ui UI helper (injected by migration-card).
  */
 
 defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Utilities\Migration_UI;
 
-if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
+if (
+	! isset( $migration )
+	|| ! $migration instanceof Migration
+	|| ! isset( $migration_ui )
+	|| ! $migration_ui instanceof Migration_UI
+) {
 	return;
 }
 
@@ -22,7 +29,7 @@ $latest_execution = $migration->get_latest_execution();
 
 $total_items     = $latest_execution ? $latest_execution->get_items_total() : $migration->get_total_items();
 $items_processed = $latest_execution ? $latest_execution->get_items_processed() : 0;
-$status_value    = $migration->get_status()->getValue();
+$status_value    = $migration_ui->get_display_status()->getValue();
 
 // Calculate progress percentage.
 $percent = $total_items > 0 ? min( 100, ( $items_processed / $total_items ) * 100 ) : 0;

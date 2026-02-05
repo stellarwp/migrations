@@ -45,6 +45,37 @@ class Migration_UI {
 	}
 
 	/**
+	 * Returns the display status, used for display purposes only.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Status The display status for the migration.
+	 */
+	public function get_display_status(): Status {
+		$status = $this->migration->get_status();
+
+		if (
+			$status->equals( Status::PENDING() )
+			&& $this->migration->get_total_items() === 0
+		) {
+			return Status::NOT_APPLICABLE();
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Returns the human-readable label for the display status.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string Translated display status label.
+	 */
+	public function get_display_status_label(): string {
+		return $this->get_display_status()->get_label();
+	}
+
+	/**
 	 * Returns the run action label for the migration.
 	 *
 	 * @since 0.0.1
@@ -52,7 +83,7 @@ class Migration_UI {
 	 * @return string Translated label.
 	 */
 	public function get_run_action_label(): string {
-		$status = $this->migration->get_status();
+		$status = $this->get_display_status();
 
 		if (
 			$status->equals( Status::COMPLETED() )
@@ -76,7 +107,7 @@ class Migration_UI {
 	 * @return string Icon name (e.g. 'start', 'retry').
 	 */
 	public function get_run_action_icon(): string {
-		$status_value = $this->migration->get_status()->getValue();
+		$status_value = $this->get_display_status()->getValue();
 
 		if (
 			in_array(
@@ -103,7 +134,7 @@ class Migration_UI {
 	 * @return bool True if run button should be shown.
 	 */
 	public function show_run(): bool {
-		$status_value = $this->migration->get_status()->getValue();
+		$status_value = $this->get_display_status()->getValue();
 
 		$runnable_statuses = [
 			Status::COMPLETED()->getValue(),
@@ -127,7 +158,7 @@ class Migration_UI {
 	 * @return bool True if rollback button should be shown.
 	 */
 	public function show_rollback(): bool {
-		$status_value = $this->migration->get_status()->getValue();
+		$status_value = $this->get_display_status()->getValue();
 
 		$rollbackable_statuses = [
 			Status::COMPLETED()->getValue(),

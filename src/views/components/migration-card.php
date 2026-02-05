@@ -16,26 +16,22 @@ use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Utilities\Migration_UI;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
+
+$migration_ui = new Migration_UI( $migration );
 
 $migration_id     = $migration->get_id();
 $single_url       = Admin_Provider::get_single_url( $migration_id );
 $migration_label  = $migration->get_label();
 $description      = $migration->get_description();
 $migration_tags   = $migration->get_tags();
-$total_items      = $migration->get_total_items();
-$migration_status = $migration->get_status();
-
-// Update migration status in case of pending migrations without items for better UX.
-if ( $migration_status->equals( Status::PENDING() ) && $total_items === 0 ) {
-	$migration_status = Status::NOT_APPLICABLE();
-}
-
-$status_value = $migration_status->getValue();
-$status_label = $migration_status->get_label();
+$migration_status = $migration_ui->get_display_status();
+$status_value     = $migration_status->getValue();
+$status_label     = $migration_ui->get_display_status_label();
 
 $template = Config::get_template_engine();
 ?>
@@ -66,7 +62,10 @@ $template = Config::get_template_engine();
 				<?php
 				$template->template(
 					'components/progress-text',
-					[ 'migration' => $migration ]
+					[
+						'migration'    => $migration,
+						'migration_ui' => $migration_ui,
+					]
 				);
 				?>
 			<?php endif; ?>
@@ -76,7 +75,9 @@ $template = Config::get_template_engine();
 			<?php
 			$template->template(
 				'components/progress-bar',
-				[ 'migration' => $migration ]
+				[
+					'migration' => $migration,
+				]
 			);
 			?>
 		<?php endif; ?>
@@ -85,7 +86,8 @@ $template = Config::get_template_engine();
 		$template->template(
 			'components/migration-actions',
 			[
-				'migration' => $migration,
+				'migration'    => $migration,
+				'migration_ui' => $migration_ui,
 			]
 		);
 		?>

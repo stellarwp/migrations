@@ -9,7 +9,8 @@
  *
  * @package StellarWP\Migrations
  *
- * @var StellarWP\Migrations\Contracts\Migration $migration Migration object.
+ * @var StellarWP\Migrations\Contracts\Migration       $migration    Migration object.
+ * @var StellarWP\Migrations\Utilities\Migration_UI    $migration_ui UI helper (injected by migration-card).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -18,11 +19,14 @@ use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Utilities\Migration_UI;
 
-if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
+if (
+	! isset( $migration )
+	|| ! isset( $migration_ui )
+	|| ! $migration instanceof Migration
+	|| ! $migration_ui instanceof Migration_UI
+) {
 	return;
 }
-
-$migration_ui = new Migration_UI( $migration );
 
 $migration_label     = $migration->get_label();
 $show_run            = $migration_ui->show_run();
