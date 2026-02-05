@@ -8,7 +8,7 @@
  * @package StellarWP\Migrations
  *
  * @var StellarWP\Migrations\Contracts\Migration    $migration    Migration object.
- * @var StellarWP\Migrations\Utilities\Migration_UI $migration_ui UI helper (injected by migration-card).
+ * @var StellarWP\Migrations\Utilities\Migration_UI $migration_ui UI helper object.
  */
 
 defined( 'ABSPATH' ) || exit;
