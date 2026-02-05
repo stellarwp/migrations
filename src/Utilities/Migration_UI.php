@@ -172,7 +172,7 @@ class Migration_UI {
 	 * @return bool True if run button should be shown.
 	 */
 	public function show_run(): bool {
-		$status_value = $this->get_display_status()->getValue();
+		$status_value = $this->migration->get_status()->getValue();
 
 		$runnable_statuses = [
 			Status::COMPLETED()->getValue(),
@@ -196,7 +196,7 @@ class Migration_UI {
 	 * @return bool True if rollback button should be shown.
 	 */
 	public function show_rollback(): bool {
-		$status_value = $this->get_display_status()->getValue();
+		$status_value = $this->migration->get_status()->getValue();
 
 		$rollbackable_statuses = [
 			Status::COMPLETED()->getValue(),
