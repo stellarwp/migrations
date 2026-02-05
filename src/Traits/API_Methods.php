@@ -286,11 +286,12 @@ trait API_Methods {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param Migration $migration    The migration instance to schedule.
-	 * @param Operation $operation    The operation to run (UP or DOWN).
-	 * @param int       $from_batch   The starting batch number. Default 1.
-	 * @param int|null  $to_batch     The ending batch number. Default null (same as from_batch).
-	 * @param int|null  $batch_size   The batch size. Default null (uses migration default).
+	 * @param Migration $migration           The migration instance to schedule.
+	 * @param Operation $operation           The operation to run (UP or DOWN).
+	 * @param int       $from_batch          The starting batch number. Default 1.
+	 * @param int|null  $to_batch            The ending batch number. Default null (same as from_batch).
+	 * @param int|null  $batch_size          The batch size. Default null (uses migration default).
+	 * @param int|null  $parent_execution_id The parent execution ID when scheduling an automatic rollback. Default null.
 	 *
 	 * @throws ApiMethodException If the execution record cannot be inserted.
 	 *
@@ -301,7 +302,8 @@ trait API_Methods {
 		Operation $operation,
 		int $from_batch = 1,
 		?int $to_batch = null,
-		?int $batch_size = null
+		?int $batch_size = null,
+		?int $parent_execution_id = null
 	): array {
 		$batch_size  ??= $migration->get_default_batch_size();
 		$total_batches = max( 1, $migration->get_total_batches( $batch_size, $operation ) );
@@ -311,14 +313,18 @@ trait API_Methods {
 		$from_batch = max( 1, $from_batch );
 		$to_batch   = min( $to_batch, $total_batches );
 
-		$insert_status = Migration_Executions::insert(
-			[
-				'migration_id'    => $migration->get_id(),
-				'status'          => Status::SCHEDULED()->getValue(),
-				'items_total'     => $migration->get_total_items(),
-				'items_processed' => 0,
-			]
-		);
+		$insert_data = [
+			'migration_id'    => $migration->get_id(),
+			'status'          => Status::SCHEDULED()->getValue(),
+			'items_total'     => $migration->get_total_items( $operation ),
+			'items_processed' => 0,
+		];
+
+		if ( null !== $parent_execution_id ) {
+			$insert_data['parent_execution_id'] = $parent_execution_id;
+		}
+
+		$insert_status = Migration_Executions::insert( $insert_data );
 
 		if ( ! $insert_status ) {
 			throw new ApiMethodException(

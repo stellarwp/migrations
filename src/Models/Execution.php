@@ -84,6 +84,15 @@ class Execution {
 	private int $items_processed;
 
 	/**
+	 * The parent execution ID (set when this execution is an automatic rollback after a failure).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var int|null
+	 */
+	private ?int $parent_execution_id;
+
+	/**
 	 * The created at.
 	 *
 	 * @since 0.0.1
@@ -107,18 +116,20 @@ class Execution {
 	 *     status: string,
 	 *     items_total: int,
 	 *     items_processed: int,
+	 *     parent_execution_id: int|null,
 	 *     created_at: DateTimeInterface
 	 * } $attributes
 	 */
 	public function __construct( array $attributes ) {
-		$this->id              = $attributes['id'];
-		$this->migration_id    = $attributes['migration_id'];
-		$this->start_date      = $attributes['start_date_gmt'];
-		$this->end_date        = $attributes['end_date_gmt'];
-		$this->status          = Status::from( $attributes['status'] );
-		$this->items_total     = $attributes['items_total'];
-		$this->items_processed = $attributes['items_processed'];
-		$this->created_at      = $attributes['created_at'];
+		$this->id                  = $attributes['id'];
+		$this->migration_id        = $attributes['migration_id'];
+		$this->start_date          = $attributes['start_date_gmt'];
+		$this->end_date            = $attributes['end_date_gmt'];
+		$this->status              = Status::from( $attributes['status'] );
+		$this->items_total         = $attributes['items_total'];
+		$this->items_processed     = $attributes['items_processed'];
+		$this->parent_execution_id = $attributes['parent_execution_id'] ?? null;
+		$this->created_at          = $attributes['created_at'];
 	}
 
 	/**
@@ -199,6 +210,17 @@ class Execution {
 	}
 
 	/**
+	 * Get the parent execution ID (set when this execution is an automatic rollback).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return int|null
+	 */
+	public function get_parent_execution_id(): ?int {
+		return $this->parent_execution_id;
+	}
+
+	/**
 	 * Get the created at.
 	 *
 	 * @since 0.0.1
@@ -218,14 +240,15 @@ class Execution {
 	 */
 	public function to_array(): array {
 		return [
-			'id'              => $this->get_id(),
-			'migration_id'    => $this->get_migration_id(),
-			'start_date'      => $this->get_start_date(),
-			'end_date'        => $this->get_end_date(),
-			'status'          => $this->get_status(),
-			'items_total'     => $this->get_items_total(),
-			'items_processed' => $this->get_items_processed(),
-			'created_at'      => $this->get_created_at(),
+			'id'                  => $this->get_id(),
+			'migration_id'        => $this->get_migration_id(),
+			'start_date'          => $this->get_start_date(),
+			'end_date'            => $this->get_end_date(),
+			'status'              => $this->get_status(),
+			'items_total'         => $this->get_items_total(),
+			'items_processed'     => $this->get_items_processed(),
+			'parent_execution_id' => $this->get_parent_execution_id(),
+			'created_at'          => $this->get_created_at(),
 		];
 	}
 }

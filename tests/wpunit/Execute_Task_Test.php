@@ -318,16 +318,15 @@ class Execute_Task_Test extends WPTestCase {
 	/**
 	 * @test
 	 */
-	public function it_should_keep_failed_status_on_automatic_rollback(): void {
+	public function it_should_have_parent_execution_id_on_automatic_rollback_execution(): void {
 		// Arrange.
 		$registry = Config::get_container()->get( Registry::class );
 
 		$registry->register( 'tests_simple_migration', Simple_Migration::class );
 
-		// Simulate that migration was run.
 		Simple_Migration::$up_called = true;
 
-		// Create an execution with FAILED status to simulate automatic rollback.
+		// Create the failed execution (original migration that failed).
 		Migration_Executions::insert(
 			[
 				'migration_id' => 'tests_simple_migration',
@@ -335,20 +334,32 @@ class Execute_Task_Test extends WPTestCase {
 			]
 		);
 
-		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_simple_migration' );
-		$this->assertInstanceOf( Execution::class, $execution );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
+		$failed_execution_id = (int) DB::last_insert_id();
+
+		// Create the rollback execution (linked to the failed one via parent_execution_id).
+		Migration_Executions::insert(
+			[
+				'migration_id'        => 'tests_simple_migration',
+				'status'              => Status::SCHEDULED()->getValue(),
+				'items_total'         => 1,
+				'items_processed'     => 0,
+				'parent_execution_id' => $failed_execution_id,
+			]
+		);
+
+		$rollback_execution_id = (int) DB::last_insert_id();
 
 		// Act.
-		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $execution->get_id() );
+		$task = new Execute( 'down', 'tests_simple_migration', 1, 1, $rollback_execution_id );
 		$task->process();
 
 		// Assert.
 		$this->assertTrue( Simple_Migration::$down_called );
 
-		$execution = Migration_Executions::get_first_by( 'id', $execution->get_id() );
-		$this->assertInstanceOf( Execution::class, $execution );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
+		$rollback_execution = Migration_Executions::get_first_by( 'id', $rollback_execution_id );
+		$this->assertInstanceOf( Execution::class, $rollback_execution );
+		$this->assertEquals( $failed_execution_id, $rollback_execution->get_parent_execution_id(), 'Rollback execution should have parent_execution_id pointing to the failed execution' );
+		$this->assertEquals( Status::REVERTED()->getValue(), $rollback_execution->get_status()->getValue(), 'Automatic rollback execution should end with REVERTED status' );
 	}
 
 	/**
