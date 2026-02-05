@@ -24,6 +24,7 @@ use StellarWP\Migrations\Registry;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Models\Execution;
+use StellarWP\Migrations\Provider;
 use Exception;
 use InvalidArgumentException;
 use function StellarWP\Shepherd\shepherd;
@@ -119,11 +120,7 @@ class Execute extends Task_Abstract {
 
 		// Update the execution status to running and record the start date.
 
-		if (
-				! $is_rollback // Rollback does not change the execution status.
-				&& 1 === $batch
-			) {
-
+		if ( 1 === $batch ) {
 				Migration_Executions::update_single(
 					[
 						'id'             => $execution_id,
@@ -225,26 +222,35 @@ class Execute extends Task_Abstract {
 				]
 			);
 
+
+			// Set the execution status to failed and record end date.
+			Migration_Executions::update_single(
+				[
+					'id'           => $execution_id,
+					'status'       => Status::FAILED()->getValue(),
+					'end_date_gmt' => current_time( 'mysql', true ),
+				]
+			);
+
+			// Start the rollback automatically, if applicable.
+
 			if ( ! $is_rollback ) {
-				// Set the execution status to failed.
-				Migration_Executions::update_single(
-					[
-						'id'     => $execution_id,
-						'status' => Status::FAILED()->getValue(),
-					]
-				);
+				$items_to_rollback = $migration->get_total_items( Operation::DOWN() );
 
-				// Start the rollback from the first batch.
+				if ( $items_to_rollback > 0 ) {
+					$logger->warning(
+						'Automatic rollback scheduled.',
+						[
+							'reason' => $e->getMessage(),
+						]
+					);
 
-				$logger->warning(
-					'Rollback scheduled.',
-					[
-						'reason' => $e->getMessage(),
-					]
-				);
-
-				// If it failed we need to trigger the rollback.
-				shepherd()->dispatch( new self( 'down', $migration_id, 1, $batch_size, $execution_id, ...$migration->get_down_extra_args_for_batch( 1, $batch_size ) ) );
+					// Schedule the rollback via API (creates execution with parent_execution_id and dispatches first batch).
+					$provider = $container->get( Provider::class );
+					$provider->schedule( $migration, Operation::DOWN(), 1, 1, $batch_size, $execution_id );
+				} else {
+					$logger->warning( 'Automatic rollback not scheduled because this migration does not support rollbacks.' );
+				}
 			}
 
 			throw new ShepherdTaskFailWithoutRetryException(
@@ -262,16 +268,14 @@ class Execute extends Task_Abstract {
 
 		$migration->{"after_{$method}"}( $batch, $batch_size, $is_completed );
 
-		// Update the items processed count for successful migrations.
+		// Update the items processed count.
 
-		if ( ! $is_rollback ) {
-			Migration_Executions::update_single(
-				[
-					'id'              => $execution_id,
-					'items_processed' => min( $execution->get_items_total(), $execution->get_items_processed() + $batch_size ),
-				]
-			);
-		}
+		Migration_Executions::update_single(
+			[
+				'id'              => $execution_id,
+				'items_processed' => min( $execution->get_items_total(), $execution->get_items_processed() + $batch_size ),
+			]
+		);
 
 		$logger->info(
 			sprintf( '%s batch %d completed.', $operation_type, $batch ),
@@ -422,28 +426,27 @@ class Execute extends Task_Abstract {
 			if (
 				$execution
 				&& $execution instanceof Execution
-				&& Status::FAILED()->equals( $execution->get_status() )
+				&& $execution->get_parent_execution_id() !== null
 			) {
-				// Automatic rollback - keep FAILED status.
+				// Automatic rollback.
 				$logger->info(
 					'Migration rollback completed after a failure.',
 					[
-						'total_batches' => $batch,
+						'total_batches'       => $batch,
+						'parent_execution_id' => $execution->get_parent_execution_id(),
 					]
 				);
-
-				$completion_status = Status::FAILED()->getValue();
 			} else {
-				// Manual rollback - set REVERTED status.
+				// Manual rollback.
 				$logger->info(
 					'Requested migration rollback completed.',
 					[
 						'total_batches' => $batch,
 					]
 				);
-
-				$completion_status = Status::REVERTED()->getValue();
 			}
+
+			$completion_status = Status::REVERTED()->getValue();
 		} else {
 			// Successful migration completion.
 			$logger->info(

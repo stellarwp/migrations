@@ -45,12 +45,12 @@ class Migration_Failure_Test extends WPTestCase {
 		}
 
 		// Assert.
-		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
+		$execution = $this->get_failed_execution_for_migration( 'tests_failing_migration' );
 		$this->assertNotNull( $execution );
 		$this->assertInstanceOf( Execution::class, $execution );
 		$this->assertEquals( Status::FAILED(), $execution->get_status() );
 
-		// Verify error log was recorded.
+		// Verify error log was recorded on the failed execution.
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
 		$error_logs = array_filter(
@@ -84,7 +84,7 @@ class Migration_Failure_Test extends WPTestCase {
 		}
 
 		// Assert.
-		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_migration' );
+		$execution = $this->get_failed_execution_for_migration( 'tests_failing_migration' );
 		$this->assertInstanceOf( Execution::class, $execution );
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
@@ -206,20 +206,20 @@ class Migration_Failure_Test extends WPTestCase {
 		}
 
 		// Assert.
-		$execution = Migration_Executions::get_first_by( 'migration_id', 'tests_failing_at_batch_migration' );
+		$execution = $this->get_failed_execution_for_migration( 'tests_failing_at_batch_migration' );
 		$this->assertInstanceOf( Execution::class, $execution );
 		$logs = Migration_Logs::get_all_by( 'migration_execution_id', $execution->get_id() );
 
-		// Check for "Rollback scheduled" warning log.
+		// Check for "Automatic rollback scheduled" warning log on the failed execution.
 		$rollback_scheduled = array_filter(
 			$logs,
 			function ( $log ) {
 				return $log['type']->getValue() === 'warning'
-					&& strpos( $log['message'], 'Rollback scheduled' ) !== false;
+					&& strpos( $log['message'], 'Automatic rollback scheduled' ) !== false;
 			}
 		);
 
-		$this->assertNotEmpty( $rollback_scheduled, 'Should have "Rollback scheduled" warning log' );
+		$this->assertNotEmpty( $rollback_scheduled, 'Should have "Automatic rollback scheduled" warning log' );
 
 		// Verify rollback was actually executed.
 		$this->assertNotEmpty( Failing_At_Batch_Migration::$down_batches, 'Rollback should have been executed' );
@@ -311,6 +311,25 @@ class Migration_Failure_Test extends WPTestCase {
 		// Assert.
 		// Verify no infinite loop - only one down attempt should occur.
 		$this->assertCount( 1, Failing_Migration::$down_batches );
+	}
+
+	/**
+	 * Get the failed execution (the one without parent_execution_id) for a migration that failed and triggered rollback.
+	 *
+	 * @param string $migration_id The migration ID.
+	 *
+	 * @return Execution|null The failed execution, or null if not found.
+	 */
+	private function get_failed_execution_for_migration( string $migration_id ): ?Execution {
+		$executions = Migration_Executions::get_all_by( 'migration_id', $migration_id );
+
+		foreach ( $executions as $exec ) {
+			if ( $exec instanceof Execution && null === $exec->get_parent_execution_id() ) {
+				return $exec;
+			}
+		}
+
+		return null;
 	}
 
 	/**

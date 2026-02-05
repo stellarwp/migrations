@@ -292,10 +292,16 @@ class Migration_Executions_Test extends WPTestCase {
 
 		$this->assertNotEmpty( $executions );
 
-		// The execution should remain as failed even though the rollback succeeded.
-		$execution = $executions[0];
-		$this->assertInstanceOf( Execution::class, $execution );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
+		// The failed execution is the one without parent_execution_id (created first).
+		$failed_execution = null;
+		foreach ( $executions as $exec ) {
+			if ( $exec instanceof Execution && null === $exec->get_parent_execution_id() ) {
+				$failed_execution = $exec;
+				break;
+			}
+		}
+		$this->assertInstanceOf( Execution::class, $failed_execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $failed_execution->get_status()->getValue() );
 	}
 
 	/**
@@ -325,20 +331,70 @@ class Migration_Executions_Test extends WPTestCase {
 		// Assert.
 		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_failing_migration' );
 
-		$execution = $executions[0];
+		// The failed execution is the one without parent_execution_id.
+		$failed_execution = null;
+		foreach ( $executions as $exec ) {
+			if ( $exec instanceof Execution && null === $exec->get_parent_execution_id() ) {
+				$failed_execution = $exec;
+				break;
+			}
+		}
+		$this->assertNotNull( $failed_execution );
+		$this->assertInstanceOf( Execution::class, $failed_execution );
+		$this->assertEquals( Status::FAILED()->getValue(), $failed_execution->get_status()->getValue() );
 
-		$this->assertNotNull( $execution );
-		$this->assertInstanceOf( Execution::class, $execution );
-		$this->assertEquals( Status::FAILED()->getValue(), $execution->get_status()->getValue() );
-
-		// End date should be set after the automatic rollback completes.
-		$end_date = $execution->get_end_date();
+		// End date should be set when the execution is marked failed.
+		$end_date = $failed_execution->get_end_date();
 		$this->assertInstanceOf( \DateTimeInterface::class, $end_date );
 		$end_date_string = $end_date->format( 'Y-m-d H:i:s' );
 
 		$this->assertNotNull( $end_date_string, 'End date should be set after rollback completes following a failure' );
 		$this->assertGreaterThanOrEqual( $before, $end_date_string );
 		$this->assertLessThanOrEqual( $after, $end_date_string );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_create_rollback_execution_with_parent_execution_id_when_migration_fails(): void {
+		// Arrange.
+		Failing_Migration::reset();
+		Failing_Migration::$should_fail = true;
+
+		$registry = Config::get_container()->get( Registry::class );
+		$registry->register( 'tests_failing_migration', Failing_Migration::class );
+
+		$prefix = Config::get_hook_prefix();
+
+		// Act.
+		try {
+			do_action( "stellarwp_migrations_{$prefix}_schedule_migrations" );
+		} catch ( \Exception $e ) {
+			// Expected exception from migration failure.
+		}
+
+		// Assert.
+		$executions = Migration_Executions::get_all_by( 'migration_id', 'tests_failing_migration' );
+
+		$this->assertCount( 2, $executions, 'Should have failed execution and rollback execution' );
+
+		$failed_execution   = null;
+		$rollback_execution = null;
+		foreach ( $executions as $exec ) {
+			if ( ! $exec instanceof Execution ) {
+				continue;
+			}
+			if ( null === $exec->get_parent_execution_id() ) {
+				$failed_execution = $exec;
+			} else {
+				$rollback_execution = $exec;
+			}
+		}
+
+		$this->assertNotNull( $failed_execution );
+		$this->assertNotNull( $rollback_execution );
+		$this->assertEquals( $failed_execution->get_id(), $rollback_execution->get_parent_execution_id(), 'Rollback execution should link to the failed execution' );
+		$this->assertEquals( Status::REVERTED()->getValue(), $rollback_execution->get_status()->getValue(), 'Rollback execution should end with REVERTED status after automatic rollback' );
 	}
 
 	/**
