@@ -261,7 +261,7 @@ abstract class Migration_Abstract implements Migration {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return Execution|null The execution model or null if none found.
+	 * @return Execution|null The execution model or null if not found.
 	 */
 	public function get_latest_execution(): ?Execution {
 		$executions = Migration_Executions::paginate(

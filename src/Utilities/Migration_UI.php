@@ -14,6 +14,8 @@ namespace StellarWP\Migrations\Utilities;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Operation;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Models\Execution;
+use StellarWP\Migrations\Tables\Migration_Executions;
 
 /**
  * Utility for migration admin UI (labels, icons, button visibility).
@@ -54,11 +56,25 @@ class Migration_UI {
 	public function get_display_status(): Status {
 		$status = $this->migration->get_status();
 
+		// If the migration is pending and has no items, return NOT_APPLICABLE.
+
 		if (
 			$status->equals( Status::PENDING() )
 			&& $this->migration->get_total_items() === 0
 		) {
 			return Status::NOT_APPLICABLE();
+		}
+
+		// If the migration is reverted but the parent execution is failed, return FAILED.
+
+		$parent_execution = $this->get_parent_execution();
+
+		if (
+			$status->equals( Status::REVERTED() )
+			&& null !== $parent_execution
+			&& $parent_execution->get_status()->equals( Status::FAILED() )
+		) {
+			return Status::FAILED();
 		}
 
 		return $status;
@@ -169,5 +185,25 @@ class Migration_UI {
 		return $this->migration->is_applicable()
 			&& in_array( $status_value, $rollbackable_statuses, true )
 			&& $this->migration->get_total_items( Operation::DOWN() ) > 0;
+	}
+
+	/**
+	 * Get the parent execution for the migration.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Execution|null The parent execution or null if not found.
+	 */
+	private function get_parent_execution(): ?Execution {
+		$latest_execution = $this->migration->get_latest_execution();
+
+		if (
+			null === $latest_execution
+			|| null === $latest_execution->get_parent_execution_id()
+		) {
+			return null;
+		}
+
+		return Migration_Executions::get_by_id( $latest_execution->get_parent_execution_id() );
 	}
 }

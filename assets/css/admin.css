@@ -320,6 +320,10 @@
 	background: #c3c4c7;
 }
 
+.stellarwp-migration-progress__fill--reverted {
+	background: #2271b1;
+}
+
 @keyframes stellarwp-migrations-progress-stripe {
 	0% {
 		background-position: 0 0;
