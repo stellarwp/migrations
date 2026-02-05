@@ -127,7 +127,7 @@ class Migration_UI {
 			$status->equals( Status::COMPLETED() )
 			|| $status->equals( Status::REVERTED() )
 		) {
-			return __( 'Run again', 'stellarwp-migrations' );
+			return __( 'Re-run', 'stellarwp-migrations' );
 		}
 
 		if ( $status->equals( Status::FAILED() ) ) {

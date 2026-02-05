@@ -332,8 +332,8 @@ class Migration_UI_Test extends WPTestCase {
 	 */
 	public static function run_action_label_provider(): array {
 		return [
-			'completed' => [ Status::COMPLETED(), 'Run again' ],
-			'reverted'  => [ Status::REVERTED(), 'Run again' ],
+			'completed' => [ Status::COMPLETED(), 'Re-run' ],
+			'reverted'  => [ Status::REVERTED(), 'Re-run' ],
 			'failed'    => [ Status::FAILED(), 'Retry' ],
 			'pending'   => [ Status::PENDING(), 'Start' ],
 		];
