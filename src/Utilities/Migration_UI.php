@@ -88,7 +88,29 @@ class Migration_UI {
 	 * @return string Translated display status label.
 	 */
 	public function get_display_status_label(): string {
-		return $this->get_display_status()->get_label();
+		$parent_execution = $this->get_parent_execution();
+		$default_label    = $this->get_display_status()->get_label();
+
+
+		if ( null === $parent_execution ) {
+			// No parent execution, so we can use the regular label.
+			return $default_label;
+		}
+
+		$migration_status        = $this->migration->get_status();
+		$parent_execution_status = $parent_execution->get_status();
+
+		// Case of successful auto-revert.
+		if ( $migration_status->equals( Status::REVERTED() ) && $parent_execution_status->equals( Status::FAILED() ) ) {
+			return $default_label . __( ' (auto-reverted)', 'stellarwp-migrations' );
+		}
+
+		// Case of failed auto-revert.
+		if ( $migration_status->equals( Status::FAILED() ) && $parent_execution_status->equals( Status::FAILED() ) ) {
+			return $default_label . __( ' (auto-revert failed)', 'stellarwp-migrations' );
+		}
+
+		return $default_label;
 	}
 
 	/**

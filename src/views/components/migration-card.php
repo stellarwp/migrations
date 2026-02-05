@@ -76,7 +76,8 @@ $template = Config::get_template_engine();
 			$template->template(
 				'components/progress-bar',
 				[
-					'migration' => $migration,
+					'migration'    => $migration,
+					'migration_ui' => $migration_ui,
 				]
 			);
 			?>
