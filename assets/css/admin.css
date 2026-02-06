@@ -253,6 +253,11 @@
 	color: #8c8f94;
 }
 
+.stellarwp-migration-card__status-label--reverted {
+	background: #f0f0f1;
+	color: #53476b;
+}
+
 .stellarwp-migration-card__progress-text {
 	color: #646970;
 	font-size: 13px;
@@ -318,6 +323,10 @@
 
 .stellarwp-migration-progress__fill--canceled {
 	background: #c3c4c7;
+}
+
+.stellarwp-migration-progress__fill--reverted {
+	background: #826eb4;
 }
 
 @keyframes stellarwp-migrations-progress-stripe {

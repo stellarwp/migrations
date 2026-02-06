@@ -19,20 +19,22 @@ defined( 'ABSPATH' ) || exit;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Utilities\Migration_UI;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
+
+$migration_ui = new Migration_UI( $migration );
 
 $executions ??= [];
 
 $latest_execution = $migration->get_latest_execution();
 
 $migration_id     = $migration->get_id();
-$migration_status = $migration->get_status();
-
-$status_value = $migration_status->getValue();
-$status_label = $migration_status->get_label();
+$migration_status = $migration_ui->get_display_status();
+$status_value     = $migration_status->getValue();
+$status_label     = $migration_ui->get_display_status_label();
 
 $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 ?>
@@ -47,7 +49,10 @@ $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 				<?php
 				Config::get_template_engine()->template(
 					'components/progress-text',
-					[ 'migration' => $migration ]
+					[
+						'migration'    => $migration,
+						'migration_ui' => $migration_ui,
+					]
 				);
 				?>
 			<?php endif; ?>
@@ -58,7 +63,10 @@ $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 				<?php
 				Config::get_template_engine()->template(
 					'components/progress-bar',
-					[ 'migration' => $migration ]
+					[
+						'migration'    => $migration,
+						'migration_ui' => $migration_ui,
+					]
 				);
 				?>
 			</div>
@@ -68,7 +76,8 @@ $started_at = $latest_execution ? $latest_execution->get_start_date() : null;
 		Config::get_template_engine()->template(
 			'components/migration-actions',
 			[
-				'migration' => $migration,
+				'migration'    => $migration,
+				'migration_ui' => $migration_ui,
 			]
 		);
 		?>

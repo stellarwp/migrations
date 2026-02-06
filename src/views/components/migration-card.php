@@ -16,20 +16,22 @@ use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Utilities\Migration_UI;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
+$migration_ui = new Migration_UI( $migration );
+
 $migration_id     = $migration->get_id();
 $single_url       = Admin_Provider::get_single_url( $migration_id );
 $migration_label  = $migration->get_label();
 $description      = $migration->get_description();
-$migration_status = $migration->get_status();
 $migration_tags   = $migration->get_tags();
-
-$status_value = $migration_status->getValue();
-$status_label = $migration_status->get_label();
+$migration_status = $migration_ui->get_display_status();
+$status_value     = $migration_status->getValue();
+$status_label     = $migration_ui->get_display_status_label();
 
 $template = Config::get_template_engine();
 ?>
@@ -60,7 +62,10 @@ $template = Config::get_template_engine();
 				<?php
 				$template->template(
 					'components/progress-text',
-					[ 'migration' => $migration ]
+					[
+						'migration'    => $migration,
+						'migration_ui' => $migration_ui,
+					]
 				);
 				?>
 			<?php endif; ?>
@@ -70,7 +75,10 @@ $template = Config::get_template_engine();
 			<?php
 			$template->template(
 				'components/progress-bar',
-				[ 'migration' => $migration ]
+				[
+					'migration'    => $migration,
+					'migration_ui' => $migration_ui,
+				]
 			);
 			?>
 		<?php endif; ?>
@@ -79,7 +87,8 @@ $template = Config::get_template_engine();
 		$template->template(
 			'components/migration-actions',
 			[
-				'migration' => $migration,
+				'migration'    => $migration,
+				'migration_ui' => $migration_ui,
 			]
 		);
 		?>

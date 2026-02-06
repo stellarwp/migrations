@@ -35,6 +35,7 @@
     "phpbrowser",
     "phpcbf",
     "phpstan",
+    "rollbackable",
     "slic",
     "squiz",
     "stellarwp",
@@ -46,5 +47,11 @@
     "wpdb",
     "wpunit"
   ],
-  "dictionaries": ["bash", "git", "html", "npm", "php"]
+  "dictionaries": [
+    "bash",
+    "git",
+    "html",
+    "npm",
+    "php"
+  ]
 }
