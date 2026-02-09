@@ -325,6 +325,7 @@
 				logsState.hasMore = true;
 
 				updateExecutionInfo( selectedOption );
+				updateDownloadLink( selectedOption );
 				loadLogs( restUrl, true );
 			}
 		} );
@@ -340,8 +341,31 @@
 		// Load logs for initially selected execution.
 		if ( select.value ) {
 			logsState.executionId = select.value;
-			updateExecutionInfo( select.options[ select.selectedIndex ] );
+			const selectedOption = select.options[ select.selectedIndex ];
+			updateExecutionInfo( selectedOption );
+			updateDownloadLink( selectedOption );
 			loadLogs( restUrl, true );
+		}
+	}
+
+	/**
+	 * Update the download logs link to point to the selected execution.
+	 *
+	 * @param {HTMLOptionElement} option The selected option element.
+	 */
+	function updateDownloadLink( option ) {
+		const downloadLink = document.getElementById( 'stellarwp-download-logs-link' );
+		if ( ! downloadLink || ! option ) {
+			return;
+		}
+
+		const downloadUrl = option.dataset.downloadUrl;
+		if ( downloadUrl ) {
+			downloadLink.href = downloadUrl;
+			downloadLink.removeAttribute( 'aria-disabled' );
+		} else {
+			downloadLink.href = '#';
+			downloadLink.setAttribute( 'aria-disabled', 'true' );
 		}
 	}
 

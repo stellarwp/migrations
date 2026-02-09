@@ -341,7 +341,7 @@ class UI_Test extends WPTestCase {
 	/**
 	 * Data provider for set_additional_params tests.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, array{params: array<string, mixed>, expected: array<string, string|int|bool>, should_error: bool}> Test cases.
 	 */

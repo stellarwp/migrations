@@ -18,6 +18,7 @@ defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
+use StellarWP\Migrations\Utilities\Log_Download_Handler;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
@@ -62,6 +63,7 @@ $rest_base_url ??= '';
 					$end_date_obj   = $execution->get_end_date();
 					$start_date     = $start_date_obj ? wp_date( 'M j, Y g:i:s a', $start_date_obj->getTimestamp() ) : '';
 					$end_date       = $end_date_obj ? wp_date( 'M j, Y g:i:s a', $end_date_obj->getTimestamp() ) : '';
+					$download_url   = Log_Download_Handler::get_download_url( $exec_id );
 					?>
 					<option
 						value="<?php echo esc_attr( (string) $exec_id ); ?>"
@@ -69,6 +71,7 @@ $rest_base_url ??= '';
 						data-start="<?php echo esc_attr( $start_date && is_string( $start_date ) ? $start_date : '' ); ?>"
 						data-end="<?php echo esc_attr( $end_date && is_string( $end_date ) ? $end_date : '' ); ?>"
 						data-status="<?php echo $exec_status instanceof Status ? esc_attr( $exec_status->getValue() ) : ''; ?>"
+						data-download-url="<?php echo esc_url( $download_url ); ?>"
 					>
 						<?php echo esc_html( $label ); ?>
 					</option>
@@ -83,6 +86,21 @@ $rest_base_url ??= '';
 			<span class="stellarwp-migration-logs__execution-end">
 				<span class="screen-reader-text"><?php esc_html_e( 'Execution ended:', 'stellarwp-migrations' ); ?></span>
 			</span>
+		</div>
+
+		<div class="stellarwp-migration-logs__actions">
+			<?php
+			$first_execution    = reset( $executions );
+			$first_download_url = $first_execution ? Log_Download_Handler::get_download_url( $first_execution->get_id() ) : '#';
+			?>
+			<a
+				id="stellarwp-download-logs-link"
+				href="<?php echo esc_url( $first_download_url ); ?>"
+				class="button button-secondary stellarwp-migration-logs__download-link"
+				aria-label="<?php esc_attr_e( 'Download logs for selected execution as CSV', 'stellarwp-migrations' ); ?>"
+			>
+				<?php esc_html_e( 'Download logs (CSV)', 'stellarwp-migrations' ); ?>
+			</a>
 		</div>
 
 		<div class="stellarwp-migration-logs__container" aria-live="polite" aria-relevant="additions removals">

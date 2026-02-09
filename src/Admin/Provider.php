@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Admin;
 
 use StellarWP\Migrations\Config;
+use StellarWP\Migrations\Utilities\Log_Download_Handler;
 
 /**
  * Admin Service Provider.
@@ -48,6 +49,8 @@ class Provider {
 
 		add_action( 'admin_menu', [ $this, 'register_hidden_page' ] );
 		add_filter( 'set-screen-option', [ $this, 'save_screen_option' ], 10, 3 );
+
+		Log_Download_Handler::init();
 	}
 
 	/**
