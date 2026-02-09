@@ -316,12 +316,14 @@ class Log_Download_Handler_Test extends WPTestCase {
 
 		// Assert.
 		$this->assertStringContainsString( 'Migration Execution ID', $output );
+
 		$sanitized_message = 'part1 part2 line2 line3 line4';
 		$this->assertStringContainsString( $sanitized_message, $output );
 		$this->assertStringNotContainsString( 'part1;part2', $output );
 		$this->assertStringNotContainsString( "\nline2", $output );
 		$this->assertStringNotContainsString( "\r\nline3", $output );
 		$this->assertStringNotContainsString( "\rline4", $output );
+
 		$lines      = preg_split( '/\r\n|\r|\n/', $output );
 		$data_lines = array_filter(
 			$lines,
