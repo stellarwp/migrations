@@ -35,7 +35,7 @@ $template = Config::get_template_engine();
 			<a href="<?php echo esc_url( $list_url ); ?>" class="stellarwp-migration-single__back-link">
 				<span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Migrations', 'stellarwp-migrations' ); ?>
 			</a>
-			<hr class="wp-header-end" />
+			<hr class="stellarwp-migrations-back-link-divider" />
 		</div>
 	<?php endif; ?>
 	<header class="stellarwp-migration-single__header">
