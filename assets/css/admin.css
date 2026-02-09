@@ -681,6 +681,14 @@
 	flex: 0 0 auto;
 }
 
+.stellarwp-migration-logs__download-btn {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+	padding: 1px 11px;
+}
+
 .stellarwp-migration-logs__select {
 	max-width: 400px;
 	width: 100%;
