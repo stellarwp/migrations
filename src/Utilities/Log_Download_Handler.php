@@ -199,7 +199,7 @@ class Log_Download_Handler {
 			static::get_headers()
 		);
 
-		fputcsv( $handle, $headers, $separator ); // phpcs:ignore WordPressVIPMinimum.Performance.FilesystemWrites.FileSystemWrites -- Stream to response.
+		fputcsv( $handle, $headers, $separator ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Stream to response output, not filesystem.
 
 		$batch_size = static::get_batch_size();
 		$offset     = 0;
@@ -218,6 +218,7 @@ class Log_Download_Handler {
 				],
 			];
 
+			/** @var array<int|string, array<string, mixed>>|null $log_entries */
 			$log_entries = Migration_Logs::paginate( $arguments, $batch_size );
 
 			if ( empty( $log_entries ) || count( $log_entries ) < $batch_size ) {
@@ -247,11 +248,13 @@ class Log_Download_Handler {
 			);
 
 			if ( ! empty( $log_entries ) ) {
+				/** @var array<string, mixed> $log_entry */
 				foreach ( $log_entries as $log_entry ) {
 					if ( ! is_array( $log_entry ) ) {
 						continue;
 					}
-					fputcsv( $handle, static::log_entry_to_row( $log_entry, $separator ), $separator ); // phpcs:ignore WordPressVIPMinimum.Performance.FilesystemWrites.FileSystemWrites -- Stream to response.
+
+					fputcsv( $handle, static::log_entry_to_row( $log_entry, $separator ), $separator ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Stream to response output, not filesystem.
 				}
 			}
 
@@ -353,12 +356,12 @@ class Log_Download_Handler {
 			: '';
 
 		return [
-			static::sanitize_csv_value( (string) $id, $separator ),
-			static::sanitize_csv_value( (string) $exec_id, $separator ),
-			static::sanitize_csv_value( (string) $created_at, $separator ),
-			static::sanitize_csv_value( (string) $type, $separator ),
-			static::sanitize_csv_value( (string) $message, $separator ),
-			static::sanitize_csv_value( $data_str, $separator ),
+			static::sanitize_csv_value( Cast::to_string( $id ), $separator ),
+			static::sanitize_csv_value( Cast::to_string( $exec_id ), $separator ),
+			static::sanitize_csv_value( Cast::to_string( $created_at ), $separator ),
+			static::sanitize_csv_value( Cast::to_string( $type ), $separator ),
+			static::sanitize_csv_value( Cast::to_string( $message ), $separator ),
+			static::sanitize_csv_value( Cast::to_string( $data_str ), $separator ),
 		];
 	}
 

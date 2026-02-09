@@ -16,6 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Utilities\Log_Download_Handler;
@@ -26,6 +27,8 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 
 $executions    ??= [];
 $rest_base_url ??= '';
+
+$template = Config::get_template_engine();
 ?>
 <div class="stellarwp-migration-logs" data-rest-url="<?php echo esc_url( $rest_base_url ); ?>">
 	<?php if ( empty( $executions ) ) : ?>
@@ -85,14 +88,16 @@ $rest_base_url ??= '';
 				$first_execution    = reset( $executions );
 				$first_download_url = $first_execution ? Log_Download_Handler::get_download_url( $first_execution->get_id() ) : '#';
 				?>
-				<a
+				<button
+					type="button"
 					id="stellarwp-download-logs-link"
-					href="<?php echo esc_url( $first_download_url ); ?>"
-					class="button button-secondary stellarwp-migration-logs__download-link"
+					class="button button-secondary stellarwp-migration-logs__download-btn"
+					data-download-url="<?php echo esc_url( $first_download_url ); ?>"
 					aria-label="<?php esc_attr_e( 'Download logs for selected execution as CSV', 'stellarwp-migrations' ); ?>"
 				>
-					<?php esc_html_e( 'Download logs (CSV)', 'stellarwp-migrations' ); ?>
-				</a>
+					<?php $template->template( 'icons/download', [ 'is_aria_hidden' => true ] ); ?>
+					<?php esc_html_e( 'Download logs', 'stellarwp-migrations' ); ?>
+				</button>
 			</div>
 		</div>
 

@@ -338,6 +338,12 @@
 			} );
 		}
 
+		// Handle download logs button.
+		const downloadBtn = logsContainer.querySelector( '#stellarwp-download-logs-link' );
+		if ( downloadBtn ) {
+			downloadBtn.addEventListener( 'click', handleDownloadLogsClick );
+		}
+
 		// Load logs for initially selected execution.
 		if ( select.value ) {
 			logsState.executionId = select.value;
@@ -349,23 +355,40 @@
 	}
 
 	/**
-	 * Update the download logs link to point to the selected execution.
+	 * Update the download logs button to point to the selected execution.
 	 *
 	 * @param {HTMLOptionElement} option The selected option element.
 	 */
 	function updateDownloadLink( option ) {
-		const downloadLink = document.getElementById( 'stellarwp-download-logs-link' );
-		if ( ! downloadLink || ! option ) {
+		const downloadBtn = document.getElementById( 'stellarwp-download-logs-link' );
+		if ( ! downloadBtn || ! option ) {
 			return;
 		}
 
 		const downloadUrl = option.dataset.downloadUrl;
 		if ( downloadUrl ) {
-			downloadLink.href = downloadUrl;
-			downloadLink.removeAttribute( 'aria-disabled' );
+			downloadBtn.dataset.downloadUrl = downloadUrl;
+			downloadBtn.removeAttribute( 'aria-disabled' );
+			downloadBtn.disabled = false;
 		} else {
-			downloadLink.href = '#';
-			downloadLink.setAttribute( 'aria-disabled', 'true' );
+			downloadBtn.dataset.downloadUrl = '';
+			downloadBtn.setAttribute( 'aria-disabled', 'true' );
+			downloadBtn.disabled = true;
+		}
+	}
+
+	/**
+	 * Handle download logs button click: navigate to the current download URL.
+	 */
+	function handleDownloadLogsClick() {
+		const downloadBtn = document.getElementById( 'stellarwp-download-logs-link' );
+		if ( ! downloadBtn || downloadBtn.disabled ) {
+			return;
+		}
+
+		const url = downloadBtn.dataset.downloadUrl;
+		if ( url ) {
+			window.location.href = url;
 		}
 	}
 
