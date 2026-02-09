@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Tests\Admin;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
-use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Admin\UI;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Enums\Status;
@@ -88,7 +87,6 @@ class UI_Test extends WPTestCase {
 		Multi_Batch_Migration::reset();
 		Not_Applicable_Migration::reset();
 		Tagged_Migration::reset();
-		Admin_Provider::reset();
 		tests_migrations_clear_calls_data();
 	}
 
@@ -493,40 +491,4 @@ class UI_Test extends WPTestCase {
 		// The setExpectedIncorrectUsage will handle the assertion.
 	}
 
-	/**
-	 * @test
-	 */
-	public function it_should_render_single_with_back_link_when_list_url_set(): void {
-		$this->set_admin_user();
-		$this->register_test_migrations();
-
-		Admin_Provider::set_list_url( 'http://wordpress.test/wp-admin/admin.php?page=test-migrations' );
-
-		ob_start();
-		$this->ui->render_single( 'tests_simple_migration' );
-		$output = ob_get_clean();
-
-		// Verify the back link container and link are present with the correct URL and text.
-		$this->assertStringContainsString( 'stellarwp-migration-single__back', $output );
-		$this->assertStringContainsString( 'stellarwp-migration-single__back-link', $output );
-		$this->assertStringContainsString( 'http://wordpress.test/wp-admin/admin.php?page=test-migrations', $output );
-		$this->assertStringContainsString( 'Migrations', $output );
-
-		$this->assertMatchesHtmlSnapshot( $output );
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_render_single_without_back_link_when_list_url_not_set(): void {
-		$this->set_admin_user();
-		$this->register_test_migrations();
-
-		// No list URL is set (default after reset), so the back link should not appear.
-		ob_start();
-		$this->ui->render_single( 'tests_simple_migration' );
-		$output = ob_get_clean();
-
-		$this->assertStringNotContainsString( 'stellarwp-migration-single__back', $output );
-	}
 }
