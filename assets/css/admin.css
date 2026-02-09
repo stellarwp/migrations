@@ -659,8 +659,26 @@
 	margin: 0;
 }
 
-.stellarwp-migration-logs__selector {
+.stellarwp-migration-logs__row {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	justify-content: space-between;
 	margin-bottom: 16px;
+}
+
+.stellarwp-migration-logs__selector {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.stellarwp-migration-logs__selector:only-child {
+	margin-bottom: 0;
+}
+
+.stellarwp-migration-logs__actions {
+	flex: 0 0 auto;
 }
 
 .stellarwp-migration-logs__select {
