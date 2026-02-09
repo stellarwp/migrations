@@ -375,7 +375,7 @@ The `Admin\Provider` class registers the hidden single migration page and provid
 
 Configures which admin sidebar menu item should be highlighted when viewing the single migration detail page.
 
-By default, the single migration page is a hidden submenu page (no parent), so no sidebar item is highlighted. When you set a parent page, the library temporarily overrides the WordPress `$parent_file` global so that the specified menu item appears active.
+By default, the single migration page is a hidden submenu page (no parent), so no sidebar item is highlighted. When you set a parent page, the library temporarily overrides the WordPress `$plugin_page` global so that the specified menu item appears active.
 
 ```php
 use StellarWP\Migrations\Admin\Provider;

@@ -260,7 +260,7 @@ class Provider {
 	 * Hijack the current parent file for sidebar highlighting.
 	 *
 	 * When a parent page is configured and we are on the single
-	 * migration page, this overrides `$parent_file` so the correct
+	 * migration page, this overrides `$plugin_page` so the correct
 	 * admin menu item is highlighted in the sidebar.
 	 *
 	 * @since 0.0.1
