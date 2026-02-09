@@ -281,11 +281,11 @@ class Provider {
 			return $submenu_file;
 		}
 
-		global $parent_file;
+		global $plugin_page;
 
-		self::$stored_parent_file = $parent_file;
+		self::$stored_parent_file = $plugin_page;
 
-		$parent_file = self::$parent_page; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$plugin_page = self::$parent_page; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 		return $submenu_file;
 	}
@@ -302,9 +302,9 @@ class Provider {
 			return;
 		}
 
-		global $parent_file;
+		global $plugin_page;
 
-		$parent_file = self::$stored_parent_file; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$plugin_page = self::$stored_parent_file; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	}
 
 	/**
