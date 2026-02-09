@@ -34,7 +34,7 @@ $template = Config::get_template_engine();
 <div class="wrap stellarwp-migration-single" data-rest-url="<?php echo esc_url( $rest_base_url ); ?>" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
 	<?php if ( is_string( $list_url ) ) : ?>
 		<div class="stellarwp-migration-single__back">
-			<a href="<?php echo esc_url( $list_url ); ?>" class="stellarwp-migration-single__back-link" aria-label="<?php esc_html_e( 'Back to Migrations', 'stellarwp-migrations' ); ?>">
+			<a href="<?php echo esc_url( $list_url ); ?>" class="stellarwp-migration-single__back-link" aria-label="<?php esc_attr_e( 'Back to Migrations', 'stellarwp-migrations' ); ?>">
 				<span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Migrations', 'stellarwp-migrations' ); ?>
 			</a>
 			<hr class="stellarwp-migrations-back-link-divider" />
