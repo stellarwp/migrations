@@ -325,6 +325,7 @@
 				logsState.hasMore = true;
 
 				updateExecutionInfo( selectedOption );
+				updateDownloadLink( selectedOption );
 				loadLogs( restUrl, true );
 			}
 		} );
@@ -337,11 +338,55 @@
 			} );
 		}
 
+		// Handle download logs button.
+		const downloadBtn = logsContainer.querySelector( '#stellarwp-download-logs-link' );
+		if ( downloadBtn ) {
+			downloadBtn.addEventListener( 'click', handleDownloadLogsClick );
+		}
+
 		// Load logs for initially selected execution.
 		if ( select.value ) {
 			logsState.executionId = select.value;
-			updateExecutionInfo( select.options[ select.selectedIndex ] );
+			const selectedOption = select.options[ select.selectedIndex ];
+			updateExecutionInfo( selectedOption );
+			updateDownloadLink( selectedOption );
 			loadLogs( restUrl, true );
+		}
+	}
+
+	/**
+	 * Update the download logs button to point to the selected execution.
+	 *
+	 * @param {HTMLOptionElement} option The selected option element.
+	 */
+	function updateDownloadLink( option ) {
+		const downloadBtn = document.getElementById( 'stellarwp-download-logs-link' );
+		if ( ! downloadBtn || ! option ) {
+			return;
+		}
+
+		const downloadUrl = option.dataset.downloadUrl;
+		if ( downloadUrl ) {
+			downloadBtn.dataset.downloadUrl = downloadUrl;
+			downloadBtn.disabled = false;
+		} else {
+			downloadBtn.dataset.downloadUrl = '';
+			downloadBtn.disabled = true;
+		}
+	}
+
+	/**
+	 * Handle download logs button click: navigate to the current download URL.
+	 */
+	function handleDownloadLogsClick() {
+		const downloadBtn = document.getElementById( 'stellarwp-download-logs-link' );
+		if ( ! downloadBtn || downloadBtn.disabled ) {
+			return;
+		}
+
+		const url = downloadBtn.dataset.downloadUrl;
+		if ( url ) {
+			window.location.href = url;
 		}
 	}
 

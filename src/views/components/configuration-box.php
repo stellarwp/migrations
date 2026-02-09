@@ -20,10 +20,12 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 	return;
 }
 
+$execution = $migration->get_latest_execution();
+
 $batch_size     = $migration->get_default_batch_size();
 $retry_attempts = $migration->get_number_of_retries_per_batch();
-$total_items    = $migration->get_total_items();
-$total_batches  = $total_items > 0 ? $migration->get_total_batches( $batch_size, null ) : 0;
+$total_items    = $execution ? $execution->get_items_total() : $migration->get_total_items();
+$total_batches  = ceil( $total_items / $batch_size );
 $is_applicable  = $migration->is_applicable();
 $can_run        = $migration->can_run();
 $tags           = $migration->get_tags();

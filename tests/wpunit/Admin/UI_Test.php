@@ -335,13 +335,18 @@ class UI_Test extends WPTestCase {
 		$expected      = preg_replace( $value_pattern, 'value="EXECUTION_ID"', $expected );
 		$current       = preg_replace( $value_pattern, 'value="EXECUTION_ID"', $current );
 
+		// Normalize download URL.
+		$download_url_pattern = '/data-download-url="[^"]*"/';
+		$expected             = preg_replace( $download_url_pattern, 'data-download-url="DOWNLOAD_URL"', $expected );
+		$current              = preg_replace( $download_url_pattern, 'data-download-url="DOWNLOAD_URL"', $current );
+
 		return [ $current, $expected ];
 	}
 
 	/**
 	 * Data provider for set_additional_params tests.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 *
 	 * @return array<string, array{params: array<string, mixed>, expected: array<string, string|int|bool>, should_error: bool}> Test cases.
 	 */
