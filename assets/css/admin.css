@@ -681,9 +681,10 @@
 	flex: 0 0 auto;
 }
 
-button.stellarwp-migration-logs__download-btn {
+stellarwp-migration-logs__download-btn {
 	align-items: center;
-	display: flex;
+	/* Override the inline display from WordPress core styles. */
+	display: flex !important;
 	gap: 8px;
 	justify-content: center;
 }
