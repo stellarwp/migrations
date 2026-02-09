@@ -85,7 +85,7 @@ class Status extends Enum {
 	 *
 	 * Used for migrations that have been manually rolled back successfully.
 	 *
-	 * @since TBD
+	 * @since 0.0.1
 	 */
 	private const REVERTED = 'reverted';
 

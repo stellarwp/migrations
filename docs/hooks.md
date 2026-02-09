@@ -269,6 +269,112 @@ add_filter( 'stellarwp_migrations_{prefix}_log_retention_days', function( int $r
 - Comply with data retention policies
 - Customize retention based on environment (shorter in development, longer in production)
 
+### Log download
+
+The following filters and actions apply when downloading migration execution logs as CSV (e.g. via the "Download logs (CSV)" link on the single migration page).
+
+#### `stellarwp_migrations_{prefix}_log_download_batch_size`
+
+Filters the number of log rows fetched per batch when streaming the CSV. Default is 500.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_log_download_batch_size', function( int $batch_size ) {
+    return 1000;
+} );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_csv_separator`
+
+Filters the CSV column separator. Default is `;`.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_log_download_csv_separator', function( string $separator ) {
+    return ',';
+} );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_headers`
+
+Filters the CSV header row (array of column labels). When you add or remove headers, you must also filter row data via `stellarwp_migrations_{prefix}_log_download_row` so that the number and order of columns in each row match the headers.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_log_download_headers', function( array $headers ) {
+    $headers[] = 'Extra Column';
+    return $headers;
+}, 10, 1 );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_row`
+
+Filters the row data for each log entry in the CSV. Use this filter when customizing headers via `log_download_headers` so that the number and order of row values match the headers. The default row has six columns: ID, Migration Execution ID, Date GMT, Type, Message, Data.
+
+**Parameters:**
+
+- `$row` (array) – The row values for CSV (same length and order as the filtered headers). Each value is already sanitized for CSV.
+- `$log_entry` (array) – The raw log entry from the table (e.g. `id`, `migration_execution_id`, `created_at`, `type`, `message`, `data`).
+- `$separator` (string) – The CSV separator in use.
+
+```php
+add_filter(
+    'stellarwp_migrations_{prefix}_log_download_row',
+    function( array $row, array $log_entry, string $separator ) {
+        // Add a column to match an extra header. Sanitize so the value does not contain the separator or newlines.
+        $value = (string) ( $log_entry['duration_seconds'] ?? '' );
+        $row[] = str_replace( [ $separator, "\r\n", "\r", "\n" ], ' ', $value );
+        return $row;
+    },
+    10,
+    3
+);
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_filename`
+
+Filters the filename used for the downloaded CSV. Default is `migration-execution-{id}-logs-{Y-m-d-His}.csv`.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_log_download_filename', function( string $filename ) {
+    return 'my-logs.csv';
+} );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_stream_before`
+
+Fires before each batch of log rows is written to the CSV stream.
+
+```php
+add_action( 'stellarwp_migrations_{prefix}_log_download_stream_before', function( $log_entries, $migration_execution_id, $offset, $batch_size ) {
+    // Optional: modify or inspect the batch before it is written.
+}, 10, 4 );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_stream_after`
+
+Fires after each batch of log rows is written to the CSV stream.
+
+```php
+add_action( 'stellarwp_migrations_{prefix}_log_download_stream_after', function( $log_entries, $migration_execution_id, $offset, $batch_size ) {
+    // Optional: run code after each batch (e.g. logging).
+}, 10, 4 );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_sanitize_csv_value`
+
+Filters each CSV cell value after default sanitization. The default behavior replaces the CSV separator and newline characters with a space so the delimiter in message or data cannot break the CSV.
+
+```php
+add_filter( 'stellarwp_migrations_{prefix}_log_download_sanitize_csv_value', function( string $sanitized, string $value, string $separator ) {
+    // Optionally apply extra sanitization (e.g. strip HTML).
+    return strip_tags( $sanitized );
+}, 10, 3 );
+```
+
+**Parameters:**
+
+- `$sanitized` (string) – Value after separator/newline replacement.
+- `$value` (string) – Original raw value.
+- `$separator` (string) – The CSV separator in use.
+
 ### `stellarwp_migrations_{prefix}_template_path`
 
 Filters the template path for the default template engine. Allows customization of where template files are loaded from.

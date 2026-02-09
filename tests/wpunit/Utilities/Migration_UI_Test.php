@@ -4,7 +4,7 @@
  *
  * Tests for the Migration_UI utility class.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\Utilities
  */
@@ -25,7 +25,7 @@ use StellarWP\Schema\Tables\Contracts\Table;
 /**
  * Migration UI Utility Tests.
  *
- * @since TBD
+ * @since 0.0.1
  *
  * @package StellarWP\Migrations\Tests\Utilities
  */

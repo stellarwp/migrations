@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace StellarWP\Migrations\Admin;
 
 use StellarWP\Migrations\Config;
+use StellarWP\Migrations\Utilities\Log_Download_Handler;
 
 /**
  * Admin Service Provider.
@@ -82,6 +83,7 @@ class Provider {
 		add_filter( 'set-screen-option', [ $this, 'save_screen_option' ], 10, 3 );
 		add_filter( 'submenu_file', [ $this, 'hijack_current_parent_file' ] );
 		add_action( 'adminmenu', [ $this, 'restore_current_parent_file' ] );
+		add_action( 'admin_post_' . Log_Download_Handler::get_action_name(), [ Log_Download_Handler::class, 'download' ] );
 	}
 
 	/**

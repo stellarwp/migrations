@@ -34,6 +34,8 @@ $show_rollback       = $migration_ui->show_rollback();
 $run_migration_label = $migration_ui->get_run_action_label();
 $run_migration_icon  = $migration_ui->get_run_action_icon();
 
+$template = Config::get_template_engine();
+
 $run_aria_label = $migration_label
 	? sprintf(
 		/* translators: Migration action label and migration label. */
@@ -60,7 +62,7 @@ $rollback_aria_label = $migration_label
 			aria-label="<?php echo esc_attr( $run_aria_label ); ?>"
 		>
 			<?php
-			Config::get_template_engine()->template(
+			$template->template(
 				'icons/' . $run_migration_icon,
 				[
 					'is_aria_hidden' => true,
@@ -80,7 +82,7 @@ $rollback_aria_label = $migration_label
 			aria-label="<?php echo esc_attr( $rollback_aria_label ); ?>"
 		>
 			<?php
-			Config::get_template_engine()->template(
+			$template->template(
 				'icons/rollback',
 				[
 					'is_aria_hidden' => true,
