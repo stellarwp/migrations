@@ -275,7 +275,7 @@ class Provider {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( (string) wp_unslash( $_GET['page'] ) ) : '';
 
 		if ( $current_page !== self::get_single_page_slug() ) {
 			return $submenu_file;
@@ -283,7 +283,7 @@ class Provider {
 
 		global $plugin_page;
 
-		self::$stored_parent_file = $plugin_page;
+		self::$stored_parent_file = is_string( $plugin_page ) ? $plugin_page : null;
 
 		$plugin_page = self::$parent_page; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
