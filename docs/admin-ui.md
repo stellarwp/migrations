@@ -404,10 +404,10 @@ Provider::set_list_url( admin_url( 'admin.php?page=my-plugin-migrations' ) );
 
 ```html
 <div class="stellarwp-migration-single__back">
-    <a href="..." class="stellarwp-migration-single__back-link">
-        <span class="dashicons dashicons-arrow-left-alt2"></span> Migrations
-    </a>
-    <hr class="wp-header-end" />
+ <a href="..." class="stellarwp-migration-single__back-link">
+  <span class="dashicons dashicons-arrow-left-alt2"></span> Migrations
+ </a>
+ <hr class="wp-header-end" />
 </div>
 ```
 
