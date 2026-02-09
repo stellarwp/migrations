@@ -14,6 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 
@@ -29,6 +30,18 @@ $executions    ??= [];
 
 $template = Config::get_template_engine();
 ?>
+<?php
+$list_url = Admin_Provider::get_list_url();
+if ( $list_url ) :
+	?>
+	<div class="stellarwp-migration-single__back">
+		<a href="<?php echo esc_url( $list_url ); ?>" class="stellarwp-migration-single__back-link">
+			<span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Migrations', 'stellarwp-migrations' ); ?>
+		</a>
+		<hr class="wp-header-end" />
+	</div>
+<?php endif; ?>
+
 <div class="wrap stellarwp-migration-single" data-rest-url="<?php echo esc_url( $rest_base_url ); ?>" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
 	<header class="stellarwp-migration-single__header">
 		<h1 class="stellarwp-migration-single__label"><?php echo esc_html( $migration_label ); ?></h1>
