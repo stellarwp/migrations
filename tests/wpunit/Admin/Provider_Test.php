@@ -227,5 +227,4 @@ class Provider_Test extends WPTestCase {
 			'The adminmenu action should be registered.'
 		);
 	}
-
 }
