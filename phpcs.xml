@@ -70,6 +70,10 @@
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
 
+	<rule ref="WordPress.WP.GlobalVariablesOverride.Prohibited">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+
 	<rule ref="WordPress.DB.SlowDBQuery.slow_db_query_meta_value">
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>

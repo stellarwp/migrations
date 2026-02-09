@@ -10,6 +10,7 @@
  * @var StellarWP\Migrations\Contracts\Migration        $migration     The migration object.
  * @var list<array<string,mixed>>                       $executions    List of execution records.
  * @var string                                          $rest_base_url REST API base URL.
+ * @var string|null                                     $list_url      List URL.
  */
 
 defined( 'ABSPATH' ) || exit;

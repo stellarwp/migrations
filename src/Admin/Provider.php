@@ -275,8 +275,7 @@ class Provider {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$raw_page     = isset( $_GET['page'] ) && is_string( $_GET['page'] ) ? wp_unslash( $_GET['page'] ) : '';
-		$current_page = sanitize_text_field( $raw_page );
+		$current_page = isset( $_GET['page'] ) && is_string( $_GET['page'] ) ? wp_unslash( sanitize_text_field( $_GET['page'] ) ) : '';
 
 		if ( $current_page !== self::get_single_page_slug() ) {
 			return $submenu_file;
