@@ -49,8 +49,7 @@ class Provider {
 
 		add_action( 'admin_menu', [ $this, 'register_hidden_page' ] );
 		add_filter( 'set-screen-option', [ $this, 'save_screen_option' ], 10, 3 );
-
-		Log_Download_Handler::init();
+		add_action( 'admin_post_' . Log_Download_Handler::get_action_name(), [ Log_Download_Handler::class, 'download' ] );
 	}
 
 	/**

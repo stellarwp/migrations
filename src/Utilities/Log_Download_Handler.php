@@ -32,21 +32,7 @@ class Log_Download_Handler {
 	 *
 	 * @var string
 	 */
-	protected static $action_suffix = 'log_download';
-
-	/**
-	 * Initializes the file download handler.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 */
-	public static function init(): void {
-		add_action(
-			'admin_post_' . static::get_action_name(),
-			[ static::class, 'download' ]
-		);
-	}
+	private static $action_suffix = 'log_download';
 
 	/**
 	 * Returns the full admin-post action name for the log download.
@@ -56,7 +42,7 @@ class Log_Download_Handler {
 	 * @return string The action name.
 	 */
 	public static function get_action_name(): string {
-		return 'stellarwp_migrations_' . Config::get_hook_prefix() . '_' . static::$action_suffix;
+		return 'stellarwp_migrations_' . Config::get_hook_prefix() . '_' . self::$action_suffix;
 	}
 
 	/**
@@ -88,7 +74,7 @@ class Log_Download_Handler {
 			wp_die( esc_html__( 'Execution not found.', 'stellarwp-migrations' ) );
 		}
 
-		$filename = static::get_filename( $migration_execution_id );
+		$filename = self::get_filename( $migration_execution_id );
 
 		header( 'Content-Description: File Transfer' );
 		header( 'Content-Type: text/csv; charset=utf-8' );
@@ -103,9 +89,9 @@ class Log_Download_Handler {
 
 		set_time_limit( 0 );
 
-		static::stream_logs_to_output( $migration_execution_id );
+		self::stream_logs_to_output( $migration_execution_id );
 
-		exit;
+		self::do_exit();
 	}
 
 	/**
@@ -118,16 +104,27 @@ class Log_Download_Handler {
 	 * @return string The download URL.
 	 */
 	public static function get_download_url( int $migration_execution_id ): string {
-		$nonce = wp_create_nonce( static::get_action_name() . $migration_execution_id );
+		$nonce = wp_create_nonce( self::get_action_name() . $migration_execution_id );
 
 		return add_query_arg(
 			[
-				'action'                 => static::get_action_name(),
+				'action'                 => self::get_action_name(),
 				'migration_execution_id' => $migration_execution_id,
 				'nonce'                  => $nonce,
 			],
 			admin_url( 'admin-post.php' )
 		);
+	}
+
+	/**
+	 * Wrapper for exit() so we can mock it in tests.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	private static function do_exit(): void {
+		exit;
 	}
 
 	/**
@@ -137,7 +134,7 @@ class Log_Download_Handler {
 	 *
 	 * @return int The batch size.
 	 */
-	protected static function get_batch_size(): int {
+	private static function get_batch_size(): int {
 		$prefix = Config::get_hook_prefix();
 
 		/**
@@ -159,7 +156,7 @@ class Log_Download_Handler {
 	 *
 	 * @return string The CSV separator.
 	 */
-	protected static function get_csv_separator(): string {
+	private static function get_csv_separator(): string {
 		$prefix = Config::get_hook_prefix();
 
 		/**
@@ -183,8 +180,8 @@ class Log_Download_Handler {
 	 *
 	 * @return void
 	 */
-	protected static function stream_logs_to_output( int $migration_execution_id ): void {
-		$separator = static::get_csv_separator();
+	private static function stream_logs_to_output( int $migration_execution_id ): void {
+		$separator = self::get_csv_separator();
 		// phpcs:ignore WordPressVIPMinimum.Performance.FilesystemWrites.FileSystemWrites -- Streaming to response output, not filesystem.
 		$handle = fopen( 'php://output', 'w' );
 
@@ -194,14 +191,14 @@ class Log_Download_Handler {
 
 		$headers = array_map(
 			static function ( $header ) use ( $separator ) {
-				return static::sanitize_csv_value( (string) $header, $separator );
+				return self::sanitize_csv_value( (string) $header, $separator );
 			},
-			static::get_headers()
+			self::get_headers()
 		);
 
 		fputcsv( $handle, $headers, $separator ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Stream to response output, not filesystem.
 
-		$batch_size = static::get_batch_size();
+		$batch_size = self::get_batch_size();
 		$offset     = 0;
 		$has_more   = true;
 
@@ -254,7 +251,7 @@ class Log_Download_Handler {
 						continue;
 					}
 
-					fputcsv( $handle, static::log_entry_to_row( $log_entry, $separator ), $separator ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Stream to response output, not filesystem.
+					fputcsv( $handle, self::log_entry_to_row( $log_entry, $separator ), $separator ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Stream to response output, not filesystem.
 				}
 			}
 
@@ -297,7 +294,7 @@ class Log_Download_Handler {
 	 *
 	 * @return string The sanitized value.
 	 */
-	protected static function sanitize_csv_value( string $value, string $separator ): string {
+	private static function sanitize_csv_value( string $value, string $separator ): string {
 		if ( $value === '' ) {
 			return '';
 		}
@@ -338,7 +335,7 @@ class Log_Download_Handler {
 	 *
 	 * @return array<int, string> The row values for CSV.
 	 */
-	protected static function log_entry_to_row( array $log_entry, string $separator ): array {
+	private static function log_entry_to_row( array $log_entry, string $separator ): array {
 		$id         = $log_entry['id'] ?? '';
 		$exec_id    = $log_entry['migration_execution_id'] ?? '';
 		$created_at = $log_entry['created_at'] ?? '';
@@ -359,12 +356,12 @@ class Log_Download_Handler {
 			: '';
 
 		$row = [
-			static::sanitize_csv_value( Cast::to_string( $id ), $separator ),
-			static::sanitize_csv_value( Cast::to_string( $exec_id ), $separator ),
-			static::sanitize_csv_value( Cast::to_string( $created_at ), $separator ),
-			static::sanitize_csv_value( Cast::to_string( $type ), $separator ),
-			static::sanitize_csv_value( Cast::to_string( $message ), $separator ),
-			static::sanitize_csv_value( Cast::to_string( $data_str ), $separator ),
+			self::sanitize_csv_value( Cast::to_string( $id ), $separator ),
+			self::sanitize_csv_value( Cast::to_string( $exec_id ), $separator ),
+			self::sanitize_csv_value( Cast::to_string( $created_at ), $separator ),
+			self::sanitize_csv_value( Cast::to_string( $type ), $separator ),
+			self::sanitize_csv_value( Cast::to_string( $message ), $separator ),
+			self::sanitize_csv_value( Cast::to_string( $data_str ), $separator ),
 		];
 
 		$prefix = Config::get_hook_prefix();
@@ -401,7 +398,7 @@ class Log_Download_Handler {
 	 *
 	 * @return array<string> The header row.
 	 */
-	protected static function get_headers(): array {
+	private static function get_headers(): array {
 		$headers = [
 			_x( 'ID', 'Migration log download header', 'stellarwp-migrations' ),
 			_x( 'Migration Execution ID', 'Migration log download header', 'stellarwp-migrations' ),
@@ -434,7 +431,7 @@ class Log_Download_Handler {
 	 *
 	 * @return string The filename.
 	 */
-	protected static function get_filename( int $migration_execution_id ): string {
+	private static function get_filename( int $migration_execution_id ): string {
 		$default = sprintf(
 			'migration-execution-%d-logs-%s.csv',
 			$migration_execution_id,
