@@ -295,13 +295,37 @@ add_filter( 'stellarwp_migrations_{prefix}_log_download_csv_separator', function
 
 #### `stellarwp_migrations_{prefix}_log_download_headers`
 
-Filters the CSV header row (array of column labels).
+Filters the CSV header row (array of column labels). When you add or remove headers, you must also filter row data via `stellarwp_migrations_{prefix}_log_download_row` so that the number and order of columns in each row match the headers.
 
 ```php
 add_filter( 'stellarwp_migrations_{prefix}_log_download_headers', function( array $headers ) {
     $headers[] = 'Extra Column';
     return $headers;
 }, 10, 1 );
+```
+
+#### `stellarwp_migrations_{prefix}_log_download_row`
+
+Filters the row data for each log entry in the CSV. Use this filter when customizing headers via `log_download_headers` so that the number and order of row values match the headers. The default row has six columns: ID, Migration Execution ID, Date GMT, Type, Message, Data.
+
+**Parameters:**
+
+- `$row` (array) – The row values for CSV (same length and order as the filtered headers). Each value is already sanitized for CSV.
+- `$log_entry` (array) – The raw log entry from the table (e.g. `id`, `migration_execution_id`, `created_at`, `type`, `message`, `data`).
+- `$separator` (string) – The CSV separator in use.
+
+```php
+add_filter(
+    'stellarwp_migrations_{prefix}_log_download_row',
+    function( array $row, array $log_entry, string $separator ) {
+        // Add a column to match an extra header. Sanitize so the value does not contain the separator or newlines.
+        $value = (string) ( $log_entry['duration_seconds'] ?? '' );
+        $row[] = str_replace( [ $separator, "\r\n", "\r", "\n" ], ' ', $value );
+        return $row;
+    },
+    10,
+    3
+);
 ```
 
 #### `stellarwp_migrations_{prefix}_log_download_filename`

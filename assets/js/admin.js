@@ -368,11 +368,9 @@
 		const downloadUrl = option.dataset.downloadUrl;
 		if ( downloadUrl ) {
 			downloadBtn.dataset.downloadUrl = downloadUrl;
-			downloadBtn.removeAttribute( 'aria-disabled' );
 			downloadBtn.disabled = false;
 		} else {
 			downloadBtn.dataset.downloadUrl = '';
-			downloadBtn.setAttribute( 'aria-disabled', 'true' );
 			downloadBtn.disabled = true;
 		}
 	}

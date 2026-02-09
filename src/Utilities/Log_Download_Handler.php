@@ -328,6 +328,9 @@ class Log_Download_Handler {
 	/**
 	 * Converts a log entry array to a CSV row (flat array of strings).
 	 *
+	 * Row length and order must match the filtered headers from get_headers() when
+	 * using the log_download_row filter so columns align correctly.
+	 *
 	 * @since 0.0.1
 	 *
 	 * @param array<string, mixed> $log_entry The log entry from the table.
@@ -355,7 +358,7 @@ class Log_Download_Handler {
 			? wp_json_encode( $data )
 			: '';
 
-		return [
+		$row = [
 			static::sanitize_csv_value( Cast::to_string( $id ), $separator ),
 			static::sanitize_csv_value( Cast::to_string( $exec_id ), $separator ),
 			static::sanitize_csv_value( Cast::to_string( $created_at ), $separator ),
@@ -363,10 +366,36 @@ class Log_Download_Handler {
 			static::sanitize_csv_value( Cast::to_string( $message ), $separator ),
 			static::sanitize_csv_value( Cast::to_string( $data_str ), $separator ),
 		];
+
+		$prefix = Config::get_hook_prefix();
+
+		/**
+		 * Filters the row data for each log entry in the migration log download.
+		 *
+		 * Use this filter when customizing headers via log_download_headers so that
+		 * the number and order of row values match the headers.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param array<int, string>   $row       The row values for CSV (same length/order as headers).
+		 * @param array<string, mixed> $log_entry The raw log entry from the table.
+		 * @param string               $separator The CSV separator in use.
+		 *
+		 * @return array<int, string> The filtered row values.
+		 */
+		return (array) apply_filters(
+			"stellarwp_migrations_{$prefix}_log_download_row",
+			$row,
+			$log_entry,
+			$separator
+		);
 	}
 
 	/**
 	 * Returns the headers for the migration log download.
+	 *
+	 * When filtering headers, also filter row data via log_download_row so column
+	 * count and order stay in sync.
 	 *
 	 * @since 0.0.1
 	 *
