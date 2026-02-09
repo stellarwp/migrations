@@ -181,7 +181,6 @@ class Provider {
 			return;
 		}
 
-
 		Config::get_container()->get( UI::class )->render_single( $migration_id );
 	}
 

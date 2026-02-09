@@ -392,7 +392,7 @@ This uses the `submenu_file` filter and `adminmenu` action internally, following
 
 ### `Provider::set_list_url( string $url )`
 
-Sets the URL for the migrations list page. When configured, the single migration detail page will display a "Migrations" back link above the migration content, separated by a soft horizontal rule.
+Sets the URL for the migrations list page. When configured, the single migration detail page will display a "Migrations" back link above the migration content, separated by a full-width horizontal rule. The URL is passed as a `list_url` template variable to the `single` template via `UI::render_single()`.
 
 ```php
 use StellarWP\Migrations\Admin\Provider;
@@ -404,10 +404,10 @@ Provider::set_list_url( admin_url( 'admin.php?page=my-plugin-migrations' ) );
 
 ```html
 <div class="stellarwp-migration-single__back">
- <a href="..." class="stellarwp-migration-single__back-link">
-  <span class="dashicons dashicons-arrow-left-alt2"></span> Migrations
- </a>
- <hr class="wp-header-end" />
+    <a href="..." class="stellarwp-migration-single__back-link">
+        <span class="dashicons dashicons-arrow-left-alt2"></span> Migrations
+    </a>
+    <hr class="stellarwp-migrations-back-link-divider" />
 </div>
 ```
 
