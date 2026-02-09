@@ -104,7 +104,6 @@ class Provider {
 		if ( $single_page_hook && is_string( $single_page_hook ) ) {
 			add_action( 'load-' . $single_page_hook, [ $this, 'add_screen_options' ] );
 			add_action( 'load-' . $single_page_hook, [ $this, 'set_page_title' ] );
-			add_action( 'load-' . $single_page_hook, [ $this, 'maybe_add_back_link' ] );
 		}
 	}
 
@@ -145,46 +144,6 @@ class Provider {
 	}
 
 	/**
-	 * Conditionally add the back link to the single migration page.
-	 *
-	 * When a list URL is configured, hooks into `all_admin_notices` to
-	 * render the back link after admin notices at full width.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 */
-	public function maybe_add_back_link(): void {
-		if ( ! self::$list_url ) {
-			return;
-		}
-
-		add_action( 'all_admin_notices', [ $this, 'render_back_link' ], 999 );
-	}
-
-	/**
-	 * Render the back link to the migrations list page.
-	 *
-	 * Outputs the link and a full-width horizontal rule separator
-	 * after admin notices and before the page content.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return void
-	 */
-	public function render_back_link(): void {
-		if ( ! self::$list_url ) {
-			return;
-		}
-
-		printf(
-			'<div class="stellarwp-migration-single__back"><a href="%s" class="stellarwp-migration-single__back-link"><span class="dashicons dashicons-arrow-left-alt2"></span> %s</a><hr class="wp-header-end" /></div>',
-			esc_url( self::$list_url ),
-			esc_html__( 'Migrations', 'stellarwp-migrations' )
-		);
-	}
-
-	/**
 	 * Save the screen option value.
 	 *
 	 * @since 0.0.1
@@ -221,6 +180,7 @@ class Provider {
 			);
 			return;
 		}
+
 
 		Config::get_container()->get( UI::class )->render_single( $migration_id );
 	}
