@@ -10,6 +10,7 @@ The Admin UI is built with a template engine abstraction, allowing consumers to 
 src/
 ├── Admin/
 │   ├── Assets.php               # CSS/JS asset registration and enqueuing
+│   ├── Provider.php             # Hidden page registration, sidebar highlighting, back link
 │   └── UI.php                   # Main UI class with render methods
 ├── Contracts/
 │   └── Template_Engine.php      # Interface for template rendering
@@ -365,6 +366,76 @@ $ui->render_list();
 ```
 
 This ensures that when users filter migrations, they stay on the same settings page and section.
+
+## Admin Provider
+
+The `Admin\Provider` class registers the hidden single migration page and provides static configuration methods for sidebar highlighting and back navigation.
+
+### `Provider::set_parent_page( string $parent_page )`
+
+Configures which admin sidebar menu item should be highlighted when viewing the single migration detail page.
+
+By default, the single migration page is a hidden submenu page (no parent), so no sidebar item is highlighted. When you set a parent page, the library temporarily overrides the WordPress `$plugin_page` global so that the specified menu item appears active.
+
+```php
+use StellarWP\Migrations\Admin\Provider;
+
+// Highlight the "Migrations" menu item when viewing a single migration.
+Provider::set_parent_page( 'my-plugin-migrations' );
+```
+
+This uses the `submenu_file` filter and `adminmenu` action internally, following the same pattern used by WordPress core and other plugins for sidebar highlighting of hidden pages.
+
+**Call this before the `admin_menu` hook fires** (e.g., during plugin initialization or service provider registration).
+
+---
+
+### `Provider::set_list_url( string $url )`
+
+Sets the URL for the migrations list page. When configured, the single migration detail page will display a "Migrations" back link above the migration content, separated by a soft horizontal rule.
+
+```php
+use StellarWP\Migrations\Admin\Provider;
+
+Provider::set_list_url( admin_url( 'admin.php?page=my-plugin-migrations' ) );
+```
+
+**Rendered output (when set):**
+
+```html
+<div class="stellarwp-migration-single__back">
+ <a href="..." class="stellarwp-migration-single__back-link">
+  <span class="dashicons dashicons-arrow-left-alt2"></span> Migrations
+ </a>
+ <hr class="wp-header-end" />
+</div>
+```
+
+When not set, no back link is rendered.
+
+---
+
+### `Provider::get_list_url()`
+
+Returns the configured list page URL, or `null` if not set.
+
+```php
+use StellarWP\Migrations\Admin\Provider;
+
+$url = Provider::get_list_url(); // string|null
+```
+
+---
+
+### Complete Provider Configuration Example
+
+```php
+use StellarWP\Migrations\Admin\Provider;
+
+// During plugin initialization, configure the admin provider.
+Provider::set_parent_page( 'my-plugin-migrations' );
+Provider::set_list_url( admin_url( 'admin.php?page=my-plugin-migrations' ) );
+```
 
 ## Custom Integration Example
 

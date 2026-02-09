@@ -490,4 +490,5 @@ class UI_Test extends WPTestCase {
 
 		// The setExpectedIncorrectUsage will handle the assertion.
 	}
+
 }

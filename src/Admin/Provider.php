@@ -33,6 +33,38 @@ class Provider {
 	private static bool $registered = false;
 
 	/**
+	 * The parent page slug for sidebar highlighting.
+	 *
+	 * When set, the admin sidebar will highlight this menu item
+	 * while viewing the single migration page.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var ?string
+	 */
+	protected static ?string $parent_page = null;
+
+	/**
+	 * Stores the original parent file during hijacking.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var ?string
+	 */
+	protected static ?string $stored_parent_file = null;
+
+	/**
+	 * The URL of the migrations list page.
+	 *
+	 * When set, the single migration page will display a back link.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @var ?string
+	 */
+	protected static ?string $list_url = null;
+
+	/**
 	 * Register the admin provider.
 	 *
 	 * @since 0.0.1
@@ -48,6 +80,8 @@ class Provider {
 
 		add_action( 'admin_menu', [ $this, 'register_hidden_page' ] );
 		add_filter( 'set-screen-option', [ $this, 'save_screen_option' ], 10, 3 );
+		add_filter( 'submenu_file', [ $this, 'hijack_current_parent_file' ] );
+		add_action( 'adminmenu', [ $this, 'restore_current_parent_file' ] );
 	}
 
 	/**
@@ -70,6 +104,7 @@ class Provider {
 		if ( $single_page_hook && is_string( $single_page_hook ) ) {
 			add_action( 'load-' . $single_page_hook, [ $this, 'add_screen_options' ] );
 			add_action( 'load-' . $single_page_hook, [ $this, 'set_page_title' ] );
+			add_action( 'load-' . $single_page_hook, [ $this, 'maybe_add_back_link' ] );
 		}
 	}
 
@@ -107,6 +142,46 @@ class Provider {
 		if ( empty( $title ) ) {
 			$title = __( 'Migration Details', 'stellarwp-migrations' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- It's intended to override the global title.
 		}
+	}
+
+	/**
+	 * Conditionally add the back link to the single migration page.
+	 *
+	 * When a list URL is configured, hooks into `all_admin_notices` to
+	 * render the back link after admin notices at full width.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function maybe_add_back_link(): void {
+		if ( ! self::$list_url ) {
+			return;
+		}
+
+		add_action( 'all_admin_notices', [ $this, 'render_back_link' ], 999 );
+	}
+
+	/**
+	 * Render the back link to the migrations list page.
+	 *
+	 * Outputs the link and a full-width horizontal rule separator
+	 * after admin notices and before the page content.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function render_back_link(): void {
+		if ( ! self::$list_url ) {
+			return;
+		}
+
+		printf(
+			'<div class="stellarwp-migration-single__back"><a href="%s" class="stellarwp-migration-single__back-link"><span class="dashicons dashicons-arrow-left-alt2"></span> %s</a><hr class="wp-header-end" /></div>',
+			esc_url( self::$list_url ),
+			esc_html__( 'Migrations', 'stellarwp-migrations' )
+		);
 	}
 
 	/**
@@ -180,6 +255,100 @@ class Provider {
 	}
 
 	/**
+	 * Set the parent page slug for sidebar highlighting.
+	 *
+	 * When set, viewing the single migration page will highlight
+	 * the specified menu item in the admin sidebar.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $parent_page The parent menu slug (e.g. 'edit.php?post_type=page').
+	 *
+	 * @return void
+	 */
+	public static function set_parent_page( string $parent_page ): void {
+		self::$parent_page = $parent_page;
+	}
+
+	/**
+	 * Set the URL for the migrations list page.
+	 *
+	 * When set, the single migration page will display a link
+	 * back to the list page.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $url The URL of the migrations list page.
+	 *
+	 * @return void
+	 */
+	public static function set_list_url( string $url ): void {
+		self::$list_url = $url;
+	}
+
+	/**
+	 * Get the URL for the migrations list page.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string|null The list page URL, or null if not set.
+	 */
+	public static function get_list_url(): ?string {
+		return self::$list_url;
+	}
+
+	/**
+	 * Hijack the current parent file for sidebar highlighting.
+	 *
+	 * When a parent page is configured and we are on the single
+	 * migration page, this overrides `$plugin_page` so the correct
+	 * admin menu item is highlighted in the sidebar.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $submenu_file The submenu file.
+	 *
+	 * @return string The submenu file (unchanged).
+	 */
+	public function hijack_current_parent_file( $submenu_file ) {
+		if ( ! self::$parent_page ) {
+			return $submenu_file;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+
+		if ( $current_page !== self::get_single_page_slug() ) {
+			return $submenu_file;
+		}
+
+		global $plugin_page;
+
+		self::$stored_parent_file = $plugin_page;
+
+		$plugin_page = self::$parent_page; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+		return $submenu_file;
+	}
+
+	/**
+	 * Restore the original parent file after the admin menu renders.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function restore_current_parent_file(): void {
+		if ( ! isset( self::$stored_parent_file ) ) {
+			return;
+		}
+
+		global $plugin_page;
+
+		$plugin_page = self::$stored_parent_file; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	}
+
+	/**
 	 * Reset registration status. Primarily for testing.
 	 *
 	 * @since 0.0.1
@@ -187,6 +356,9 @@ class Provider {
 	 * @return void
 	 */
 	public static function reset(): void {
-		self::$registered = false;
+		self::$registered         = false;
+		self::$parent_page        = null;
+		self::$stored_parent_file = null;
+		self::$list_url           = null;
 	}
 }
