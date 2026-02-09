@@ -147,6 +147,7 @@ class UI {
 				'migration'     => $migration,
 				'executions'    => $executions,
 				'rest_base_url' => rest_url( REST_Provider::get_namespace() ),
+				'list_url'      => Provider::get_list_url(),
 			]
 		);
 	}
