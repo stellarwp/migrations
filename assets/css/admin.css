@@ -503,6 +503,37 @@
 	max-width: 1200px;
 }
 
+/* Back Link */
+.stellarwp-migration-single__back {
+	margin-bottom: 16px;
+}
+
+.stellarwp-migration-single__back-link {
+	align-items: center;
+	color: #50575e;
+	display: inline-flex;
+	font-size: 13px;
+	gap: 2px;
+	text-decoration: none;
+}
+
+.stellarwp-migration-single__back-link:hover,
+.stellarwp-migration-single__back-link:focus {
+	color: #2271b1;
+}
+
+.stellarwp-migration-single__back-link .dashicons {
+	font-size: 16px;
+	height: 16px;
+	width: 16px;
+}
+
+.stellarwp-migrations-back-link-divider {
+	border: none;
+	border-top: 1px solid #c3c4c7;
+	margin: 12px 0 0;
+}
+
 /* Header */
 .stellarwp-migration-single__header {
 	margin-bottom: 24px;

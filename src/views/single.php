@@ -10,6 +10,7 @@
  * @var StellarWP\Migrations\Contracts\Migration        $migration     The migration object.
  * @var list<array<string,mixed>>                       $executions    List of execution records.
  * @var string                                          $rest_base_url REST API base URL.
+ * @var string|null                                     $list_url      List URL.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -26,10 +27,19 @@ $migration_label = $migration->get_label();
 $description     = $migration->get_description();
 $rest_base_url ??= '';
 $executions    ??= [];
+$list_url      ??= null;
 
 $template = Config::get_template_engine();
 ?>
 <div class="wrap stellarwp-migration-single" data-rest-url="<?php echo esc_url( $rest_base_url ); ?>" data-migration-id="<?php echo esc_attr( $migration_id ); ?>">
+	<?php if ( is_string( $list_url ) ) : ?>
+		<div class="stellarwp-migration-single__back">
+			<a href="<?php echo esc_url( $list_url ); ?>" class="stellarwp-migration-single__back-link" aria-label="<?php esc_attr_e( 'Back to Migrations', 'stellarwp-migrations' ); ?>">
+				<span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Migrations', 'stellarwp-migrations' ); ?>
+			</a>
+			<hr class="stellarwp-migrations-back-link-divider" />
+		</div>
+	<?php endif; ?>
 	<header class="stellarwp-migration-single__header">
 		<h1 class="stellarwp-migration-single__label"><?php echo esc_html( $migration_label ); ?></h1>
 		<p class="stellarwp-migration-single__description"><?php echo esc_html( $description ); ?></p>
