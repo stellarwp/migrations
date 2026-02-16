@@ -23,14 +23,11 @@ if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
 
 $migration_ui = new Migration_UI( $migration );
 
-$migration_id     = $migration->get_id();
-$single_url       = Admin_Provider::get_single_url( $migration_id );
-$migration_label  = $migration->get_label();
-$description      = $migration->get_description();
-$migration_tags   = $migration->get_tags();
-$migration_status = $migration_ui->get_display_status();
-$status_value     = $migration_status->getValue();
-$status_label     = $migration_ui->get_display_status_label();
+$migration_id    = $migration->get_id();
+$single_url      = Admin_Provider::get_single_url( $migration_id );
+$migration_label = $migration->get_label();
+$description     = $migration->get_description();
+$migration_tags  = $migration->get_tags();
 
 $template = Config::get_template_engine();
 ?>
@@ -57,34 +54,17 @@ $template = Config::get_template_engine();
 	</a>
 
 	<hr class="stellarwp-migration-card__separator" />
+
 	<div class="stellarwp-migration-card__footer">
-		<div class="stellarwp-migration-card__status">
-			<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--<?php echo esc_attr( $status_value ); ?>">
-				<?php echo esc_html( $status_label ); ?>
-			</span>
-
-				<?php
-				$template->template(
-					'components/progress-text',
-					[
-						'migration'    => $migration,
-						'migration_ui' => $migration_ui,
-					]
-				);
-				?>
-		</div>
-
-			<?php
-			$template->template(
-				'components/progress-bar',
-				[
-					'migration'    => $migration,
-					'migration_ui' => $migration_ui,
-				]
-			);
-			?>
-
 		<?php
+		$template->template(
+			'components/migration-status/' . $migration_ui->get_display_status()->getValue(),
+			[
+				'migration'    => $migration,
+				'migration_ui' => $migration_ui,
+			]
+		);
+
 		$template->template(
 			'components/migration-actions',
 			[
@@ -94,5 +74,6 @@ $template = Config::get_template_engine();
 		);
 		?>
 	</div>
+
 	<div class="stellarwp-migration-card__message" style="display: none;"></div>
 </div>
