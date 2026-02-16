@@ -106,9 +106,9 @@ class Status extends Enum {
 	public function get_label(): string {
 		switch ( $this->getValue() ) {
 			case self::PENDING:
-				return _x( 'Pending', 'Migration status', 'stellarwp-migrations' );
+				return _x( 'Not started', 'Migration status', 'stellarwp-migrations' );
 			case self::RUNNING:
-				return _x( 'Running', 'Migration status', 'stellarwp-migrations' );
+				return _x( 'Migration in progress', 'Migration status', 'stellarwp-migrations' );
 			case self::COMPLETED:
 				return _x( 'Completed', 'Migration status', 'stellarwp-migrations' );
 			case self::FAILED:
