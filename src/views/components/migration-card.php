@@ -51,6 +51,9 @@ $template = Config::get_template_engine();
 	<p class="stellarwp-migration-card__description">
 		<?php echo esc_html( $description ); ?>
 	</p>
+	<a href="<?php echo esc_url( $single_url ); ?>" class="stellarwp-migration-card__details-link">
+		<?php esc_html_e( 'View Details', 'stellarwp-migrations' ); ?> &rarr;
+	</a>
 	<hr class="stellarwp-migration-card__separator" />
 	<div class="stellarwp-migration-card__footer">
 		<div class="stellarwp-migration-card__status">

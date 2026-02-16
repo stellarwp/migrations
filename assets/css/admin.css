@@ -183,6 +183,19 @@
 	margin: 0 0 16px;
 }
 
+.stellarwp-migration-card__details-link {
+	color: #2271b1;
+	display: inline-block;
+	font-size: 12px;
+	margin: 0 0 16px;
+	text-decoration: none;
+}
+
+.stellarwp-migration-card__details-link:hover {
+	color: #135e96;
+	text-decoration: underline;
+}
+
 .stellarwp-migration-card__separator {
 	border: none;
 	border-top: 1px solid #f0f0f1;
