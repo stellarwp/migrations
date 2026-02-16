@@ -13,7 +13,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
 use StellarWP\Migrations\Utilities\Migration_UI;
 
@@ -29,20 +28,22 @@ if (
 $status_value = $migration_ui->get_display_status()->getValue();
 $status_label = $migration_ui->get_display_status_label();
 
-$template = Config::get_template_engine();
 ?>
 <div class="stellarwp-migration-card__status">
 	<span class="stellarwp-migration-card__status-label stellarwp-migration-card__status-label--<?php echo esc_attr( $status_value ); ?>">
 		<?php echo esc_html( $status_label ); ?>
 	</span>
 
+	<span class="stellarwp-migration-card__dot-separator">&middot;</span>
+
+	<span class="stellarwp-migration-card__total-items">
 		<?php
-		$template->template(
-			'components/progress-text',
-			[
-				'migration'    => $migration,
-				'migration_ui' => $migration_ui,
-			]
+		$total_items = $migration->get_total_items();
+		printf(
+			/* translators: %s: total number of items */
+			esc_html( _n( '%s total item', '%s total items', $total_items, 'stellarwp-migrations' ) ),
+			esc_html( number_format_i18n( $total_items ) )
 		);
 		?>
+	</span>
 </div>

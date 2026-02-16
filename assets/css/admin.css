@@ -278,6 +278,18 @@
 	font-variant-numeric: tabular-nums;
 }
 
+.stellarwp-migration-card__dot-separator {
+	color: #8c8f94;
+	font-size: 14px;
+	line-height: 1;
+}
+
+.stellarwp-migration-card__total-items {
+	color: #646970;
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
 /* Progress Bar */
 .stellarwp-migration-progress {
 	flex: 1;
