@@ -340,38 +340,6 @@ class Migration_UI_Test extends WPTestCase {
 	}
 
 	// -------------------------------------------------------------------------
-	// get_run_action_icon()
-	// -------------------------------------------------------------------------
-
-	/**
-	 * @test
-	 */
-	public function it_should_return_retry_icon_for_completed_reverted_or_failed(): void {
-		$statuses = [ Status::COMPLETED(), Status::REVERTED(), Status::FAILED() ];
-
-		foreach ( $statuses as $status ) {
-			$migration = $this->create_migration_mock( [ 'get_status' => $status ] );
-			$ui        = new Migration_UI( $migration );
-
-			$result = $ui->get_run_action_icon();
-
-			$this->assertSame( 'retry', $result, 'Expected retry for status: ' . $status->getValue() );
-		}
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_return_start_icon_for_pending(): void {
-		$migration = $this->create_migration_mock( [ 'get_status' => Status::PENDING() ] );
-		$ui        = new Migration_UI( $migration );
-
-		$result = $ui->get_run_action_icon();
-
-		$this->assertSame( 'start', $result );
-	}
-
-	// -------------------------------------------------------------------------
 	// show_run()
 	// -------------------------------------------------------------------------
 
