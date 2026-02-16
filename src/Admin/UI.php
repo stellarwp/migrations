@@ -304,7 +304,7 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param list<Migration>                                      $migrations Migrations to filter.
+		 * @param list<Migration>                             $migrations Migrations to filter.
 		 * @param array{tags: string[], show_completed: bool} $filters    Filters to apply.
 		 *
 		 * @return list<Migration> Filtered migrations.
