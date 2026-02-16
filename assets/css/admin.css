@@ -133,7 +133,7 @@
 	align-items: center;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 12px;
+	gap: 24px;
 	margin-bottom: 8px;
 }
 
@@ -170,17 +170,31 @@
 	background: #f0f0f1;
 	border-radius: 3px;
 	color: #50575e;
-	font-size: 11px;
-	letter-spacing: 0.5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 400;
 	padding: 2px 8px;
-	text-transform: uppercase;
+	text-transform: lowercase;
 }
 
 .stellarwp-migration-card__description {
 	color: #50575e;
 	font-size: 12px;
 	line-height: 1.5;
+	margin: 0 0 4px;
+}
+
+.stellarwp-migration-card__details-link {
+	color: #2271b1;
+	display: inline-block;
+	font-size: 12px;
 	margin: 0 0 16px;
+	text-decoration: none;
+}
+
+.stellarwp-migration-card__details-link:hover {
+	color: #135e96;
+	text-decoration: underline;
 }
 
 .stellarwp-migration-card__separator {
@@ -259,6 +273,18 @@
 }
 
 .stellarwp-migration-card__progress-text {
+	color: #646970;
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
+.stellarwp-migration-card__dot-separator {
+	color: #8c8f94;
+	font-size: 14px;
+	line-height: 1;
+}
+
+.stellarwp-migration-card__total-items {
 	color: #646970;
 	font-size: 13px;
 	font-variant-numeric: tabular-nums;

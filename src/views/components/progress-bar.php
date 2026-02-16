@@ -14,6 +14,7 @@
 defined( 'ABSPATH' ) || exit;
 
 use StellarWP\Migrations\Contracts\Migration;
+use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Utilities\Migration_UI;
 
 if (
@@ -27,8 +28,16 @@ if (
 
 $latest_execution = $migration->get_latest_execution();
 
-$total_items     = $latest_execution ? $latest_execution->get_items_total() : $migration->get_total_items();
-$items_processed = $latest_execution ? $latest_execution->get_items_processed() : 0;
+if (
+	! $latest_execution
+	// Only show progress bar for running migrations.
+	|| ! $latest_execution->get_status()->equals( Status::RUNNING() )
+) {
+	return;
+}
+
+$total_items     = $latest_execution->get_items_total();
+$items_processed = $latest_execution->get_items_processed();
 $status_value    = $migration_ui->get_display_status()->getValue();
 
 // Calculate progress percentage.
