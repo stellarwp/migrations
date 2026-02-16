@@ -122,7 +122,7 @@ class Status extends Enum {
 			case self::SCHEDULED:
 				return _x( 'Scheduled', 'Migration status', 'stellarwp-migrations' );
 			case self::REVERTED:
-				return _x( 'Reverted', 'Migration status', 'stellarwp-migrations' );
+				return _x( 'Rolled back', 'Migration status', 'stellarwp-migrations' );
 			default:
 				return _x( 'Unknown', 'Migration status', 'stellarwp-migrations' );
 		}
