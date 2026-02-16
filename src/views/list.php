@@ -68,6 +68,7 @@ $current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CH
 			</div>
 
 			<div class="stellarwp-migrations-filters__checkboxes">
+				<input type="hidden" name="show_completed" value="0" />
 				<label>
 					<input
 						type="checkbox"
