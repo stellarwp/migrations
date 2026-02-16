@@ -408,14 +408,14 @@ class UI {
 		return apply_filters(
 			"stellarwp_migrations_{$prefix}_status_priority",
 			[
-				Status::RUNNING()->getValue()        => 1,
-				Status::FAILED()->getValue()         => 2,
-				Status::PAUSED()->getValue()         => 3,
-				Status::PENDING()->getValue()        => 4,
-				Status::SCHEDULED()->getValue()      => 5,
-				Status::CANCELED()->getValue()       => 6,
-				Status::REVERTED()->getValue()       => 7,
-				Status::COMPLETED()->getValue()      => 8,
+				Status::RUNNING()->getValue()   => 1,
+				Status::FAILED()->getValue()    => 2,
+				Status::PAUSED()->getValue()    => 3,
+				Status::PENDING()->getValue()   => 4,
+				Status::SCHEDULED()->getValue() => 5,
+				Status::CANCELED()->getValue()  => 6,
+				Status::REVERTED()->getValue()  => 7,
+				Status::COMPLETED()->getValue() => 8,
 			]
 		);
 	}
