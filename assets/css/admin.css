@@ -133,7 +133,7 @@
 	align-items: center;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 12px;
+	gap: 24px;
 	margin-bottom: 8px;
 }
 
@@ -180,7 +180,7 @@
 	color: #50575e;
 	font-size: 12px;
 	line-height: 1.5;
-	margin: 0 0 16px;
+	margin: 0 0 4px;
 }
 
 .stellarwp-migration-card__details-link {
