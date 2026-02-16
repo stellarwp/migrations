@@ -170,8 +170,9 @@
 	background: #f0f0f1;
 	border-radius: 3px;
 	color: #50575e;
-	font-size: 11px;
-	letter-spacing: 0.5px;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 400;
 	padding: 2px 8px;
 	text-transform: lowercase;
 }
