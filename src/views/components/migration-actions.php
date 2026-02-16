@@ -32,7 +32,6 @@ $migration_label     = $migration->get_label();
 $show_run            = $migration_ui->show_run();
 $show_rollback       = $migration_ui->show_rollback();
 $run_migration_label = $migration_ui->get_run_action_label();
-$run_migration_icon  = $migration_ui->get_run_action_icon();
 
 $template = Config::get_template_engine();
 
@@ -63,7 +62,7 @@ $rollback_aria_label = $migration_label
 		>
 			<?php
 			$template->template(
-				'icons/' . $run_migration_icon,
+				'icons/start',
 				[
 					'is_aria_hidden' => true,
 				]

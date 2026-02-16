@@ -138,33 +138,6 @@ class Migration_UI {
 	}
 
 	/**
-	 * Returns the run action icon name for the migration.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @return string Icon name (e.g. 'start', 'retry').
-	 */
-	public function get_run_action_icon(): string {
-		$status_value = $this->get_display_status()->getValue();
-
-		if (
-			in_array(
-				$status_value,
-				[
-					Status::COMPLETED()->getValue(),
-					Status::REVERTED()->getValue(),
-					Status::FAILED()->getValue(),
-				],
-				true
-			)
-		) {
-			return 'retry';
-		}
-
-		return 'start';
-	}
-
-	/**
 	 * Whether the run button should be shown for the migration.
 	 *
 	 * @since 0.0.1

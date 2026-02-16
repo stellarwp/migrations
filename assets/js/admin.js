@@ -162,7 +162,7 @@
 		// Add loading state to clicked button
 		button.classList.add( 'stellarwp-migration-btn--loading' );
 		const originalText = button.textContent;
-		button.textContent = action === 'run' ? __( 'Running...', 'stellarwp-migrations' ) : __( 'Rolling back...', 'stellarwp-migrations' );
+		button.textContent = action === 'run' ? __( 'Adding to queue...', 'stellarwp-migrations' ) : __( 'Rolling back...', 'stellarwp-migrations' );
 
 		// Build the endpoint path (relative to REST root)
 		const endpoint = restUrl + '/migrations/' + encodeURIComponent( migrationId ) + '/' + action;

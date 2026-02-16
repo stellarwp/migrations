@@ -1,6 +1,7 @@
 <div class="wrap">
 	<form method="get" class="stellarwp-migrations-filters">
 		
+		
 		<div class="stellarwp-migrations-filters__row">
 			
 			<div class="stellarwp-migrations-filters__actions">
@@ -11,12 +12,13 @@
 			</div>
 
 			<div class="stellarwp-migrations-filters__checkboxes">
+				<input type="hidden" name="show_completed" value="0" />
 				<label>
 					<input
 						type="checkbox"
 						name="show_completed"
 						value="1"
-												onchange="this.form.submit();"
+						 checked='checked'						onchange="this.form.submit();"
 					/>
 					Show Completed				</label>
 				<label>

@@ -220,7 +220,7 @@ class UI {
 			"stellarwp_migrations_{$prefix}_filters",
 			[
 				'tags'                => $tags,
-				'show_completed'      => ! empty( filter_input( INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT ) ),
+				'show_completed'      => filter_input( INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT ) !== '0',
 				'show_non_applicable' => ! empty( filter_input( INPUT_GET, 'show_non_applicable', FILTER_SANITIZE_NUMBER_INT ) ),
 			]
 		);
