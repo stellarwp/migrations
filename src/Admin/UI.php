@@ -200,7 +200,7 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @return array{tags: string[], show_completed: bool, show_non_applicable: bool} Parsed filters.
+	 * @return array{tags: string[], show_completed: bool} Parsed filters.
 	 */
 	private function parse_filters(): array {
 		$tags = $this->parse_tags_filter();
@@ -212,16 +212,15 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param array{tags: string[], show_completed: bool, show_non_applicable: bool} $filters Filters to apply.
+		 * @param array{tags: string[], show_completed: bool} $filters Filters to apply.
 		 *
-		 * @return array{tags: string[], show_completed: bool, show_non_applicable: bool} Filters to apply.
+		 * @return array{tags: string[], show_completed: bool} Filters to apply.
 		 */
 		return apply_filters(
 			"stellarwp_migrations_{$prefix}_filters",
 			[
-				'tags'                => $tags,
-				'show_completed'      => filter_input( INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT ) !== '0',
-				'show_non_applicable' => ! empty( filter_input( INPUT_GET, 'show_non_applicable', FILTER_SANITIZE_NUMBER_INT ) ),
+				'tags'           => $tags,
+				'show_completed' => filter_input( INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT ) !== '0',
 			]
 		);
 	}
@@ -268,20 +267,19 @@ class UI {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param array{tags: string[], show_completed: bool, show_non_applicable: bool} $filters Filters to apply.
+	 * @param array{tags: string[], show_completed: bool} $filters Filters to apply.
 	 *
 	 * @return list<Migration> Filtered migrations.
 	 */
 	private function get_filtered_migrations( array $filters ): array {
-		$show_completed      = ! empty( $filters['show_completed'] );
-		$show_non_applicable = ! empty( $filters['show_non_applicable'] );
-		$filter_tags         = ! empty( $filters['tags'] ) ? (array) $filters['tags'] : [];
+		$show_completed = ! empty( $filters['show_completed'] );
+		$filter_tags    = ! empty( $filters['tags'] ) ? (array) $filters['tags'] : [];
 
 		$registry = Config::get_container()->get( Registry::class );
 
 		$migrations = $registry->filter(
-			static function ( Migration $migration ) use ( $show_completed, $show_non_applicable, $filter_tags ): bool {
-				if ( ! $show_non_applicable && $migration->get_status()->equals( Status::NOT_APPLICABLE() ) ) {
+			static function ( Migration $migration ) use ( $show_completed, $filter_tags ): bool {
+				if ( $migration->get_status()->equals( Status::NOT_APPLICABLE() ) ) {
 					return false;
 				}
 
@@ -306,8 +304,8 @@ class UI {
 		 *
 		 * @since 0.0.1
 		 *
-		 * @param list<Migration>                                                        $migrations Migrations to filter.
-		 * @param array{tags: string[], show_completed: bool, show_non_applicable: bool} $filters    Filters to apply.
+		 * @param list<Migration>                                      $migrations Migrations to filter.
+		 * @param array{tags: string[], show_completed: bool} $filters    Filters to apply.
 		 *
 		 * @return list<Migration> Filtered migrations.
 		 */
@@ -418,7 +416,6 @@ class UI {
 				Status::CANCELED()->getValue()       => 6,
 				Status::REVERTED()->getValue()       => 7,
 				Status::COMPLETED()->getValue()      => 8,
-				Status::NOT_APPLICABLE()->getValue() => 9,
 			]
 		);
 	}

@@ -9,7 +9,7 @@
  *
  * @var list<StellarWP\Migrations\Contracts\Migration>                             $migrations         List of migrations objects.
  * @var list<string>                                                               $all_tags           All available tags.
- * @var array{tags: list<string>, show_completed: bool, show_non_applicable: bool} $filters            Current filter values.
+ * @var array{tags: list<string>, show_completed: bool} $filters            Current filter values.
  * @var string                                                                     $rest_base_url      REST API base URL.
  * @var array<string,string|int|bool>                                              $additional_params  Additional query parameters to preserve.
  */
@@ -62,7 +62,7 @@ $current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CH
 				<button type="submit" class="button button-primary">
 					<?php esc_html_e( 'Filter', 'stellarwp-migrations' ); ?>
 				</button>
-				<a href="<?php echo esc_url( remove_query_arg( [ 'tags', 'show_completed', 'show_non_applicable' ] ) ); ?>" class="button button-secondary">
+				<a href="<?php echo esc_url( remove_query_arg( [ 'tags', 'show_completed' ] ) ); ?>" class="button button-secondary">
 					<?php esc_html_e( 'Reset', 'stellarwp-migrations' ); ?>
 				</a>
 			</div>
@@ -78,16 +78,6 @@ $current_page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CH
 						onchange="this.form.submit();"
 					/>
 					<?php esc_html_e( 'Show Completed', 'stellarwp-migrations' ); ?>
-				</label>
-				<label>
-					<input
-						type="checkbox"
-						name="show_non_applicable"
-						value="1"
-						<?php checked( $filters['show_non_applicable'] ); ?>
-						onchange="this.form.submit();"
-					/>
-					<?php esc_html_e( 'Show Non-Applicable', 'stellarwp-migrations' ); ?>
 				</label>
 			</div>
 		</div>
