@@ -173,7 +173,7 @@
 	font-size: 11px;
 	letter-spacing: 0.5px;
 	padding: 2px 8px;
-	text-transform: uppercase;
+	text-transform: lowercase;
 }
 
 .stellarwp-migration-card__description {
