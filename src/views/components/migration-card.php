@@ -15,7 +15,6 @@ defined( 'ABSPATH' ) || exit;
 use StellarWP\Migrations\Admin\Provider as Admin_Provider;
 use StellarWP\Migrations\Config;
 use StellarWP\Migrations\Contracts\Migration;
-use StellarWP\Migrations\Enums\Status;
 use StellarWP\Migrations\Utilities\Migration_UI;
 
 if ( ! isset( $migration ) || ! $migration instanceof Migration ) {
@@ -64,7 +63,6 @@ $template = Config::get_template_engine();
 				<?php echo esc_html( $status_label ); ?>
 			</span>
 
-			<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 				<?php
 				$template->template(
 					'components/progress-text',
@@ -74,10 +72,8 @@ $template = Config::get_template_engine();
 					]
 				);
 				?>
-			<?php endif; ?>
 		</div>
 
-		<?php if ( ! $migration_status->equals( Status::NOT_APPLICABLE() ) ) : ?>
 			<?php
 			$template->template(
 				'components/progress-bar',
@@ -87,7 +83,6 @@ $template = Config::get_template_engine();
 				]
 			);
 			?>
-		<?php endif; ?>
 
 		<?php
 		$template->template(
